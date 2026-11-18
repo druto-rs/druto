@@ -19,6 +19,8 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 | **Layer 0: Primitives**       | Path pattern matching, parameter extraction & HTTP method routing | `matcher`                     | `@poppinss/matchit`         | `illuminate/routing` (trie)           |
 | **Layer 0: Primitives**       | Async onion middleware pipeline                                   | `pipeline`                    | `@poppinss/middleware`      | `illuminate/pipeline`                 |
 | **Layer 0: Primitives**       | String inflection, pluralization, casing                          | `inflector`                   | `@poppinss/string`          | `illuminate/support` (Str/Pluralizer) |
+| **Layer 0: Primitives**       | AEAD encryption, HMAC signing, key rotation, signed URLs          | `crypto`                      | `@boringnode/encryption`    | `illuminate/encryption`               |
+| **Layer 0: Primitives**       | Password hashing drivers (Argon2id, Bcrypt), rehash detection     | `hash`                        | `@adonisjs/hash`            | `illuminate/hashing`                  |
 | **Layer 1: Configuration**    | .env parsing & boot-time schema validation                        | `env`                         | `@adonisjs/env`             | `Dotenv` + `config`                   |
 | **Layer 2: HTTP**             | HTTP server, router, request, response, errors                    | `router` / `http` *(planned)* | `@adonisjs/http-server`     | `illuminate/routing`, `http`          |
 | **Layer 3: Security & State** | Sessions, cookies, CSRF, auth guards                              | `session`, `auth` *(planned)* | `@adonisjs/session`, `auth` | `illuminate/session`, `auth`          |
@@ -30,8 +32,10 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 
 ```
 crates/
+├── crypto/      # Authenticated encryption, HMAC signing, key rotation, signed URLs
 ├── druto/       # Framework umbrella facade
 ├── env/         # Environment variable loading, expansion, and schema validation
+├── hash/        # Password hashing drivers, automatic rehash detection, verification
 ├── inflector/   # String inflections, casing transformations, and pluralization
 ├── matcher/     # Route pattern matching and parameter extraction
 └── pipeline/    # Asynchronous middleware pipeline and execution runner
