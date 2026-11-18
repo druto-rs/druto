@@ -174,6 +174,19 @@ pub(crate) fn is_camel_or_pascal(input: &str, require_uppercase_first: bool) -> 
     true
 }
 
+#[inline]
+fn append_cased(buffer: &mut String, character: char, uppercase: bool) {
+    if uppercase {
+        for upper_char in character.to_uppercase() {
+            buffer.push(upper_char);
+        }
+    } else {
+        for lower_char in character.to_lowercase() {
+            buffer.push(lower_char);
+        }
+    }
+}
+
 /// Joins word slices with a single separator character in either all-lowercase or all-uppercase.
 pub(crate) fn join_words_cased(
     words: &[&str],
@@ -188,15 +201,7 @@ pub(crate) fn join_words_cased(
             result.push(separator);
         }
         for current_char in word.chars() {
-            if uppercase {
-                for upper_char in current_char.to_uppercase() {
-                    result.push(upper_char);
-                }
-            } else {
-                for lower_char in current_char.to_lowercase() {
-                    result.push(lower_char);
-                }
-            }
+            append_cased(&mut result, current_char, uppercase);
         }
     }
     result
@@ -211,15 +216,7 @@ pub(crate) fn join_words_title(words: &[&str], separator: char, original_len: us
             result.push(separator);
         }
         for (char_idx, current_char) in word.chars().enumerate() {
-            if char_idx == 0 {
-                for upper_char in current_char.to_uppercase() {
-                    result.push(upper_char);
-                }
-            } else {
-                for lower_char in current_char.to_lowercase() {
-                    result.push(lower_char);
-                }
-            }
+            append_cased(&mut result, current_char, char_idx == 0);
         }
     }
     result
@@ -236,15 +233,7 @@ pub(crate) fn join_words_camel_or_pascal(
         for (char_idx, current_char) in word.chars().enumerate() {
             let should_capitalize =
                 (index == 0 && capitalize_first && char_idx == 0) || (index > 0 && char_idx == 0);
-            if should_capitalize {
-                for upper_char in current_char.to_uppercase() {
-                    result.push(upper_char);
-                }
-            } else {
-                for lower_char in current_char.to_lowercase() {
-                    result.push(lower_char);
-                }
-            }
+            append_cased(&mut result, current_char, should_capitalize);
         }
     }
     result

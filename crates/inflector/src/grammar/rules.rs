@@ -90,15 +90,7 @@ pub(crate) fn pluralize_suffix(word: &str) -> String {
 
     // -f endings: leaf -> leaves, half -> halves, wolf -> wolves, loaf -> loaves, shelf -> shelves, thief -> thieves, calf -> calves
     if let Some(prefix) = word.strip_suffix('f')
-        && (prefix.ends_with("lea")
-            || prefix.ends_with("hal")
-            || prefix.ends_with("wol")
-            || prefix.ends_with("loa")
-            || prefix.ends_with("shel")
-            || prefix.ends_with("thie")
-            || prefix.ends_with("cal")
-            || prefix.ends_with("el")
-            || prefix.ends_with("scar"))
+        && is_f_to_ves_stem(prefix)
     {
         let mut result = String::with_capacity(prefix.len() + 3);
         result.push_str(prefix);
@@ -194,16 +186,7 @@ pub(crate) fn singularize_suffix(word: &str) -> String {
             result.push_str("fe");
             return result;
         }
-        if prefix.ends_with("lea")
-            || prefix.ends_with("hal")
-            || prefix.ends_with("wol")
-            || prefix.ends_with("loa")
-            || prefix.ends_with("shel")
-            || prefix.ends_with("thie")
-            || prefix.ends_with("cal")
-            || prefix.ends_with("el")
-            || prefix.ends_with("scar")
-        {
+        if is_f_to_ves_stem(prefix) {
             let mut result = String::with_capacity(prefix.len() + 1);
             result.push_str(prefix);
             result.push('f');
@@ -256,6 +239,19 @@ pub(crate) fn singularize_suffix(word: &str) -> String {
     }
 
     word.to_string()
+}
+
+#[inline]
+fn is_f_to_ves_stem(prefix: &str) -> bool {
+    prefix.ends_with("lea")
+        || prefix.ends_with("hal")
+        || prefix.ends_with("wol")
+        || prefix.ends_with("loa")
+        || prefix.ends_with("shel")
+        || prefix.ends_with("thie")
+        || prefix.ends_with("cal")
+        || prefix.ends_with("el")
+        || prefix.ends_with("scar")
 }
 
 #[inline]
