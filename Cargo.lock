@@ -26,6 +26,10 @@ dependencies = [
 [[package]]
 name = "inflector"
 version = "0.1.0"
+dependencies = [
+    "regex",
+    "serde",
+]
 
 [[package]]
 name = "matcher"

@@ -6,3 +6,10 @@ license.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+regex = { workspace = true, optional = true }
+serde = { workspace = true, optional = true, features = ["std"] }
+
+[features]
+default = ["regex"]
+regex = ["dep:regex"]
+serde = ["dep:serde"]
