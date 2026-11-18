@@ -11,3 +11,4 @@ rust-version = "1.95"
 [workspace.dependencies]
 serde = { version = "1.0.229", default-features = false, features = ["derive", "alloc"] }
 regex = { version = "1.13.2", default-features = false, features = ["std", "perf"] }
+proptest = "1.12.0"
