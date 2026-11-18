@@ -2,7 +2,6 @@
 
 use std::fmt;
 
-use base64::prelude::*;
 use zeroize::Zeroize;
 
 use crate::error::CryptoError;
@@ -47,13 +46,7 @@ impl Key {
     pub fn from_base64(encoded: &str) -> Result<Self, CryptoError> {
         let clean = encoded.trim();
         let stripped = clean.strip_prefix("base64:").unwrap_or(clean);
-
-        let decoded = BASE64_STANDARD
-            .decode(stripped)
-            .or_else(|_| BASE64_URL_SAFE_NO_PAD.decode(stripped))
-            .or_else(|_| BASE64_STANDARD_NO_PAD.decode(stripped))
-            .map_err(|err| CryptoError::EncodingError(err.to_string()))?;
-
+        let decoded = crate::encoding::decode_base64_flexible(stripped)?;
         Self::try_from_slice(&decoded)
     }
 

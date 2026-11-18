@@ -138,15 +138,15 @@ impl HashManager {
 
     /// Resolves a driver by its registered name.
     pub fn driver(&self, name: &str) -> Result<Arc<dyn Hasher>, HashError> {
-        if !self.drivers.contains_key(name) {
-            return Err(HashError::DriverNotFound(name.to_string()));
-        }
-
         let guard = self
             .fake_override
             .read()
             .expect("hash manager lock poisoned");
+
         if let Some(fake) = guard.as_ref() {
+            if !self.drivers.contains_key(name) {
+                return Err(HashError::DriverNotFound(name.to_string()));
+            }
             return Ok(fake.clone());
         }
 

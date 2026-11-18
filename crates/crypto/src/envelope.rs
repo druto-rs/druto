@@ -91,13 +91,7 @@ impl Envelope {
 
     /// Deserializes an envelope from an unpadded URL-safe Base64 string.
     pub fn from_base64(encoded: &str) -> Result<Self, CryptoError> {
-        let trimmed = encoded.trim();
-        let bytes = BASE64_URL_SAFE_NO_PAD
-            .decode(trimmed)
-            .or_else(|_| BASE64_STANDARD_NO_PAD.decode(trimmed))
-            .or_else(|_| BASE64_STANDARD.decode(trimmed))
-            .map_err(|err| CryptoError::EncodingError(err.to_string()))?;
-
+        let bytes = crate::encoding::decode_base64_flexible(encoded)?;
         Self::from_bytes(&bytes)
     }
 }

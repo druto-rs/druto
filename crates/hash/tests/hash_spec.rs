@@ -387,9 +387,21 @@ fn test_bcrypt_config_bounds_and_invalid_hash_formats() {
             .is_invalid_parameters()
     );
 
-    // Needs rehash edge cases: wrong prefix version or non-number cost
+    // Needs rehash edge cases: wrong prefix version, non-number cost, or cost not allowed
     assert!(hasher.needs_rehash("$2z$10$abcdefghijklmnopqrstuvwxyz123456789012345678901234567"));
     assert!(hasher.needs_rehash("$2b$xx$abcdefghijklmnopqrstuvwxyz123456789012345678901234567"));
+
+    // Bcrypt cost out of bounds in verify (CostNotAllowed error)
+    let bad_cost_res = hasher.verify(
+        "password",
+        "$2b$02$abcdefghijklmnopqrstuvwxyz123456789012345678901234567",
+    );
+    assert!(bad_cost_res.is_err());
+    assert!(
+        bad_cost_res
+            .expect_err("cost out of bounds")
+            .is_invalid_hash()
+    );
 
     // is_valid_hash false branches
     assert!(!hasher.is_valid_hash(""));
@@ -428,7 +440,7 @@ fn test_hash_manager_extended_methods_and_fake_driver_resolution() {
     assert_eq!(used_driver.algorithm(), HashAlgorithm::Bcrypt);
 
     // restore method
-    let _guard = manager.fake();
+    let guard = manager.fake();
     assert_eq!(manager.default_hasher().algorithm(), HashAlgorithm::Fake);
     manager.restore();
     assert_eq!(
@@ -436,9 +448,19 @@ fn test_hash_manager_extended_methods_and_fake_driver_resolution() {
         HashAlgorithm::Argon2id
     );
 
+    // driver resolution without fake for non-existent driver
+    let nonexistent_real = manager.driver("unknown_driver_name");
+    assert!(nonexistent_real.is_err());
+    assert!(
+        nonexistent_real
+            .err()
+            .expect("must fail")
+            .is_driver_not_found()
+    );
+
     // driver resolution under fake:
     // When fake is active, valid driver names return fake, but non-existent drivers return DriverNotFound!
-    let _guard2 = manager.fake();
+    let guard2 = manager.fake();
     let bcrypt_fake = manager.driver("bcrypt").expect("valid driver must succeed");
     assert_eq!(bcrypt_fake.algorithm(), HashAlgorithm::Fake);
 
@@ -446,6 +468,22 @@ fn test_hash_manager_extended_methods_and_fake_driver_resolution() {
     assert!(nonexistent_under_fake.is_err());
     let err = nonexistent_under_fake.err().expect("typo must fail");
     assert!(err.is_driver_not_found());
+    drop(guard2);
+    drop(guard);
+
+    // builder default driver fallback when not explicitly specified
+    let default_fallback_manager = HashManager::builder()
+        .driver_arc("argon2id", Arc::new(Argon2Hasher::default()))
+        .build()
+        .expect("builder fallback to argon2id default");
+    assert_eq!(
+        default_fallback_manager.default_hasher().algorithm(),
+        HashAlgorithm::Argon2id
+    );
+
+    // argon2 hash without version in needs_rehash
+    let argon2_hasher = Argon2Hasher::default();
+    assert!(argon2_hasher.needs_rehash("$argon2id$m=65536,t=3,p=4$c29tZXNhbHQ$c29tZWhhc2g"));
 
     // driver_arc builder method
     let custom_arc: Arc<dyn Hasher> = Arc::new(FakeHasher::new());

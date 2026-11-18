@@ -5,6 +5,7 @@
 //! signed URL generation and validation ([`UrlSigner`]).
 
 pub mod algorithm;
+pub(crate) mod encoding;
 pub mod encrypter;
 pub mod envelope;
 pub mod error;

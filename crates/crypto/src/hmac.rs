@@ -65,14 +65,8 @@ impl HmacSigner {
     /// Verifies data against a Base64URL-encoded signature using constant-time comparison.
     #[must_use]
     pub fn verify_base64(&self, data: &[u8], signature_base64: &str) -> bool {
-        let trimmed = signature_base64.trim();
-        let decoded = match BASE64_URL_SAFE_NO_PAD
-            .decode(trimmed)
-            .or_else(|_| BASE64_STANDARD_NO_PAD.decode(trimmed))
-            .or_else(|_| BASE64_STANDARD.decode(trimmed))
-        {
-            Ok(bytes) => bytes,
-            Err(_) => return false,
+        let Ok(decoded) = crate::encoding::decode_base64_flexible(signature_base64) else {
+            return false;
         };
 
         self.verify(data, &decoded)
