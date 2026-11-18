@@ -12,9 +12,18 @@ fmt:
 test *args:
     cargo nextest run --workspace --all-features --no-tests=pass {{ args }}
 
-# Run tests under cargo-llvm-cov and write target/lcov.info.
-coverage:
-    cargo llvm-cov nextest --workspace --all-features --lcov --output-path target/lcov.info --summary-only --no-tests=pass
+# Run tests under cargo-llvm-cov, write target/lcov.info, and print the coverage table.
+# Usage: `just coverage` (whole workspace) or `just coverage my-crate` (single crate)
+coverage crate="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ -n "{{ crate }}" ]; then
+        TARGET_ARGS="-p {{ crate }}"
+    else
+        TARGET_ARGS="--workspace"
+    fi
+    cargo llvm-cov nextest $TARGET_ARGS --all-features --lcov --output-path target/lcov.info --no-tests=pass
+    cargo llvm-cov report
 
 # Lint with clippy.
 clippy *args:
