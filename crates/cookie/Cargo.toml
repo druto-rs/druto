@@ -1,0 +1,14 @@
+[package]
+name = "cookie"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+crypto.workspace = true
+time.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true

@@ -34,10 +34,14 @@ Activate and adhere to the following specialized skills when applicable:
 When working within a specific crate, consult its local `CONTEXT.md` and `AGENTS.md`:
 
 - **Root Context**: [`CONTEXT.md`](CONTEXT.md)
+- **`crates/cookie`**: [`CONTEXT.md`](crates/cookie/CONTEXT.md) | [`AGENTS.md`](crates/cookie/AGENTS.md)
 - **`crates/crypto`**: [`CONTEXT.md`](crates/crypto/CONTEXT.md) | [`AGENTS.md`](crates/crypto/AGENTS.md)
+- **`crates/events`**: [`CONTEXT.md`](crates/events/CONTEXT.md) | [`AGENTS.md`](crates/events/AGENTS.md)
 - **`crates/hash`**: [`CONTEXT.md`](crates/hash/CONTEXT.md) | [`AGENTS.md`](crates/hash/AGENTS.md)
 - **`crates/matcher`**: [`CONTEXT.md`](crates/matcher/CONTEXT.md) | [`AGENTS.md`](crates/matcher/AGENTS.md)
 - **`crates/pipeline`**: [`CONTEXT.md`](crates/pipeline/CONTEXT.md) | [`AGENTS.md`](crates/pipeline/AGENTS.md)
+- **`crates/qs`**: [`CONTEXT.md`](crates/qs/CONTEXT.md) | [`AGENTS.md`](crates/qs/AGENTS.md)
+- **`crates/session`**: [`CONTEXT.md`](crates/session/CONTEXT.md) | [`AGENTS.md`](crates/session/AGENTS.md)
 - **`crates/env`**: [`CONTEXT.md`](crates/env/CONTEXT.md) | [`AGENTS.md`](crates/env/AGENTS.md)
 - **`crates/inflector`**: [`CONTEXT.md`](crates/inflector/CONTEXT.md) | [`AGENTS.md`](crates/inflector/AGENTS.md)
 - **`crates/druto`**: [`CONTEXT.md`](crates/druto/CONTEXT.md) | [`AGENTS.md`](crates/druto/AGENTS.md)
