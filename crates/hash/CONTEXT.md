@@ -58,13 +58,16 @@ This crate is the Rust equivalent of:
   integration belong in `crates/auth` or user models.
 - **No Fast Hashes for Passwords**: SHA-256, MD5, and fast digests must never be used as password hash drivers.
 
-## Proposed Public Surface
+## Implemented Public Surface
 
-- `trait Hasher`: Core password hashing contract.
-- `struct HashManager`: Configuration-driven registry and facade.
-- `struct Argon2Hasher`: Argon2id driver with configurable parameters.
-- `struct BcryptHasher`: Bcrypt driver with configurable rounds.
-- `struct FakeHasher`: Blazing-fast test double.
-- `struct Argon2Config`, `struct BcryptConfig`: Driver configurations.
-- `enum HashAlgorithm`: `Argon2id`, `Bcrypt`, `Fake`.
-- `enum HashError`: Strongly typed errors for invalid PHC formats, parameter parsing failures, and verification errors.
+- `trait Hasher`: Core synchronous password hashing contract (`make`, `verify`, `needs_rehash`, `is_valid_hash`).
+- `struct HashManager`: Configuration-driven registry and facade delegating to the default driver.
+- `struct HashManagerBuilder`: Fluent builder for constructing and registering custom hasher drivers.
+- `struct FakeGuard`: RAII guard for temporary scoped test mocking without global mutable state.
+- `struct Argon2Hasher`: Argon2id driver with configurable parameters ($m=65536, t=3, p=4$, v0x13).
+- `struct BcryptHasher`: Modular Crypt Format Bcrypt driver with configurable rounds (4–31, default 12).
+- `struct FakeHasher`: Blazing-fast test double formatting hashes as `$fake$<plaintext>`.
+- `struct Argon2Config`, `struct BcryptConfig`: Strongly typed driver configurations.
+- `enum HashAlgorithm`: `Argon2id`, `Bcrypt`, `Fake`, `Custom(String)`.
+- `enum HashError`: Strongly typed errors for invalid PHC/MCF formats, parameter bounds, missing drivers, and internal
+  failures.

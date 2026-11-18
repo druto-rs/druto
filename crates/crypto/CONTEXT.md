@@ -57,13 +57,19 @@ This crate is the Rust equivalent of:
 - **No Hand-Rolled Math**: Relies on audited `RustCrypto` implementations under the hood rather than custom
   cryptographic math.
 
-## Proposed Public Surface
+## Implemented Public Surface
 
-- `struct Key`: 256-bit cryptographically verified key wrapper.
-- `struct KeyRing`: Primary key and fallback previous keys container.
-- `struct Encrypter`: High-level AEAD encrypter and decrypter supporting key rotation and purpose binding.
-- `struct HmacSigner`: Timing-safe HMAC-SHA256 signer and verifier.
-- `struct UrlSigner`: Builder and validator for signed and temporary signed URLs.
-- `enum Algorithm`: Supported ciphers (`Aes256Gcm`, `ChaCha20Poly1305`).
+- `struct Key`: 256-bit cryptographically verified key wrapper with CSPRNG generation, Base64 decoding, and redacted
+  `Debug`.
+- `struct KeyRing`: Primary key and fallback previous keys container for zero-downtime key rotation.
+- `struct Encrypter`: High-level AEAD encrypter and decrypter supporting key rotation and context purpose binding.
+- `struct Envelope`: Compact 29-byte binary header (`1B algorithm + 12B nonce + 16B auth tag + ciphertext`) encoded as
+  unpadded URL-safe Base64 (`base64url`).
+- `struct HmacSigner`: Timing-safe HMAC-SHA256 signer and verifier using constant-time comparison
+  (`subtle::ConstantTimeEq`).
+- `struct UrlSigner`: Canonical query string signer and validator for tamper-proof and temporary signed URLs with UNIX
+  expiration.
+- `enum Algorithm`: Supported ciphers (`Aes256Gcm = 1`, `ChaCha20Poly1305 = 2`).
 - `enum CryptoError`: Strongly typed errors for key length violations, authentication tag mismatches, expired
   signatures, and purpose mismatches.
+- Constants: `KEY_LEN` (32), `ALG_LEN` (1), `NONCE_LEN` (12), `TAG_LEN` (16), `HEADER_LEN` (29), `HMAC_SHA256_LEN` (32).
