@@ -13,7 +13,7 @@ Rustdoc (`///`, `//!`) is always fine — it documents the public surface.
 - Do not suppress Clippy warnings inline (`#[allow(...)]` or `#[expect(...)]`) at all. Resolve the warning or
   restructure the code instead.
 - Avoid using leading underscores (`_`) on identifiers, variables, parameters, or struct fields.
-- Always check local repo .md files whether ignored or not.
+- Always check local repo `.md` files whether ignored or not.
 
 # Skills
 
@@ -28,3 +28,14 @@ Activate and adhere to the following specialized skills when applicable:
 - **`enterprise-ux`**: Use when designing, reviewing, or improving UI layouts, workflow ergonomics, data density, or
   navigation patterns.
 - **`diagnosing-bugs`**: Use when investigating build failures, runtime errors, panics, or performance regressions.
+
+# Crate-Specific Context & Instructions
+
+When working within a specific crate, consult its local `CONTEXT.md` and `AGENTS.md`:
+
+- **Root Context**: [`CONTEXT.md`](CONTEXT.md)
+- **`crates/matcher`**: [`CONTEXT.md`](crates/matcher/CONTEXT.md) | [`AGENTS.md`](crates/matcher/AGENTS.md)
+- **`crates/pipeline`**: [`CONTEXT.md`](crates/pipeline/CONTEXT.md) | [`AGENTS.md`](crates/pipeline/AGENTS.md)
+- **`crates/env`**: [`CONTEXT.md`](crates/env/CONTEXT.md) | [`AGENTS.md`](crates/env/AGENTS.md)
+- **`crates/inflector`**: [`CONTEXT.md`](crates/inflector/CONTEXT.md) | [`AGENTS.md`](crates/inflector/AGENTS.md)
+- **`crates/druto`**: [`CONTEXT.md`](crates/druto/CONTEXT.md) | [`AGENTS.md`](crates/druto/AGENTS.md)
