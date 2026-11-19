@@ -1650,3 +1650,256 @@ proptest! {
         prop_assert_eq!(record.expires_at, restored.expires_at);
     }
 }
+
+// ============================================================================
+// RedisSessionStore Driver Tests
+// ============================================================================
+
+#[cfg(feature = "redis")]
+mod redis_store_tests {
+    use std::{collections::HashMap, sync::Arc, time::Duration};
+
+    use cookie::{Cookie, CookieJar};
+    use pipeline::{Pipeline, from_terminal};
+    use redis::{RedisCommands, RedisFake};
+    use serde_json::json;
+    use session::{
+        DEFAULT_REDIS_KEY_PREFIX, RedisSessionStore, SessionConfig, SessionContext, SessionError,
+        SessionId, SessionManager, SessionMiddleware, SessionRecord, SessionStore,
+        TestSessionContext, current_unix_timestamp,
+    };
+
+    use super::block_on;
+
+    #[test]
+    fn test_redis_session_store_construction_and_prefixes() {
+        let fake_redis = Arc::new(RedisFake::new());
+        let default_store = RedisSessionStore::new(fake_redis.clone());
+
+        assert_eq!(default_store.prefix(), DEFAULT_REDIS_KEY_PREFIX);
+        assert_eq!(
+            default_store.format_key("test_session_id"),
+            format!("{DEFAULT_REDIS_KEY_PREFIX}test_session_id")
+        );
+        assert!(Arc::ptr_eq(default_store.client(), &fake_redis));
+
+        let custom_store =
+            RedisSessionStore::with_prefix(fake_redis.clone(), "custom:app:sessions:");
+        assert_eq!(custom_store.prefix(), "custom:app:sessions:");
+        assert_eq!(
+            custom_store.format_key("xyz123"),
+            "custom:app:sessions:xyz123"
+        );
+    }
+
+    #[test]
+    fn test_redis_session_store_full_lifecycle_roundtrip() {
+        let fake_redis = Arc::new(RedisFake::new());
+        let store = RedisSessionStore::new(fake_redis.clone());
+
+        let session_id = SessionId::generate().expect("session ID generation must succeed");
+        let now = current_unix_timestamp();
+
+        let mut data = HashMap::new();
+        data.insert("user_id".to_string(), json!(1001));
+        data.insert("role".to_string(), json!("administrator"));
+
+        let mut flash = HashMap::new();
+        flash.insert("welcome".to_string(), json!("welcome to your dashboard"));
+
+        let record = SessionRecord::new(
+            Some(session_id.clone()),
+            data.clone(),
+            flash.clone(),
+            now,
+            now.saturating_add(3600),
+        );
+
+        // 1. Initial load for non-existent session yields None
+        let initial_load = block_on(store.load(Some(session_id.as_str())))
+            .expect("initial load operation must succeed");
+        assert!(initial_load.is_none());
+
+        // 2. Save session record into Redis store
+        let saved_token = block_on(store.save(&session_id, &record, Duration::from_secs(3600)))
+            .expect("save operation must succeed");
+        assert_eq!(saved_token, session_id.as_str());
+
+        // Verify key exists in underlying RedisFake
+        let redis_key = store.format_key(session_id.as_str());
+        let stored_json = block_on(fake_redis.get(&redis_key))
+            .expect("fake redis get must succeed")
+            .expect("key must exist in fake redis");
+        assert!(stored_json.contains("administrator"));
+
+        // 3. Load session record from Redis store
+        let loaded = block_on(store.load(Some(session_id.as_str())))
+            .expect("load operation must succeed")
+            .expect("record must exist");
+        assert_eq!(loaded.id, Some(session_id.clone()));
+        assert_eq!(loaded.data.get("user_id"), Some(&json!(1001)));
+        assert_eq!(loaded.data.get("role"), Some(&json!("administrator")));
+        assert_eq!(
+            loaded.flash.get("welcome"),
+            Some(&json!("welcome to your dashboard"))
+        );
+
+        // 4. Touch session to slide TTL window
+        block_on(store.touch(&session_id, Duration::from_secs(7200)))
+            .expect("touch operation must succeed");
+        let ttl = block_on(fake_redis.ttl(&redis_key)).expect("ttl check must succeed");
+        assert!(ttl > 3600 && ttl <= 7200);
+
+        // 5. Destroy session record
+        block_on(store.destroy(&session_id)).expect("destroy operation must succeed");
+
+        // 6. Post-destroy load returns None
+        let post_destroy = block_on(store.load(Some(session_id.as_str())))
+            .expect("post destroy load must succeed");
+        assert!(post_destroy.is_none());
+        assert!(!block_on(fake_redis.exists(&redis_key)).expect("exists check must succeed"));
+    }
+
+    #[test]
+    fn test_redis_session_store_expired_key_and_invalid_tokens() {
+        let fake_redis = Arc::new(RedisFake::new());
+        let store = RedisSessionStore::new(fake_redis.clone());
+
+        // Missing cookie value returns Ok(None)
+        let none_load = block_on(store.load(None)).expect("load with None must succeed");
+        assert!(none_load.is_none());
+
+        // Malformed session tokens return Ok(None) without querying backend
+        let invalid_short =
+            block_on(store.load(Some("short"))).expect("invalid token load must succeed");
+        assert!(invalid_short.is_none());
+
+        let invalid_chars =
+            block_on(store.load(Some("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLM012!@#")))
+                .expect("invalid characters load must succeed");
+        assert!(invalid_chars.is_none());
+
+        // Key expiration handling
+        let session_id = SessionId::generate().expect("session ID generation must succeed");
+        let now = current_unix_timestamp();
+        let record = SessionRecord::new(
+            Some(session_id.clone()),
+            HashMap::new(),
+            HashMap::new(),
+            now,
+            now.saturating_add(60),
+        );
+
+        block_on(store.save(&session_id, &record, Duration::from_secs(60)))
+            .expect("save must succeed");
+        let redis_key = store.format_key(session_id.as_str());
+
+        // Expire key explicitly in RedisFake
+        block_on(fake_redis.expire(&redis_key, 0)).expect("fake redis expire must succeed");
+
+        // Load must return Ok(None) for expired key
+        let expired_load = block_on(store.load(Some(session_id.as_str())))
+            .expect("load on expired key must succeed");
+        assert!(expired_load.is_none());
+    }
+
+    #[test]
+    fn test_redis_session_store_middleware_integration() {
+        let fake_redis = Arc::new(RedisFake::new());
+        let store = Arc::new(RedisSessionStore::new(fake_redis.clone()));
+        let config = SessionConfig::default();
+        let manager = Arc::new(SessionManager::new(config.clone(), store.clone()));
+        let middleware = SessionMiddleware::new(manager);
+
+        let pipeline = Pipeline::<TestSessionContext, String, SessionError>::new().pipe(middleware);
+
+        // --- Request 1: Fresh session, set attributes and flash message ---
+        let mut context1 = TestSessionContext::new();
+        let outcome1 = block_on(pipeline.run(
+            &mut context1,
+            from_terminal(|context: &mut TestSessionContext| {
+                Box::pin(async move {
+                    let session = context.session_mut().expect("session must be attached");
+                    session.put("account_id", "acc_9876")?;
+                    session.flash("flash_status", "operation_successful")?;
+                    Ok("request 1 completed".to_string())
+                })
+            }),
+        ))
+        .expect("pipeline 1 must succeed");
+        assert_eq!(outcome1, "request 1 completed");
+
+        let cookie_raw = context1
+            .cookie_jar
+            .get_raw(&config.cookie_name)
+            .expect("session cookie must be staged");
+        let session_id_string = cookie_raw.to_string();
+
+        // Verify key exists in RedisFake
+        let redis_key = store.format_key(&session_id_string);
+        assert!(block_on(fake_redis.exists(&redis_key)).expect("exists check must succeed"));
+
+        // --- Request 2: Existing session, retrieve data and flash message ---
+        let mut jar2 = CookieJar::new();
+        jar2.set(
+            Cookie::build(config.cookie_name.clone(), session_id_string.clone())
+                .build()
+                .unwrap(),
+        );
+        let mut context2 = TestSessionContext::with_cookie_jar(jar2);
+
+        let outcome2 = block_on(pipeline.run(
+            &mut context2,
+            from_terminal(|context: &mut TestSessionContext| {
+                Box::pin(async move {
+                    let session = context.session_mut().expect("session must be attached");
+                    let account_id: Option<String> = session.get("account_id")?;
+                    assert_eq!(account_id, Some("acc_9876".to_string()));
+
+                    let flash_status: Option<String> = session.old("flash_status")?;
+                    assert_eq!(flash_status, Some("operation_successful".to_string()));
+
+                    // Add next flash message
+                    session.flash("second_flash", "next_stage")?;
+                    Ok("request 2 completed".to_string())
+                })
+            }),
+        ))
+        .expect("pipeline 2 must succeed");
+        assert_eq!(outcome2, "request 2 completed");
+
+        // --- Request 3: Third request verifies flash lifecycle and invalidation ---
+        let mut jar3 = CookieJar::new();
+        jar3.set(
+            Cookie::build(config.cookie_name.clone(), session_id_string.clone())
+                .build()
+                .unwrap(),
+        );
+        let mut context3 = TestSessionContext::with_cookie_jar(jar3);
+
+        let outcome3 = block_on(pipeline.run(
+            &mut context3,
+            from_terminal(|context: &mut TestSessionContext| {
+                Box::pin(async move {
+                    let session = context.session_mut().expect("session must be attached");
+                    // Prior flash message from request 1 is purged
+                    let purged_flash: Option<String> = session.old("flash_status")?;
+                    assert_eq!(purged_flash, None);
+
+                    // Flash from request 2 is available
+                    let active_flash: Option<String> = session.old("second_flash")?;
+                    assert_eq!(active_flash, Some("next_stage".to_string()));
+
+                    // Invalidate session on logout
+                    session.invalidate();
+                    Ok("request 3 completed".to_string())
+                })
+            }),
+        ))
+        .expect("pipeline 3 must succeed");
+        assert_eq!(outcome3, "request 3 completed");
+
+        // Confirm session destroyed in RedisFake after invalidate
+        assert!(!block_on(fake_redis.exists(&redis_key)).expect("exists check must succeed"));
+    }
+}

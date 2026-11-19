@@ -6,16 +6,10 @@
 Druto framework. It allows stateful user interactions across HTTP requests by bridging `cookie`, `crypto`, and
 `pipeline` without binding to concrete HTTP server implementations.
 
-## Reference Architecture
+## Architecture Overview
 
-This crate is the Rust equivalent of:
-
-- **AdonisJS**: `@adonisjs/session` (`Session`, `SessionManager`, `ValuesStore`, drivers: `cookie`, `memory`, `file`,
-  `redis`)
-- **Laravel**: `illuminate/session` (`SessionManager`, `Store`, `StartSession` middleware, flash data management)
-- **Topcoat**: `topcoat-session` (token generation, hashing, and rotation)
-- **Loco.rs**: `loco_rs::auth::session` & `session_store` (cookie & server stores, fixation defense)
-- **Cot**: `cot::session` (trait-based session store abstraction)
+`session` provides stateful session lifecycle primitives, session fixation defense, and pluggable storage backends
+complying with RFC 6265bis HTTP State Management Mechanism specifications.
 
 ## Core Responsibilities
 
@@ -49,6 +43,10 @@ This crate is the Rust equivalent of:
           Enforces a safe payload ceiling (~3800 bytes) with `SessionError::PayloadTooLarge` to prevent silent browser
           truncation,
           and gracefully falls back to a fresh session (`Ok(None)`) on decryption failure or key rotation mismatch.
+        - **`RedisSessionStore`**: Asynchronous distributed key-value storage driver backed by `crates/redis`
+          (`RedisCommands`), gated behind the optional `redis` feature flag. Stores serialized JSON session records
+          with native TTL expiration (`SETEX`), configurable key prefixes (defaulting to `"druto:session:"`), and
+          sliding TTL refresh (`EXPIRE`).
 
 2. **Session Fixation Defense & ID Management**:
     - Session identifiers encapsulated in a validated newtype:
@@ -136,6 +134,7 @@ This crate is the Rust equivalent of:
 - `struct MemorySessionStore`: In-memory driver for testing and development.
 - `struct FileSessionStore`: Disk-based driver persisting JSON session records with atomic temp file renames.
 - `struct CookieSessionStore`: Encrypted cookie driver with size ceiling and zero server-side storage.
+- `struct RedisSessionStore`: Asynchronous Redis-backed session store gated behind the optional `redis` feature flag.
 - `struct SessionManager`: Driver registry, configuration facade, and session factory (`start`, `commit`).
 - `struct SessionConfig`: Configuration options (cookie name, lifetime/TTL, secure, http-only, same-site, rolling,
   expire-on-close).

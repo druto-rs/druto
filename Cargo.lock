@@ -1495,6 +1495,7 @@ dependencies = [
  "getrandom 0.4.3",
  "pipeline",
  "proptest",
+ "redis",
  "serde",
  "serde_json",
  "time",

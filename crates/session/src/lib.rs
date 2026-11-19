@@ -25,3 +25,5 @@ pub use stores::{
     CookieSessionStore, FileSessionStore, MAX_COOKIE_PAYLOAD_SIZE, MemorySessionStore,
     SESSION_COOKIE_PURPOSE,
 };
+#[cfg(feature = "redis")]
+pub use stores::{DEFAULT_REDIS_KEY_PREFIX, RedisSessionStore};

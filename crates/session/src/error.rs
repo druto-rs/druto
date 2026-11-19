@@ -77,3 +77,10 @@ impl From<crypto::CryptoError> for SessionError {
         Self::Crypto(err.to_string())
     }
 }
+
+#[cfg(feature = "redis")]
+impl From<redis::RedisError> for SessionError {
+    fn from(err: redis::RedisError) -> Self {
+        Self::Store(err.to_string())
+    }
+}

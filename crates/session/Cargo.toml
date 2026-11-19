@@ -5,11 +5,16 @@ edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
 
+[features]
+default = []
+redis = ["dep:redis"]
+
 [dependencies]
 # Workspace Crates
 cookie.workspace = true
 crypto.workspace = true
 pipeline.workspace = true
+redis = { workspace = true, optional = true }
 
 # External Dependencies
 base64.workspace = true
@@ -20,3 +25,4 @@ time.workspace = true
 
 [dev-dependencies]
 proptest.workspace = true
+redis = { workspace = true }

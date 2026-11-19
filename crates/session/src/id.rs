@@ -65,6 +65,15 @@ impl SessionId {
         Ok(Self(candidate.to_string()))
     }
 
+    /// Validates and parses a candidate session identifier string.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SessionError::InvalidId`] if the input string is malformed or invalid.
+    pub fn validate(candidate: &str) -> Result<Self, SessionError> {
+        Self::parse(candidate)
+    }
+
     /// Returns a reference to the underlying string slice.
     #[must_use]
     pub fn as_str(&self) -> &str {

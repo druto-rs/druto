@@ -15,6 +15,7 @@ crypto = { path = "crates/crypto" }
 matcher = { path = "crates/matcher" }
 pipeline = { path = "crates/pipeline" }
 qs = { path = "crates/qs" }
+redis = { path = "crates/redis" }
 router = { path = "crates/router" }
 session = { path = "crates/session" }
 

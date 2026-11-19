@@ -23,6 +23,9 @@ It bridges `cookie`, `crypto`, and `pipeline` without binding to concrete HTTP s
     - `CookieSessionStore` must enforce a safe size ceiling (~3800 bytes) and return `SessionError::PayloadTooLarge` to
       prevent
       silent browser truncation, and gracefully fall back to a fresh session on decryption error or rotated key absence.
+    - `RedisSessionStore` must format keys with the configured prefix (`druto:session:` by default), delegate expiration
+      to native Redis TTLs (`SETEX` and `EXPIRE`), and strictly validate incoming session IDs prior to executing Redis
+      commands.
 5. **Session ID Validation**:
     - Untrusted session ID strings from cookies must strictly validate character set (URL-safe base64) and length (43
       bytes),
@@ -31,8 +34,7 @@ It bridges `cookie`, `crypto`, and `pipeline` without binding to concrete HTTP s
 ## Testing Requirements
 
 - **Driver Roundtrips**: Test store, retrieve, update, touch, and destroy across `MemorySessionStore`,
-  `CookieSessionStore`,
-  and `FileSessionStore`.
+  `CookieSessionStore`, `FileSessionStore`, and `RedisSessionStore`.
 - **Flash Data Lifecycle**: Verify that flash data exists on request $N+1$, and is automatically discarded by
   request $N+2$.
 - **Reflash & Keep**: Verify `reflash` and `keep` preserve flash data across multiple requests.
