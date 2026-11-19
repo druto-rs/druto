@@ -29,14 +29,3 @@ and intermediate cache defense (`Vary` header management).
 4. **Pipeline & Router Integration**:
     - Implement `pipeline::Middleware<HttpContext, Response, RouterError>`.
     - Non-destructive header manipulation: augment existing headers without wiping headers set by upstream layers.
-
-5. **Style & Conventions**:
-    - Follow [Google's Rust Style Guide](https://google.github.io/styleguide/rustguide.md).
-    - Do not suppress Clippy warnings inline (`#[allow(...)]` or `#[expect(...)]`). Resolve the warning or restructure
-      the code instead.
-    - Avoid using leading underscores (`_`) on identifiers, variables, parameters, or struct fields.
-    - Code formatting must be verified via `cargo +nightly fmt --check`.
-
-6. **Comments**:
-    - Comment only the "why" when code alone cannot state the external constraint or intentional design decision.
-    - Document public surfaces with rustdoc (`///`, `//!`).

@@ -13,12 +13,6 @@ This crate owns the generic asynchronous chain-of-responsibility runner. It must
    - Downstream after-phase runs in reverse registration order ($N \to \dots \to 2 \to 1$).
 3. **Double `next` Protection**:
    - Calling `next.run()` more than once in the same middleware must fail predictably (e.g., returning an error) rather than running downstream handlers twice.
-4. **No Clippy Suppressions**:
-   - Do not suppress Clippy warnings inline (`#[allow(...)]` or `#[expect(...)]`). Restructure the code or resolve the warning cleanly.
-5. **No Leading Underscores**:
-   - Do not use leading underscores on identifiers, variables, parameters, or struct fields.
-6. **Comments**:
-   - Comment only the "why" when code alone cannot state the external constraint or intentional design decision. Document public surfaces with rustdoc (`///`, `//!`).
 
 ## Testing Requirements
 

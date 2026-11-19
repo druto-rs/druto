@@ -6,17 +6,20 @@ license.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+# Workspace Crates
+cookie.workspace = true
+crypto.workspace = true
 pipeline.workspace = true
 router.workspace = true
 session.workspace = true
-cookie.workspace = true
-crypto.workspace = true
-subtle.workspace = true
+
+# External Dependencies
 base64.workspace = true
 getrandom.workspace = true
 regex.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+subtle.workspace = true
 
 [dev-dependencies]
 proptest.workspace = true

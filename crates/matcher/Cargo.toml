@@ -5,14 +5,15 @@ edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
 
-[features]
-default = ["regex"]
-regex = ["dep:regex"]
-serde = ["dep:serde"]
-
 [dependencies]
+# External Dependencies
 regex = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 
 [dev-dependencies]
-proptest = { workspace = true }
+proptest.workspace = true
+
+[features]
+default = ["regex"]
+regex = ["dep:regex"]
+serde = ["dep:serde"]

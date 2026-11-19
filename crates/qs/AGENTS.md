@@ -23,14 +23,6 @@ resource boundaries to prevent memory exhaustion, stack overflow, and CPU hash-c
 4. **Serde Coercion & Ergonomics**:
     - When deserializing query parameters into strongly typed Rust structs, coerce string primitives into target numeric
       types (`u8`..`u128`, `i8`..`i128`, `f32`/`f64`) and booleans (`"true"`/`"false"`).
-5. **No Clippy Suppressions**:
-    - Do not suppress Clippy warnings inline (`#[allow(...)]` or `#[expect(...)]`). Restructure the code cleanly
-      instead.
-6. **No Leading Underscores**:
-    - Do not use leading underscores on identifiers, variables, parameters, or struct fields.
-7. **Comments**:
-    - Comment only the "why" when code alone cannot state an external constraint or intentional design decision.
-      Document public surfaces thoroughly with rustdoc (`///`, `//!`).
 
 ## Testing Requirements
 

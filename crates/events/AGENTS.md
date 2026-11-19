@@ -33,14 +33,6 @@ foundation for the framework.
     - The core crate must not depend directly on an opinionated async runtime (such as `tokio`) in `[dependencies]`.
       Use standard `std::future::Future` and `std::pin::Pin` for futures. Runtime-specific helpers or Tokio join sets
       should be test-only or feature-gated.
-8. **No Clippy Suppressions**:
-    - Do not suppress Clippy warnings inline (`#[allow(...)]` or `#[expect(...)]`). Restructure the code to resolve
-      warnings cleanly.
-9. **No Leading Underscores**:
-    - Do not use leading underscores (`_`) on identifiers, variables, parameters, or struct fields.
-10. **Comments**:
-    - Comment only the "why" when code alone cannot state the external constraint or intentional design decision.
-      Document public surfaces thoroughly with rustdoc (`///`, `//!`).
 
 ## Testing Requirements
 

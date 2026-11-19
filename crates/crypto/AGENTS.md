@@ -4,8 +4,7 @@
 
 This crate owns symmetric authenticated encryption (AEAD), HMAC signing, key rotation management, purpose binding,
 and signed URL generation and validation. It must remain decoupled from HTTP server types, request contexts, and
-password
-hashing.
+password hashing.
 
 ## Design Rules
 
@@ -23,14 +22,6 @@ hashing.
 5. **Purpose Binding via Associated Data (AAD)**:
     - When purpose binding is used, the purpose string must be passed as authenticated associated data (AAD) to the AEAD
       cipher so any tampering or purpose mismatch immediately fails authentication.
-6. **No Clippy Suppressions**:
-    - Do not suppress Clippy warnings inline (`#[allow(...)]` or `#[expect(...)]`). Restructure the code or resolve the
-      warning cleanly.
-7. **No Leading Underscores**:
-    - Do not use leading underscores on identifiers, variables, parameters, or struct fields.
-8. **Comments**:
-    - Comment only the "why" when code alone cannot state the external constraint or intentional design decision.
-      Document public surfaces with rustdoc (`///`, `//!`).
 
 ## Testing Requirements
 

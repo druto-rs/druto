@@ -17,13 +17,6 @@ networking sockets.
 3. **No Silent Decryption Panic**:
     - If a client alters an encrypted or signed cookie, parsing must fail gracefully returning `Err(CookieError::...)`
       rather than panicking.
-4. **No Clippy Suppressions**:
-    - Do not suppress Clippy warnings inline (`#[allow(...)]` or `#[expect(...)]`). Restructure code cleanly.
-5. **No Leading Underscores**:
-    - Do not use leading underscores on identifiers, variables, parameters, or struct fields.
-6. **Comments**:
-    - Comment only the "why" when code alone cannot state the external constraint or intentional design decision.
-      Document public surfaces with rustdoc (`///`, `//!`).
 
 ## Testing Requirements
 

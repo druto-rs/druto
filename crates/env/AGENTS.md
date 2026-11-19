@@ -16,14 +16,6 @@ synchronously at application startup.
 3. **Cyclic Reference Detection**:
     - Prevent infinite loops during variable interpolation (e.g. `A=${B}`, `B=${A}`) by capping expansion depth or
       tracking resolution history.
-4. **No Clippy Suppressions**:
-    - Do not suppress Clippy warnings inline (`#[allow(...)]` or `#[expect(...)]`). Restructure the code or resolve the
-      warning cleanly.
-5. **No Leading Underscores**:
-    - Do not use leading underscores on identifiers, variables, parameters, or struct fields.
-6. **Comments**:
-    - Comment only the "why" when code alone cannot state the external constraint or intentional design decision.
-      Document public surfaces with rustdoc (`///`, `//!`).
 
 ## Testing Requirements
 

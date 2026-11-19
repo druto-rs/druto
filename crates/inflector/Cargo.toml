@@ -6,6 +6,7 @@ license.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+# External Dependencies
 regex = { workspace = true, optional = true }
 serde = { workspace = true, optional = true, features = ["std"] }
 

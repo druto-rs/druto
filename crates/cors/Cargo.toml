@@ -6,8 +6,11 @@ license.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+# Workspace Crates
 pipeline.workspace = true
 router.workspace = true
+
+# External Dependencies
 regex.workspace = true
 
 [dev-dependencies]

@@ -53,13 +53,4 @@ transport socket listeners.
     - Support the Fluent Builder (`Router`), Modular Nesting (`router.nest()`), and Declarative Macro (`routes!`) in
       this crate, ensuring all syntaxes compile down to the identical `Router` builder calls.
     - Provide registration compatibility for companion proc-macro attributes (`#[get]`, `#[controller]`).
-12. **No Clippy Suppressions**:
-    - Do not suppress Clippy warnings inline (`#[allow(...)]` or `#[expect(...)]`). Resolve the warning or restructure
-      the code instead.
-13. **No Leading Underscores**:
-    - Do not use leading underscores on identifiers, variables, parameters, or struct fields.
-14. **Comments**:
-    - Comment only the "why" when code alone cannot state the external constraint or intentional design decision.
-      Document public surfaces with rustdoc (`///`, `//!`).
-15. **Google Rust Style Guide**:
-    - Follow [Google's Rust Style Guide](https://google.github.io/styleguide/rustguide.md).
+

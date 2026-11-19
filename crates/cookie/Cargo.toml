@@ -6,7 +6,10 @@ license.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+# Workspace Crates
 crypto.workspace = true
+
+# External Dependencies
 time.workspace = true
 
 [dev-dependencies]

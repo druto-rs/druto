@@ -27,14 +27,6 @@ It bridges `cookie`, `crypto`, and `pipeline` without binding to concrete HTTP s
     - Untrusted session ID strings from cookies must strictly validate character set (URL-safe base64) and length (43
       bytes),
       completely preventing directory traversal attacks.
-6. **No Clippy Suppressions**:
-    - Do not suppress Clippy warnings inline (`#[allow(...)]` or `#[expect(...)]`). Resolve the warning or restructure
-      the code instead.
-7. **No Leading Underscores**:
-    - Do not use leading underscores on identifiers, variables, parameters, or struct fields.
-8. **Comments**:
-    - Comment only the "why" when code alone cannot state the external constraint or intentional design decision.
-      Document public surfaces with rustdoc (`///`, `//!`).
 
 ## Testing Requirements
 

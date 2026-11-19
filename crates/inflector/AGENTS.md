@@ -20,14 +20,6 @@ is pure computation with zero network, filesystem, or async dependencies.
     - Consolidate common string processing, delimited ASCII scanning, title iteration, and padding buffer allocations
       into internal helpers (`case::mod` and `utils::pad`) rather than duplicating loops or capacity logic across
       modules.
-5. **No Clippy Suppressions**:
-    - Do not suppress Clippy warnings inline (`#[allow(...)]` or `#[expect(...)]`). Restructure the code or resolve the
-      warning cleanly.
-6. **No Leading Underscores**:
-    - Do not use leading underscores on identifiers, variables, parameters, or struct fields.
-7. **Comments**:
-    - Comment only the "why" when code alone cannot state the external constraint or intentional design decision.
-      Document public surfaces with rustdoc (`///`, `//!`).
 
 ## Testing Requirements
 

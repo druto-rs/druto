@@ -6,10 +6,11 @@ license.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-serde = { workspace = true, optional = true }
+# External Dependencies
 regex = { workspace = true, optional = true }
+serde = { workspace = true, optional = true }
 
 [features]
-default = ["serde", "regex"]
-serde = ["dep:serde"]
+default = ["regex", "serde"]
 regex = ["dep:regex"]
+serde = ["dep:serde"]

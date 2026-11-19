@@ -15,15 +15,6 @@ network, async, or transport dependencies.
     - Order of route registration must not produce nondeterministic matches.
     - Ambiguities must follow strict priority: Static > Regex Constrained > Built-in Constrained > Dynamic Param >
       Wildcard.
-3. **No Clippy Suppressions**:
-    - Do not suppress Clippy warnings inline (`#[allow(...)]` or `#[expect(...)]`). Restructure the code or resolve the
-      warning cleanly.
-4. **No Leading Underscores**:
-    - Do not use leading underscores on identifiers, variables, parameters, or struct fields.
-5. **Comments & Documentation**:
-    - Comment only the "why" when code alone cannot state the external constraint or intentional design decision.
-      Document public surfaces with rustdoc (`///`, `//!`).
-    - Do not reference external frameworks in rustdoc comments.
 
 ## Testing Requirements
 
