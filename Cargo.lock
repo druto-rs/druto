@@ -59,6 +59,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "auth"
+version = "0.1.0"
+
+[[package]]
 name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -141,6 +145,10 @@ dependencies = [
     "byteorder",
     "cipher",
 ]
+
+[[package]]
+name = "bodyparser"
+version = "0.1.0"
 
 [[package]]
 name = "borsh"
@@ -480,6 +488,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "65cd87c9a6d60536580b316ad985726104730a5151c99845f2490428ef91240a"
 
 [[package]]
+name = "limiter"
+version = "0.1.0"
+
+[[package]]
 name = "linux-raw-sys"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -674,6 +686,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "redis"
+version = "0.1.0"
+
+[[package]]
 name = "regex"
 version = "1.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -833,6 +849,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "staticfiles"
+version = "0.1.0"
+
+[[package]]
 name = "subtle"
 version = "2.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -949,6 +969,10 @@ dependencies = [
     "crypto-common",
     "ctutils",
 ]
+
+[[package]]
+name = "validator"
+version = "0.1.0"
 
 [[package]]
 name = "wait-timeout"
