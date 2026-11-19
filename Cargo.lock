@@ -817,6 +817,20 @@ dependencies = [
 [[package]]
 name = "shield"
 version = "0.1.0"
+dependencies = [
+    "base64",
+    "cookie",
+    "crypto",
+    "getrandom",
+    "pipeline",
+    "proptest",
+    "regex",
+    "router",
+    "serde",
+    "serde_json",
+    "session",
+    "subtle",
+]
 
 [[package]]
 name = "subtle"
