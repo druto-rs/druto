@@ -27,8 +27,9 @@ inspired by Laravel and AdonisJS.
 - `matcher`: Fast URL pattern matching and parameter extraction.
 - `pipeline`: Asynchronous middleware onion execution.
 - `qs`: Nested bracket-notation query string parsing and serialization.
+- `router`: HTTP routing, request/response models, middleware pipeline, and reverse URL generation.
 - `session`: Multi-driver HTTP session management, flash data, and session fixation defense.
-- *(Future)* `router`, `http`, `auth`, `db`, `cli`.
+- *(Future)* `auth`, `cache`, `validation`, `db`, `cli`.
 
 ## Responsibilities of `druto`
 
