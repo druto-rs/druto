@@ -27,6 +27,7 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 | **Layer 2: State & Storage** | RFC 6265 cookies, signed & encrypted cookie jars                  | `cookie`          | `@adonisjs/http-server`  | `illuminate/cookie`                   |
 | **Layer 2: State & Storage** | Multi-driver session management & flash data                      | `session`         | `@adonisjs/session`      | `illuminate/session`                  |
 | **Layer 2: State & Storage** | Asynchronous Redis connection manager, pooling & pub/sub          | `redis`           | `@adonisjs/redis`        | `illuminate/redis`                    |
+| **Layer 2: State & Storage** | Unified multi-driver cache, tiered L1/L2, stampede defense & tags | `cache`           | `@adonisjs/cache`        | `illuminate/cache`                    |
 | **Layer 3: HTTP**            | HTTP router, request, response, groups, context, URL generator    | `router`          | `@adonisjs/http-server`  | `illuminate/routing`, `http`          |
 | **Layer 3: HTTP**            | Cross-Origin Resource Sharing (CORS) preflight & response headers | `cors`            | `@adonisjs/cors`         | `fruitcake/laravel-cors`              |
 | **Layer 3: HTTP**            | Web security hardening (CSRF, CSP, HSTS, FrameGuard, NoSniff)     | `shield`          | `@adonisjs/shield`       | `VerifyCsrfToken` + Security Headers  |
@@ -45,6 +46,7 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 crates/
 ├── auth/        # Authentication guards, session/token authenticators, user identity
 ├── bodyparser/  # Streaming multipart parser, file uploads, body size enforcement
+├── cache/       # Unified multi-driver caching engine, multi-tier L1/L2 stores, stampede protection & tags
 ├── cookie/      # RFC 6265 cookies, plain, signed, and encrypted cookie jars
 ├── cors/        # Cross-Origin Resource Sharing (CORS) preflight and header negotiation
 ├── crypto/      # Authenticated encryption, HMAC signing, key rotation, signed URLs
@@ -61,7 +63,8 @@ crates/
 ├── router/      # HTTP routing, request/response, groups, context, URL generation
 ├── session/     # Multi-driver HTTP session management, flash data, fixation defense
 ├── shield/      # Web application security suite (CSRF, CSP, FrameGuard, HSTS, NoSniff)
-└── staticfiles/ # High-performance static asset file serving, range requests, ETags
+├── staticfiles/ # High-performance static asset file serving, range requests, ETags
+└── validator/   # Request schema definition, validation rules, sanitization, errors
 ```
 
 Each crate maintains its own `CONTEXT.md` (architecture and boundaries) and `AGENTS.md` (agent rules and constraints).
