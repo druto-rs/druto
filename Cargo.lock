@@ -763,11 +763,15 @@ dependencies = [
 name = "session"
 version = "0.1.0"
 dependencies = [
+    "base64",
     "cookie",
     "crypto",
+    "getrandom",
     "pipeline",
+    "proptest",
     "serde",
     "serde_json",
+    "time",
 ]
 
 [[package]]

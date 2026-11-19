@@ -711,6 +711,33 @@ mod tests {
         }
     }
 
+    struct CountingTopicListener {
+        counter: Arc<AtomicUsize>,
+    }
+
+    impl CountingTopicListener {
+        fn new(counter: &Arc<AtomicUsize>) -> Self {
+            Self {
+                counter: Arc::clone(counter),
+            }
+        }
+    }
+
+    impl TopicListener for CountingTopicListener {
+        fn handle<'a>(
+            &'a self,
+            topic: &'a str,
+            payload: &'a dyn Any,
+        ) -> crate::event::BoxFuture<'a, Result<(), EventError>> {
+            let _ = (topic, payload);
+            let counter = Arc::clone(&self.counter);
+            Box::pin(async move {
+                counter.fetch_add(1, Ordering::SeqCst);
+                Ok(())
+            })
+        }
+    }
+
     #[test]
     fn test_dispatcher_typed_listener_struct_execution() {
         let dispatcher = EventDispatcher::new();
@@ -1116,14 +1143,7 @@ mod tests {
         let dispatcher = EventDispatcher::new();
         let topic_calls = Arc::new(AtomicUsize::new(0));
 
-        let tc = Arc::clone(&topic_calls);
-        let topic_id = dispatcher.listen_topic_fn("order.*", move |_, _| {
-            let c = Arc::clone(&tc);
-            Box::pin(async move {
-                c.fetch_add(1, Ordering::SeqCst);
-                Ok(())
-            })
-        });
+        let topic_id = dispatcher.listen_topic("order.*", CountingTopicListener::new(&topic_calls));
 
         {
             let mut inner = dispatcher.inner.write().unwrap();
@@ -1376,16 +1396,7 @@ mod tests {
         let topic_count = Arc::new(AtomicUsize::new(0));
 
         let _ = dispatcher.once(CountingListener::<OrderCreated>::new(&count));
-        let topic_id = dispatcher.listen_topic_fn("order.*", {
-            let tc = Arc::clone(&topic_count);
-            move |_, _| {
-                let c = Arc::clone(&tc);
-                Box::pin(async move {
-                    c.fetch_add(1, Ordering::SeqCst);
-                    Ok(())
-                })
-            }
-        });
+        let topic_id = dispatcher.listen_topic("order.*", CountingTopicListener::new(&topic_count));
         {
             let mut inner = dispatcher.inner.write().unwrap();
             inner.once_listeners.insert(topic_id);
