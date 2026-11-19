@@ -6,3 +6,10 @@ license.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+pipeline.workspace = true
+router.workspace = true
+regex.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+serde_json.workspace = true

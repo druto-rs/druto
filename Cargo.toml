@@ -33,3 +33,4 @@ pipeline = { path = "crates/pipeline" }
 matcher = { path = "crates/matcher" }
 qs = { path = "crates/qs" }
 session = { path = "crates/session" }
+router = { path = "crates/router" }
