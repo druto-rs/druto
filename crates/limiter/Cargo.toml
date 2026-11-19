@@ -5,4 +5,21 @@ edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
 
+[features]
+default = []
+redis = ["dep:redis"]
+
 [dependencies]
+# Workspace Crates
+pipeline.workspace = true
+router.workspace = true
+redis = { workspace = true, optional = true }
+
+# External Dependencies
+bytes.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+redis = { workspace = true }
