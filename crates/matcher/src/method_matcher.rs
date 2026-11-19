@@ -77,6 +77,47 @@ impl<T> MethodMatcher<T> {
         Ok(())
     }
 
+    /// Registers a route with parameter constraints for a specific HTTP method.
+    pub fn insert_with_constraints(
+        &mut self,
+        method: Method,
+        pattern: &str,
+        payload: T,
+        constraints: HashMap<String, crate::constraint::Constraint>,
+    ) -> Result<(), MatcherError>
+    where
+        T: Clone,
+    {
+        let matcher = self
+            .method_matchers
+            .entry(method)
+            .or_insert_with(|| Matcher::with_config(self.config.clone()));
+
+        matcher.insert_with_constraints(pattern, payload, constraints)
+    }
+
+    /// Registers a named route with parameter constraints for a specific HTTP method.
+    pub fn insert_named_with_constraints(
+        &mut self,
+        name: &str,
+        method: Method,
+        pattern: &str,
+        payload: T,
+        constraints: HashMap<String, crate::constraint::Constraint>,
+    ) -> Result<(), MatcherError>
+    where
+        T: Clone,
+    {
+        let matcher = self
+            .method_matchers
+            .entry(method.clone())
+            .or_insert_with(|| Matcher::with_config(self.config.clone()));
+
+        matcher.insert_named_with_constraints(name, pattern, payload, constraints)?;
+        self.named_routes.insert(name.to_string(), method);
+        Ok(())
+    }
+
     /// Registers a route that responds to any HTTP method.
     pub fn insert_any(&mut self, pattern: &str, payload: T) -> Result<(), MatcherError>
     where

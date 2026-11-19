@@ -25,7 +25,11 @@ bcrypt = "0.19.3"
 zeroize = "1.9.2"
 time = { version = "0.3.55", default-features = false, features = ["std", "formatting", "parsing"] }
 percent-encoding = "2.3.2"
+bytes = "1.12.2"
 
 crypto = { path = "crates/crypto" }
 cookie = { path = "crates/cookie" }
 pipeline = { path = "crates/pipeline" }
+matcher = { path = "crates/matcher" }
+qs = { path = "crates/qs" }
+session = { path = "crates/session" }

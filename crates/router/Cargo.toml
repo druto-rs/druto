@@ -6,3 +6,17 @@ license.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+matcher.workspace = true
+pipeline.workspace = true
+cookie.workspace = true
+qs.workspace = true
+crypto.workspace = true
+session.workspace = true
+bytes.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+percent-encoding.workspace = true
+regex.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true

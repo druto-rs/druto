@@ -85,6 +85,33 @@ impl<T> Matcher<T> {
         self.insert_named_internal(Some(name.to_string()), pattern, payload, HashMap::new())
     }
 
+    /// Inserts a route pattern with an associated payload and parameter constraints.
+    pub fn insert_with_constraints(
+        &mut self,
+        pattern: &str,
+        payload: T,
+        constraints: HashMap<String, Constraint>,
+    ) -> Result<(), MatcherError>
+    where
+        T: Clone,
+    {
+        self.insert_named_internal(None, pattern, payload, constraints)
+    }
+
+    /// Inserts a named route pattern with an associated payload and parameter constraints.
+    pub fn insert_named_with_constraints(
+        &mut self,
+        name: &str,
+        pattern: &str,
+        payload: T,
+        constraints: HashMap<String, Constraint>,
+    ) -> Result<(), MatcherError>
+    where
+        T: Clone,
+    {
+        self.insert_named_internal(Some(name.to_string()), pattern, payload, constraints)
+    }
+
     /// Internal insertion method applying extra programmatic constraints.
     fn insert_named_internal(
         &mut self,

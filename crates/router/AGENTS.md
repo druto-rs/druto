@@ -12,23 +12,54 @@ transport socket listeners.
 1. **Transport & Runtime Agnostic**:
     - The router must not depend directly on concrete transport socket listeners or be tightly coupled to an async
       runtime.
-    - It processes abstract HTTP requests and produces abstract HTTP responses.
-2. **Deterministic Precedence**:
+    - It processes abstract HTTP requests (`Request`) and produces abstract HTTP responses (`Response`).
+2. **Two-Phase Lifecycle (Builder vs Compiled Dispatcher)**:
+    - Route registration takes place in a mutable builder phase (`Router`, `RouteGroup`, `RouteResource`).
+    - Dispatching requests operates on an immutable, thread-safe (`Send + Sync + 'static`) `CompiledRouter` generated
+      by `Router::compile()`.
+    - Route middleware chains must be pre-composed during compilation into `pipeline::Pipeline` instances (`Global` ➔
+      `Group (outer to inner)` ➔ `Route` ➔ `Terminal Handler`) stored in `matcher::MethodMatcher` to avoid
+      runtime hierarchy resolution overhead.
+3. **Deterministic Precedence**:
     - Route compilation must rely on `matcher::MethodMatcher` to guarantee deterministic specificity hierarchy
       regardless of registration order.
-3. **Immutability After Compilation**:
-    - Route registration happens in a mutable builder phase. Dispatching requests must operate on an immutable,
-      thread-safe (`Send + Sync + 'static`) compiled router.
-4. **Middleware Onion Discipline**:
-    - Middleware execution must integrate with `pipeline::Pipeline`, allowing global, group, and route-specific
-      middleware to intercept requests and wrap responses.
-5. **No Clippy Suppressions**:
+4. **Unified Handler Contract & `IntoResponse`**:
+    - Handlers adhere to `async fn(&mut HttpContext) -> impl IntoResponse`.
+    - `IntoResponse::apply(self, ctx: &mut HttpContext) -> Result<(), RouterError>` merges status, headers, and body
+      into `ctx.response` without clobbering upstream middleware cookies or headers.
+5. **Non-Destructive Buffered Request Bodies**:
+    - Request payloads are buffered in memory as `Bytes` by default up to `max_body_size` (default 2MB) with
+      `413 Payload Too Large` enforcement.
+    - Handlers and middleware inspect bodies non-destructively: `&request.json::<T>()`, `&request.bytes()`, etc.
+    - Explicit streaming is supported for large file uploads.
+6. **Middleware Onion & SessionContext**:
+    - Middleware execution must integrate with `pipeline::Pipeline`.
+    - `HttpContext` must implement `session::SessionContext` so `SessionMiddleware` attaches sessions seamlessly.
+7. **Type-Safe Request Extensions**:
+    - `HttpContext` must provide an `Extensions` type map (`TypeId`-indexed) for cross-cutting middleware data.
+8. **Method Spoofing & Verb Resolution**:
+    - Support method spoofing for `POST` via `_method` and `X-HTTP-Method-Override`. Expose `request.intended_method()`
+      and `request.method()`.
+9. **Reverse URL & Cryptographic Signing**:
+    - Reverse URL generation must strictly validate required parameters and URL-encode dynamic values using
+      `matcher::MethodMatcher::build_path`.
+    - Integrate `crypto::UrlSigner` into `UrlGenerator` and expose signature checks on `Request`.
+10. **Automatic RFC 9110 Compliance & Error Mapping**:
+    - Handle automatic `OPTIONS` (`204 No Content` + `Allow` header), automatic `HEAD` (fallback to `GET` + body
+      suppression),
+      automatic `405 Method Not Allowed` with `Allow` header, and custom SPA fallback via `router.fallback(handler)`.
+    - `RouterError` must implement `IntoResponse` with standard HTTP status code mappings.
+11. **Quad-Surface Routing Interoperability**:
+    - Support the Fluent Builder (`Router`), Modular Nesting (`router.nest()`), and Declarative Macro (`routes!`) in
+      this crate, ensuring all syntaxes compile down to the identical `Router` builder calls.
+    - Provide registration compatibility for companion proc-macro attributes (`#[get]`, `#[controller]`).
+12. **No Clippy Suppressions**:
     - Do not suppress Clippy warnings inline (`#[allow(...)]` or `#[expect(...)]`). Resolve the warning or restructure
       the code instead.
-6. **No Leading Underscores**:
+13. **No Leading Underscores**:
     - Do not use leading underscores on identifiers, variables, parameters, or struct fields.
-7. **Comments**:
+14. **Comments**:
     - Comment only the "why" when code alone cannot state the external constraint or intentional design decision.
       Document public surfaces with rustdoc (`///`, `//!`).
-8. **Reverse URL Resolution**:
-    - Reverse URL generation must strictly validate required parameters and URL-encode dynamic values.
+15. **Google Rust Style Guide**:
+    - Follow [Google's Rust Style Guide](https://google.github.io/styleguide/rustguide.md).
