@@ -27,6 +27,8 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 | **Layer 2: State & Storage** | RFC 6265 cookies, signed & encrypted cookie jars                  | `cookie`          | `@adonisjs/http-server`  | `illuminate/cookie`                   |
 | **Layer 2: State & Storage** | Multi-driver session management & flash data                      | `session`         | `@adonisjs/session`      | `illuminate/session`                  |
 | **Layer 3: HTTP**            | HTTP router, request, response, groups, context, URL generator    | `router`          | `@adonisjs/http-server`  | `illuminate/routing`, `http`          |
+| **Layer 3: HTTP**            | Cross-Origin Resource Sharing (CORS) preflight & response headers | `cors`            | `@adonisjs/cors`         | `fruitcake/laravel-cors`              |
+| **Layer 3: HTTP**            | Web security hardening (CSRF, CSP, HSTS, FrameGuard, NoSniff)     | `shield`          | `@adonisjs/shield`       | `VerifyCsrfToken` + Security Headers  |
 | **Layer 4: Data**            | Query builder, migrations, ORM                                    | `db` *(planned)*  | `@adonisjs/lucid`        | `illuminate/database` (Eloquent)      |
 | **Layer 5: Developer Tools** | CLI command suite, generators                                     | `cli` *(planned)* | `@adonisjs/ace`          | `illuminate/console` (Artisan)        |
 | **Layer 6: Facade**          | Framework umbrella & prelude                                      | `druto`           | `@adonisjs/core`         | `laravel/framework`                   |
@@ -36,6 +38,7 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 ```
 crates/
 ├── cookie/      # RFC 6265 cookies, plain, signed, and encrypted cookie jars
+├── cors/        # Cross-Origin Resource Sharing (CORS) preflight and header negotiation
 ├── crypto/      # Authenticated encryption, HMAC signing, key rotation, signed URLs
 ├── druto/       # Framework umbrella facade
 ├── env/         # Environment variable loading, expansion, and schema validation
@@ -46,7 +49,8 @@ crates/
 ├── pipeline/    # Asynchronous middleware pipeline and execution runner
 ├── qs/          # Nested bracket-notation query string parser & serializer
 ├── router/      # HTTP routing, request/response, groups, context, URL generation
-└── session/     # Multi-driver HTTP session management, flash data, fixation defense
+├── session/     # Multi-driver HTTP session management, flash data, fixation defense
+└── shield/      # Web application security suite (CSRF, CSP, FrameGuard, HSTS, NoSniff)
 ```
 
 Each crate maintains its own `CONTEXT.md` (architecture and boundaries) and `AGENTS.md` (agent rules and constraints).

@@ -45,4 +45,6 @@ When working within a specific crate, consult its local `CONTEXT.md` and `AGENTS
 - **`crates/env`**: [`CONTEXT.md`](crates/env/CONTEXT.md) | [`AGENTS.md`](crates/env/AGENTS.md)
 - **`crates/inflector`**: [`CONTEXT.md`](crates/inflector/CONTEXT.md) | [`AGENTS.md`](crates/inflector/AGENTS.md)
 - **`crates/router`**: [`CONTEXT.md`](crates/router/CONTEXT.md) | [`AGENTS.md`](crates/router/AGENTS.md)
+- **`crates/cors`**: [`CONTEXT.md`](crates/cors/CONTEXT.md) | [`AGENTS.md`](crates/cors/AGENTS.md)
+- **`crates/shield`**: [`CONTEXT.md`](crates/shield/CONTEXT.md) | [`AGENTS.md`](crates/shield/AGENTS.md)
 - **`crates/druto`**: [`CONTEXT.md`](crates/druto/CONTEXT.md) | [`AGENTS.md`](crates/druto/AGENTS.md)
