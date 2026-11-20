@@ -30,6 +30,7 @@ fred = { version = "10.1.0", default-features = false }
 futures-util = { version = "0.3.34", default-features = false }
 getrandom = "0.4.3"
 hmac = "0.13.0"
+kouta = { git = "https://github.com/Hitarashi/kouta.git", branch = "main" }
 percent-encoding = "2.3.2"
 proptest = "1.12.0"
 regex = { version = "1.13.2", default-features = false, features = ["std", "perf"] }

@@ -1,16 +1,15 @@
-//! Asynchronous distributed Redis cache store backed by [`RedisCommands`].
+//! Asynchronous distributed Redis cache store for Druto backed by [`RedisCommands`].
 
 use std::{sync::Arc, time::Duration};
 
-use redis::RedisCommands;
-
-use crate::{
+use kouta::{
     entry::CacheEntry,
     error::CacheError,
     store::{BoxFuture, CacheStore},
 };
+use redis::RedisCommands;
 
-/// Default key prefix for cache entries stored in Redis.
+/// Default key prefix for cache entries stored in Redis by Druto.
 pub const DEFAULT_REDIS_KEY_PREFIX: &str = "druto:cache:";
 
 /// Asynchronous distributed cache store backed by [`RedisCommands`].
@@ -57,7 +56,11 @@ impl<C: RedisCommands + 'static> CacheStore for RedisCacheStore<C> {
     fn get<'a>(&'a self, key: &'a str) -> BoxFuture<'a, Result<Option<CacheEntry>, CacheError>> {
         Box::pin(async move {
             let full_key = self.format_key(key);
-            let content = self.client.get(&full_key).await?;
+            let content = self
+                .client
+                .get(&full_key)
+                .await
+                .map_err(|err| CacheError::Store(err.to_string()))?;
 
             if let Some(raw) = content {
                 let entry = CacheEntry::from_storage_str(&raw)?;
@@ -79,7 +82,10 @@ impl<C: RedisCommands + 'static> CacheStore for RedisCacheStore<C> {
             let content = entry.to_storage_string()?;
             let ttl_secs = ttl.as_secs().max(1);
 
-            self.client.set_ex(&full_key, &content, ttl_secs).await?;
+            self.client
+                .set_ex(&full_key, &content, ttl_secs)
+                .await
+                .map_err(|err| CacheError::Store(err.to_string()))?;
             Ok(())
         })
     }
@@ -93,7 +99,11 @@ impl<C: RedisCommands + 'static> CacheStore for RedisCacheStore<C> {
         Box::pin(async move {
             let full_key = self.format_key(key);
             let content = entry.to_storage_string()?;
-            let added = self.client.set_nx(&full_key, &content).await?;
+            let added = self
+                .client
+                .set_nx(&full_key, &content)
+                .await
+                .map_err(|err| CacheError::Store(err.to_string()))?;
 
             if added {
                 let ttl_secs = ttl.as_secs().max(1);
@@ -109,7 +119,11 @@ impl<C: RedisCommands + 'static> CacheStore for RedisCacheStore<C> {
     fn pull<'a>(&'a self, key: &'a str) -> BoxFuture<'a, Result<Option<CacheEntry>, CacheError>> {
         Box::pin(async move {
             let full_key = self.format_key(key);
-            let content = self.client.get(&full_key).await?;
+            let content = self
+                .client
+                .get(&full_key)
+                .await
+                .map_err(|err| CacheError::Store(err.to_string()))?;
 
             if let Some(raw) = content {
                 let delete_result = self.client.del(&full_key).await;
@@ -125,7 +139,11 @@ impl<C: RedisCommands + 'static> CacheStore for RedisCacheStore<C> {
     fn forget<'a>(&'a self, key: &'a str) -> BoxFuture<'a, Result<bool, CacheError>> {
         Box::pin(async move {
             let full_key = self.format_key(key);
-            let removed = self.client.del(&full_key).await?;
+            let removed = self
+                .client
+                .del(&full_key)
+                .await
+                .map_err(|err| CacheError::Store(err.to_string()))?;
             Ok(removed)
         })
     }
@@ -134,7 +152,11 @@ impl<C: RedisCommands + 'static> CacheStore for RedisCacheStore<C> {
         Box::pin(async move {
             let full_keys: Vec<String> = keys.iter().map(|key| self.format_key(key)).collect();
             let key_refs: Vec<&str> = full_keys.iter().map(AsRef::as_ref).collect();
-            let removed = self.client.del_many(&key_refs).await?;
+            let removed = self
+                .client
+                .del_many(&key_refs)
+                .await
+                .map_err(|err| CacheError::Store(err.to_string()))?;
             Ok(removed as usize)
         })
     }
@@ -147,7 +169,11 @@ impl<C: RedisCommands + 'static> CacheStore for RedisCacheStore<C> {
     ) -> BoxFuture<'a, Result<i64, CacheError>> {
         Box::pin(async move {
             let full_key = self.format_key(key);
-            let new_value = self.client.incr_by(&full_key, amount).await?;
+            let new_value = self
+                .client
+                .incr_by(&full_key, amount)
+                .await
+                .map_err(|err| CacheError::Store(err.to_string()))?;
             if ttl > Duration::ZERO {
                 let expire_result = self.client.expire(&full_key, ttl.as_secs().max(1)).await;
                 drop(expire_result);
@@ -159,12 +185,18 @@ impl<C: RedisCommands + 'static> CacheStore for RedisCacheStore<C> {
     fn flush(&self) -> BoxFuture<'_, Result<(), CacheError>> {
         Box::pin(async move {
             let pattern = format!("{}*", self.prefix);
-            let keys = self.client.keys(&pattern).await?;
+            let keys = self
+                .client
+                .keys(&pattern)
+                .await
+                .map_err(|err| CacheError::Store(err.to_string()))?;
 
             if !keys.is_empty() {
                 let key_refs: Vec<&str> = keys.iter().map(AsRef::as_ref).collect();
-                let deleted_count = self.client.del_many(&key_refs).await?;
-                let _ = deleted_count;
+                self.client
+                    .del_many(&key_refs)
+                    .await
+                    .map_err(|err| CacheError::Store(err.to_string()))?;
             }
             Ok(())
         })

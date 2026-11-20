@@ -34,7 +34,7 @@ fn test_cache_error_display_and_source() {
     #[cfg(feature = "redis")]
     {
         let redis_err = redis::RedisError::connection("redis bad connection");
-        let converted = CacheError::from(redis_err);
+        let converted = CacheError::Store(redis_err.to_string());
         assert!(format!("{converted}").contains("redis bad connection"));
     }
 }
