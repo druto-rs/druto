@@ -1386,6 +1386,56 @@ fn test_method_trait_conversions() {
     assert_eq!(from_string, Method::Delete);
 }
 
+#[test]
+fn test_matcher_and_method_matcher_constraints_and_named() {
+    use std::collections::HashMap;
+
+    let mut matcher = Matcher::new();
+    let mut constraints = HashMap::new();
+    constraints.insert("id".to_string(), Constraint::num());
+
+    matcher
+        .insert_with_constraints("/users/:id", 100, constraints.clone())
+        .unwrap();
+
+    let matched = matcher.find("/users/42").unwrap();
+    assert_eq!(*matched.payload, 100);
+    assert!(matches!(
+        matcher.find("/users/abc"),
+        Err(MatcherError::NotFound { .. })
+    ));
+
+    matcher
+        .insert_named_with_constraints("user.show", "/accounts/:id", 200, constraints.clone())
+        .unwrap();
+    let built = matcher.build_path("user.show", &[("id", "500")]).unwrap();
+    assert_eq!(built, "/accounts/500");
+
+    let mut method_matcher = MethodMatcher::new();
+    method_matcher
+        .insert_with_constraints(Method::Get, "/api/:id", 300, constraints.clone())
+        .unwrap();
+    let api_match = method_matcher.find(&Method::Get, "/api/77").unwrap();
+    assert_eq!(*api_match.payload, 300);
+
+    method_matcher
+        .insert_named_with_constraints(
+            "api.detail",
+            Method::Post,
+            "/api/:id/save",
+            400,
+            constraints,
+        )
+        .unwrap();
+    let api_built = method_matcher
+        .build_path("api.detail", &[("id", "88")])
+        .unwrap();
+    assert_eq!(api_built, "/api/88/save");
+
+    let err_missing = method_matcher.build_path("nonexistent", &[]).unwrap_err();
+    assert!(matches!(err_missing, MatcherError::RouteNotFound { .. }));
+}
+
 proptest! {
     #![proptest_config(proptest::test_runner::Config {
         failure_persistence: None,

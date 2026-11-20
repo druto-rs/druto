@@ -209,3 +209,175 @@ async fn test_parse_multipart_stream_fail_fast_on_limit() {
         }
     );
 }
+
+#[test]
+fn test_multipart_rfc5987_filename_star() {
+    let boundary = "RFC5987_BOUNDARY";
+    let body = format!(
+        "--{boundary}\r\n\
+        Content-Disposition: form-data; name=\"doc\"; filename*=\"utf-8''resume.pdf\"\r\n\
+        Content-Type: application/pdf\r\n\
+        \r\n\
+        %PDF-1.4\r\n\
+        --{boundary}\r\n\
+        Content-Disposition: form-data; name=\"raw\"; filename*=\"direct.txt\"\r\n\
+        Content-Type: text/plain\r\n\
+        \r\n\
+        plain\r\n\
+        --{boundary}--\r\n"
+    );
+
+    let temp_dir = tempfile::tempdir().unwrap();
+    let parser = MultipartParser::new(boundary, PayloadLimits::default()).temp_dir(temp_dir.path());
+    assert_eq!(parser.boundary(), boundary);
+
+    let mut parsed = parser.parse_slice(body.as_bytes()).unwrap();
+    assert_eq!(parsed.all_files().len(), 2);
+    let doc = parsed.file("doc").unwrap();
+    assert_eq!(doc.client_filename(), "resume.pdf");
+    let raw = parsed.file("raw").unwrap();
+    assert_eq!(raw.client_filename(), "direct.txt");
+
+    // Test file_mut, files_by_name, all_files_mut, into_files
+    assert!(parsed.file_mut("doc").is_some());
+    assert_eq!(parsed.files_by_name("doc").len(), 1);
+    assert_eq!(parsed.all_files_mut().len(), 2);
+    let files = parsed.into_files();
+    assert_eq!(files.len(), 2);
+}
+
+#[test]
+fn test_multipart_malformed_headers_and_payloads() {
+    let boundary = "ERR_B";
+    let parser = MultipartParser::new(boundary, PayloadLimits::default());
+
+    // 1. Missing name in Content-Disposition
+    let missing_name_body = format!(
+        "--{boundary}\r\n\
+        Content-Disposition: form-data\r\n\
+        \r\n\
+        value\r\n\
+        --{boundary}--\r\n"
+    );
+    let err = parser
+        .parse_slice(missing_name_body.as_bytes())
+        .unwrap_err();
+    assert!(
+        matches!(err, BodyParserError::MalformedMultipart(ref msg) if msg.contains("Missing 'name'"))
+    );
+
+    // 2. Part header terminator not found
+    let missing_terminator = format!(
+        "--{boundary}\r\n\
+        Content-Disposition: form-data; name=\"test\""
+    );
+    let err = parser
+        .parse_slice(missing_terminator.as_bytes())
+        .unwrap_err();
+    assert!(
+        matches!(err, BodyParserError::MalformedMultipart(ref msg) if msg.contains("terminator not found"))
+    );
+
+    // 3. Part headers invalid UTF-8
+    let mut invalid_header = format!("--{boundary}\r\n").into_bytes();
+    invalid_header.extend_from_slice(&[0xFF, 0xFE]);
+    invalid_header.extend_from_slice(b"\r\n\r\nvalue\r\n--");
+    invalid_header.extend_from_slice(boundary.as_bytes());
+    invalid_header.extend_from_slice(b"--\r\n");
+    let err = parser.parse_slice(&invalid_header).unwrap_err();
+    assert!(
+        matches!(err, BodyParserError::MalformedMultipart(ref msg) if msg.contains("invalid UTF-8"))
+    );
+
+    // 4. Closing boundary for part not found
+    let no_closing_boundary = format!(
+        "--{boundary}\r\n\
+        Content-Disposition: form-data; name=\"test\"\r\n\
+        \r\n\
+        unclosed body text"
+    );
+    let err = parser
+        .parse_slice(no_closing_boundary.as_bytes())
+        .unwrap_err();
+    assert!(
+        matches!(err, BodyParserError::MalformedMultipart(ref msg) if msg.contains("Closing boundary"))
+    );
+
+    // 5. Text field with invalid UTF-8
+    let mut invalid_utf8_body = format!(
+        "--{boundary}\r\n\
+        Content-Disposition: form-data; name=\"test\"\r\n\
+        \r\n"
+    )
+    .into_bytes();
+    invalid_utf8_body.extend_from_slice(&[0xFF, 0xFE]);
+    invalid_utf8_body.extend_from_slice(format!("\r\n--{boundary}--\r\n").as_bytes());
+    let err = parser.parse_slice(&invalid_utf8_body).unwrap_err();
+    assert!(
+        matches!(err, BodyParserError::MalformedMultipart(ref msg) if msg.contains("Text field contains invalid UTF-8"))
+    );
+}
+
+#[test]
+fn test_multipart_aggregate_fields_size_limit() {
+    let boundary = "LIMIT_B";
+    let body = format!(
+        "--{boundary}\r\n\
+        Content-Disposition: form-data; name=\"f1\"\r\n\
+        \r\n\
+        123456\r\n\
+        --{boundary}\r\n\
+        Content-Disposition: form-data; name=\"f2\"\r\n\
+        \r\n\
+        789012\r\n\
+        --{boundary}--\r\n"
+    );
+
+    let limits = PayloadLimits::builder().max_fields_size(10).build();
+    let parser = MultipartParser::new(boundary, limits);
+    let err = parser.parse_slice(body.as_bytes()).unwrap_err();
+    assert_eq!(
+        err,
+        BodyParserError::PayloadTooLarge {
+            limit: 10,
+            received: 12,
+        }
+    );
+}
+
+#[tokio::test]
+async fn test_parse_multipart_stream_with_temp_dir_and_stream_error() {
+    let boundary = "STREAM_TEMP_B";
+    let body = format!(
+        "--{boundary}\r\n\
+        Content-Disposition: form-data; name=\"file\"; filename=\"test.txt\"\r\n\
+        Content-Type: text/plain\r\n\
+        \r\n\
+        Sample stream text\r\n\
+        --{boundary}--\r\n"
+    );
+
+    let temp_dir = tempfile::tempdir().unwrap();
+    let stream = stream::iter(vec![Ok::<Bytes, std::io::Error>(Bytes::from(body))]);
+    let parsed = parse_multipart_stream(
+        stream,
+        boundary,
+        PayloadLimits::default(),
+        Some(temp_dir.path()),
+    )
+    .await
+    .unwrap();
+
+    let file = parsed.file("file").unwrap();
+    assert_eq!(file.client_filename(), "test.txt");
+
+    // Stream yielding an IO error propagates as BodyParserError::IoError
+    let fail_stream = stream::iter(vec![Err(std::io::Error::new(
+        std::io::ErrorKind::BrokenPipe,
+        "pipe failed",
+    ))]);
+    let err = parse_multipart_stream(fail_stream, boundary, PayloadLimits::default(), None)
+        .await
+        .unwrap_err();
+    assert!(matches!(err, BodyParserError::IoError(ref msg) if msg.contains("pipe failed")));
+}

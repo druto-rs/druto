@@ -3,7 +3,7 @@ use std::{
     time::Duration,
 };
 
-use cache::{Cache, CacheEvent, CacheTier, MemoryCacheStore};
+use cache::{Cache, CacheEvent, CacheStore, CacheTier, MemoryCacheStore};
 
 #[tokio::test]
 async fn test_cache_facade_features_and_events() {
@@ -146,4 +146,54 @@ async fn test_cache_namespace_prefixing() {
         cache.get::<String>("v1:users").await.unwrap().unwrap(),
         "UserList"
     );
+}
+
+#[tokio::test]
+async fn test_cache_with_prefix_and_grace_period_hit() {
+    let store = Arc::new(MemoryCacheStore::new());
+    let recorded_events = Arc::new(Mutex::new(Vec::new()));
+    let events_clone = Arc::clone(&recorded_events);
+
+    let cache = Cache::new(store.clone())
+        .with_prefix("tenant:")
+        .with_events(Arc::new(move |event| {
+            events_clone.lock().unwrap().push(event.clone());
+        }));
+
+    cache
+        .put("settings", &"theme_dark", Duration::from_secs(300))
+        .await
+        .unwrap();
+
+    let fetched: String = cache.get("settings").await.unwrap().unwrap();
+    assert_eq!(fetched, "theme_dark");
+
+    // Check directly in underlying store for prefix
+    assert!(store.get("tenant:settings").await.unwrap().is_some());
+
+    // Put a graced entry directly to verify CacheTier::Graced event on hit
+    let graced_entry = cache::CacheEntry::from_value(
+        &"graced_val",
+        Duration::from_millis(10),
+        Duration::from_secs(60),
+        Vec::new(),
+    )
+    .unwrap();
+    store
+        .put("tenant:graced_item", &graced_entry, Duration::from_secs(60))
+        .await
+        .unwrap();
+
+    tokio::time::sleep(Duration::from_millis(25)).await;
+    let graced_fetched: String = cache.get("graced_item").await.unwrap().unwrap();
+    assert_eq!(graced_fetched, "graced_val");
+
+    let events = recorded_events.lock().unwrap();
+    assert!(events.iter().any(|e| matches!(
+        e,
+        CacheEvent::Hit {
+            key,
+            tier: CacheTier::Graced
+        } if key == "graced_item"
+    )));
 }

@@ -267,3 +267,79 @@ fn test_middleware_query_method_parses_body() {
         Some("alice")
     );
 }
+
+#[test]
+fn test_middleware_text_payload_and_missing_content_type() {
+    // 1. Text payload
+    let text_request = Request::builder()
+        .method(Method::Post)
+        .path("/raw-text")
+        .header(HeaderName::CONTENT_TYPE, "text/plain; charset=utf-8")
+        .body(b"Hello raw plain text!".to_vec())
+        .build();
+
+    let mut ctx1 = HttpContext::new(text_request);
+    let called1 = Arc::new(AtomicBool::new(false));
+    let middleware = BodyParserMiddleware::default_config();
+    assert_eq!(middleware.config().allowed_methods().len(), 5);
+
+    let result1 = execute_pipeline(middleware.clone(), &mut ctx1, Arc::clone(&called1));
+    assert!(result1.is_ok());
+    assert!(called1.load(Ordering::SeqCst));
+
+    // 2. Missing Content-Type bypasses parsing
+    let no_content_type = Request::builder()
+        .method(Method::Post)
+        .path("/no-type")
+        .body(b"payload without header".to_vec())
+        .build();
+
+    let mut ctx2 = HttpContext::new(no_content_type);
+    let called2 = Arc::new(AtomicBool::new(false));
+    let result2 = execute_pipeline(middleware, &mut ctx2, Arc::clone(&called2));
+    assert!(result2.is_ok());
+    assert!(called2.load(Ordering::SeqCst));
+}
+
+#[test]
+fn test_middleware_multipart_with_temp_dir_config() {
+    let temp_dir = tempfile::tempdir().unwrap();
+    let config = BodyParserConfig::builder()
+        .temp_dir(temp_dir.path())
+        .build();
+    let middleware = BodyParserMiddleware::new(config);
+
+    let boundary = "TEMP_DIR_BOUND";
+    let body = format!(
+        "--{boundary}\r\n\
+        Content-Disposition: form-data; name=\"upload\"; filename=\"note.txt\"\r\n\
+        Content-Type: text/plain\r\n\
+        \r\n\
+        Note stored in temp dir\r\n\
+        --{boundary}--\r\n"
+    );
+
+    let request = Request::builder()
+        .method(Method::Post)
+        .path("/upload")
+        .header(
+            HeaderName::CONTENT_TYPE,
+            format!("multipart/form-data; boundary={boundary}"),
+        )
+        .body(body.into_bytes())
+        .build();
+
+    let mut ctx = HttpContext::new(request);
+    let called = Arc::new(AtomicBool::new(false));
+    let result = execute_pipeline(middleware, &mut ctx, Arc::clone(&called));
+
+    assert!(result.is_ok());
+    assert!(called.load(Ordering::SeqCst));
+
+    let files = ctx
+        .extensions
+        .get::<UploadedFiles>()
+        .expect("UploadedFiles must be present");
+    let file = files.file("upload").expect("upload file missing");
+    assert!(file.path().starts_with(temp_dir.path()));
+}

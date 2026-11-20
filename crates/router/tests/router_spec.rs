@@ -2855,4 +2855,19 @@ fn test_response_status_and_url_generator_exhaustive() {
         constraint: r"\d+".to_string(),
     });
     assert!(matches!(constraint_err, RouterError::InvalidParams { .. }));
+
+    // Test request.headers() accessor
+    let req = Request::builder()
+        .header(HeaderName::CONTENT_TYPE, "application/json")
+        .build();
+    assert_eq!(req.headers().len(), 1);
+
+    // Test route.prefix_pattern with empty or root prefix
+    let mut route_empty_prefix = router::Route::new(
+        vec![Method::Get],
+        "dashboard",
+        Arc::new(dummy_terminal_handler),
+    );
+    route_empty_prefix.prefix_pattern("/");
+    assert_eq!(route_empty_prefix.pattern(), "/dashboard");
 }

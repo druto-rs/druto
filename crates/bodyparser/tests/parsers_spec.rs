@@ -38,6 +38,14 @@ fn test_parse_json_depth_limit_exceeded() {
 
     let err = parse_json_value(payload, &limits).unwrap_err();
     assert_eq!(err, BodyParserError::NestingDepthExceeded { max_depth: 3 });
+
+    // Test array nesting depth limit exceeded
+    let array_payload = br#"[[[[1]]]]"#;
+    let err_array = parse_json_value(array_payload, &limits).unwrap_err();
+    assert_eq!(
+        err_array,
+        BodyParserError::NestingDepthExceeded { max_depth: 3 }
+    );
 }
 
 #[test]

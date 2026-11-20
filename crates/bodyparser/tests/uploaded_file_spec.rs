@@ -140,3 +140,98 @@ fn test_uploaded_file_move_to() {
         bodyparser::BodyParserError::FileAlreadyMoved
     );
 }
+
+#[test]
+fn test_file_error_display_and_source() {
+    let cases = vec![
+        (
+            FileError::SizeLimitExceeded {
+                limit: 100,
+                actual: 200,
+            },
+            "File size of 200 bytes exceeds maximum limit of 100 bytes",
+        ),
+        (
+            FileError::SizeBelowMinimum {
+                minimum: 50,
+                actual: 10,
+            },
+            "File size of 10 bytes is below required minimum of 50 bytes",
+        ),
+        (
+            FileError::InvalidExtension {
+                extension: "exe".to_string(),
+                allowed: vec!["jpg".to_string(), "png".to_string()],
+            },
+            "File extension 'exe' is not allowed. Allowed extensions: jpg, png",
+        ),
+        (
+            FileError::InvalidMimeType {
+                mime: "text/plain".to_string(),
+                allowed: vec!["image/jpeg".to_string(), "image/png".to_string()],
+            },
+            "MIME type 'text/plain' is not allowed. Allowed types: image/jpeg, image/png",
+        ),
+        (
+            FileError::MimeMismatch {
+                declared: "image/png".to_string(),
+                detected: "application/x-executable".to_string(),
+            },
+            "Detected content signature 'application/x-executable' does not match declared type 'image/png'",
+        ),
+    ];
+
+    for (error, expected) in cases {
+        assert_eq!(format!("{error}"), expected);
+        use std::error::Error;
+        assert!(error.source().is_none());
+    }
+}
+
+#[test]
+fn test_file_validator_extension_clean_and_extensionless() {
+    let mut temp1 = TempFile::new(None).unwrap();
+    temp1.write_chunk(b"data").unwrap();
+    let mut file_with_dot = UploadedFile::new("f", "doc.pdf", None, "application/pdf", temp1);
+
+    let validator = FileValidator::new().extension(".pdf");
+    file_with_dot.validate(&validator);
+    assert!(file_with_dot.is_valid());
+
+    let mut temp2 = TempFile::new(None).unwrap();
+    temp2.write_chunk(b"data").unwrap();
+    let mut file_no_ext = UploadedFile::new("f", "LICENSE", None, "text/plain", temp2);
+
+    file_no_ext.validate(&validator);
+    assert!(!file_no_ext.is_valid());
+    assert!(file_no_ext.has_errors());
+    assert_eq!(
+        file_no_ext.errors()[0],
+        FileError::InvalidExtension {
+            extension: String::new(),
+            allowed: vec!["pdf".to_string()],
+        }
+    );
+}
+
+#[test]
+fn test_file_validator_mime_exact_and_mismatches() {
+    let mut temp = TempFile::new(None).unwrap();
+    temp.write_chunk(b"binary payload").unwrap();
+    let mut file = UploadedFile::new("upload", "archive.tar", None, "application/x-tar", temp);
+
+    let validator = FileValidator::new().mimes(["application/zip", "application/gzip"]);
+    file.validate(&validator);
+
+    assert!(!file.is_valid());
+    assert_eq!(
+        file.errors(),
+        &[FileError::InvalidMimeType {
+            mime: "application/x-tar".to_string(),
+            allowed: vec![
+                "application/zip".to_string(),
+                "application/gzip".to_string()
+            ],
+        }]
+    );
+}

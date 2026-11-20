@@ -135,3 +135,153 @@ async fn test_tiered_cache_store_fallback_insurance() {
     let fetched = tiered.get("k").await.unwrap().expect("served from L1");
     assert_eq!(fetched.deserialize::<String>().unwrap(), "local_saved");
 }
+
+struct FailingStore;
+
+impl CacheStore for FailingStore {
+    fn get<'a>(
+        &'a self,
+        key: &'a str,
+    ) -> cache::store::BoxFuture<'a, Result<Option<CacheEntry>, cache::CacheError>> {
+        let _ = key;
+        Box::pin(async { Err(cache::CacheError::Store("down".to_string())) })
+    }
+
+    fn put<'a>(
+        &'a self,
+        key: &'a str,
+        entry: &'a CacheEntry,
+        ttl: Duration,
+    ) -> cache::store::BoxFuture<'a, Result<(), cache::CacheError>> {
+        let _ = (key, entry, ttl);
+        Box::pin(async { Err(cache::CacheError::Store("down".to_string())) })
+    }
+
+    fn add<'a>(
+        &'a self,
+        key: &'a str,
+        entry: &'a CacheEntry,
+        ttl: Duration,
+    ) -> cache::store::BoxFuture<'a, Result<bool, cache::CacheError>> {
+        let _ = (key, entry, ttl);
+        Box::pin(async { Err(cache::CacheError::Store("down".to_string())) })
+    }
+
+    fn pull<'a>(
+        &'a self,
+        key: &'a str,
+    ) -> cache::store::BoxFuture<'a, Result<Option<CacheEntry>, cache::CacheError>> {
+        let _ = key;
+        Box::pin(async { Err(cache::CacheError::Store("down".to_string())) })
+    }
+
+    fn forget<'a>(
+        &'a self,
+        key: &'a str,
+    ) -> cache::store::BoxFuture<'a, Result<bool, cache::CacheError>> {
+        let _ = key;
+        Box::pin(async { Err(cache::CacheError::Store("down".to_string())) })
+    }
+
+    fn forget_many<'a>(
+        &'a self,
+        keys: &'a [&'a str],
+    ) -> cache::store::BoxFuture<'a, Result<usize, cache::CacheError>> {
+        let _ = keys;
+        Box::pin(async { Err(cache::CacheError::Store("down".to_string())) })
+    }
+
+    fn increment<'a>(
+        &'a self,
+        key: &'a str,
+        amount: i64,
+        ttl: Duration,
+    ) -> cache::store::BoxFuture<'a, Result<i64, cache::CacheError>> {
+        let _ = (key, amount, ttl);
+        Box::pin(async { Err(cache::CacheError::Store("down".to_string())) })
+    }
+
+    fn flush(&self) -> cache::store::BoxFuture<'_, Result<(), cache::CacheError>> {
+        Box::pin(async { Err(cache::CacheError::Store("down".to_string())) })
+    }
+}
+
+#[tokio::test]
+async fn test_tiered_cache_failing_distributed_store() {
+    let memory = MemoryCacheStore::default();
+    let failing_store = Arc::new(FailingStore);
+
+    // 1. With fallback insurance enabled:
+    let tiered_insured = TieredCacheStore::new(memory.clone(), failing_store.clone())
+        .with_fallback_insurance(true)
+        .with_short_circuit(false);
+
+    let entry = CacheEntry::from_value(
+        &"value_insured",
+        Duration::from_secs(3600),
+        Duration::ZERO,
+        Vec::new(),
+    )
+    .unwrap();
+
+    // Put falls back to L1 and succeeds
+    tiered_insured
+        .put("insured_key", &entry, Duration::from_secs(3600))
+        .await
+        .unwrap();
+
+    // Get falls back to L1 when distributed fails
+    let got = tiered_insured
+        .get("insured_key")
+        .await
+        .unwrap()
+        .expect("served from L1");
+    assert_eq!(got.deserialize::<String>().unwrap(), "value_insured");
+
+    // Add falls back to L1
+    let entry_add = CacheEntry::from_value(
+        &"value_add",
+        Duration::from_secs(3600),
+        Duration::ZERO,
+        Vec::new(),
+    )
+    .unwrap();
+    assert!(
+        tiered_insured
+            .add("add_key", &entry_add, Duration::from_secs(3600))
+            .await
+            .unwrap()
+    );
+
+    // Increment falls back to L1
+    let inc = tiered_insured
+        .increment("counter", 10, Duration::from_secs(3600))
+        .await
+        .unwrap();
+    assert_eq!(inc, 10);
+
+    // 2. With fallback insurance disabled:
+    let tiered_strict = TieredCacheStore::new(memory.clone(), failing_store)
+        .with_fallback_insurance(false)
+        .with_short_circuit(false);
+
+    assert!(
+        tiered_strict
+            .put("strict_key", &entry, Duration::from_secs(3600))
+            .await
+            .is_err()
+    );
+    assert!(tiered_strict.get("strict_key").await.is_err());
+    assert!(
+        tiered_strict
+            .add("strict_key", &entry, Duration::from_secs(3600))
+            .await
+            .is_err()
+    );
+    assert!(
+        tiered_strict
+            .increment("strict_count", 1, Duration::from_secs(3600))
+            .await
+            .is_err()
+    );
+}

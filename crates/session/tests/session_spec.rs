@@ -1902,4 +1902,37 @@ mod redis_store_tests {
         // Confirm session destroyed in RedisFake after invalidate
         assert!(!block_on(fake_redis.exists(&redis_key)).expect("exists check must succeed"));
     }
+
+    #[test]
+    fn test_session_id_and_record_edge_cases() {
+        use std::ops::Deref;
+
+        let session_id = SessionId::generate().expect("generation failed");
+        assert_eq!(session_id.as_str(), session_id.deref());
+        assert_eq!(session_id.as_ref(), session_id.as_str());
+
+        let debug_str = format!("{session_id:?}");
+        assert!(debug_str.contains("SessionId("));
+
+        let validated =
+            SessionId::validate(session_id.as_str()).expect("validation should succeed");
+        assert_eq!(validated, session_id);
+
+        // Invalid length
+        let err_short = SessionId::parse("too_short").unwrap_err();
+        assert!(
+            matches!(err_short, SessionError::InvalidId(ref msg) if msg.contains("expected length 43"))
+        );
+
+        // Invalid character in 43-character string
+        let invalid_chars = "012345678901234567890123456789012345678901!";
+        let err_char = SessionId::parse(invalid_chars).unwrap_err();
+        assert!(
+            matches!(err_char, SessionError::InvalidId(ref msg) if msg.contains("invalid characters"))
+        );
+
+        // SessionRecord deserialization failure
+        let deser_err = SessionRecord::from_json("{invalid json").unwrap_err();
+        assert!(matches!(deser_err, SessionError::Deserialization(_)));
+    }
 }

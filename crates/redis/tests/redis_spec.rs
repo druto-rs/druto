@@ -1212,3 +1212,244 @@ async fn test_wildcard_middle_matching() {
         }
     }
 }
+
+#[tokio::test]
+async fn test_subscriber_stream_ext_and_unsubscriptions() {
+    use futures_util::StreamExt;
+
+    let (subscriber, broadcast_tx) = redis::pubsub::RedisSubscriber::new_mock();
+    let channel_stream = subscriber.subscribe("events").await.unwrap();
+    drop(channel_stream);
+    let mut pattern_stream = subscriber.psubscribe("events.*").await.unwrap();
+
+    let msg = RedisMessage::new("events.order", None, "placed", b"placed".to_vec());
+    assert_eq!(msg.channel(), "events.order");
+    assert_eq!(msg.payload(), "placed");
+    assert_eq!(msg.binary_payload(), b"placed");
+    let json_err: Result<UserSession, _> = msg.to_json();
+    assert!(json_err.is_err());
+
+    let _ = broadcast_tx.send(msg);
+
+    // StreamExt next()
+    let received = pattern_stream.next().await.unwrap();
+    assert_eq!(received.channel(), "events.order");
+    assert_eq!(received.pattern(), Some("events.*"));
+
+    // Unsubscribe and punsubscribe
+    assert!(subscriber.unsubscribe("events").await.is_ok());
+    assert!(subscriber.punsubscribe("events.*").await.is_ok());
+    assert!(subscriber.quit().await.is_ok());
+}
+
+#[tokio::test]
+async fn test_wildcard_pattern_match_variations() {
+    let (subscriber, broadcast_tx) = redis::pubsub::RedisSubscriber::new_mock();
+    let mut stream_star = subscriber.psubscribe("*").await.unwrap();
+    let mut stream_exact = subscriber.psubscribe("exact").await.unwrap();
+
+    let msg1 = RedisMessage::new("any.channel", None, "data", b"data".to_vec());
+    let _ = broadcast_tx.send(msg1);
+    let rec1 = stream_star.next_message().await.unwrap();
+    assert_eq!(rec1.channel(), "any.channel");
+
+    let msg2 = RedisMessage::new("exact", None, "data", b"data".to_vec());
+    let _ = broadcast_tx.send(msg2);
+    let rec2 = stream_exact.next_message().await.unwrap();
+    assert_eq!(rec2.channel(), "exact");
+}
+
+#[test]
+fn test_script_and_output_exhaustive() {
+    let script = RedisScript::new("return 100;");
+    assert_eq!(script.source(), "return 100;");
+    assert!(!script.has_simulation());
+    let debug_repr = format!("{script:?}");
+    assert!(debug_repr.contains("RedisScript"));
+    assert!(debug_repr.contains("has_simulation: false"));
+
+    // ScriptOutput from conversions
+    let out_i64 = ScriptOutput::from(42i64);
+    assert_eq!(out_i64.as_i64(), Some(42));
+    assert_eq!(out_i64.into_string(), Some("42".to_string()));
+
+    let out_str = ScriptOutput::from("hello");
+    assert_eq!(out_str.as_str(), Some("hello"));
+
+    let out_bool = ScriptOutput::from(true);
+    assert_eq!(out_bool.as_bool(), Some(true));
+    assert_eq!(out_bool.as_i64(), Some(1));
+    assert_eq!(ScriptOutput::from(false).as_i64(), Some(0));
+
+    let out_bytes = ScriptOutput::from(b"binary_data".to_vec());
+    assert_eq!(
+        out_bytes.clone().into_string(),
+        Some("binary_data".to_string())
+    );
+
+    // as_bool variations
+    assert_eq!(ScriptOutput::String("0".to_string()).as_bool(), Some(false));
+    assert_eq!(
+        ScriptOutput::String("false".to_string()).as_bool(),
+        Some(false)
+    );
+    assert_eq!(
+        ScriptOutput::String("FALSE".to_string()).as_bool(),
+        Some(false)
+    );
+    assert_eq!(ScriptOutput::String("1".to_string()).as_bool(), Some(true));
+    assert_eq!(ScriptOutput::String("OK".to_string()).as_bool(), Some(true));
+    assert_eq!(ScriptOutput::String("unknown".to_string()).as_bool(), None);
+    assert_eq!(ScriptOutput::Nil.as_bool(), Some(false));
+    assert_eq!(ScriptOutput::Binary(vec![1]).as_bool(), None);
+
+    // into_json errors
+    let non_string = ScriptOutput::Nil;
+    let json_res: Result<UserSession, _> = non_string.into_json();
+    assert!(json_res.is_err());
+
+    // fred::types::Value conversions
+    let val_int = fred::types::Value::Integer(10);
+    assert_eq!(ScriptOutput::from(val_int), ScriptOutput::Integer(10));
+
+    let val_str = fred::types::Value::String("fred_str".into());
+    assert_eq!(
+        ScriptOutput::from(val_str),
+        ScriptOutput::String("fred_str".to_string())
+    );
+
+    let val_bytes = fred::types::Value::Bytes(vec![1, 2, 3].into());
+    assert_eq!(
+        ScriptOutput::from(val_bytes),
+        ScriptOutput::Binary(vec![1, 2, 3])
+    );
+
+    let val_bool = fred::types::Value::Boolean(true);
+    assert_eq!(ScriptOutput::from(val_bool), ScriptOutput::Boolean(true));
+
+    let val_null = fred::types::Value::Null;
+    assert_eq!(ScriptOutput::from(val_null), ScriptOutput::Nil);
+
+    let val_double = fred::types::Value::Double(12.5);
+    assert!(
+        matches!(ScriptOutput::from(val_double), ScriptOutput::String(ref s) if s.contains("12.5"))
+    );
+
+    let val_array = fred::types::Value::Array(vec![
+        fred::types::Value::Integer(1),
+        fred::types::Value::String("second".into()),
+    ]);
+    let out_arr = ScriptOutput::from(val_array);
+    assert!(matches!(out_arr, ScriptOutput::Array(ref items) if items.len() == 2));
+}
+
+#[test]
+fn test_pipeline_and_transaction_builders_extended() {
+    let mut pipeline = redis::RedisPipeline::new();
+    assert!(pipeline.is_empty());
+    assert_eq!(pipeline.len(), 0);
+
+    pipeline
+        .set_nx("nx_k", "nx_v")
+        .hdel("h_k", "h_field")
+        .rpush("list_k", &["v1", "v2"]);
+
+    assert!(!pipeline.is_empty());
+    assert_eq!(pipeline.len(), 3);
+    assert_eq!(pipeline.operations().len(), 3);
+
+    let ops = pipeline.clone().into_operations();
+    assert_eq!(ops.len(), 3);
+
+    pipeline.clear();
+    assert!(pipeline.is_empty());
+
+    let mut tx = redis::RedisTransaction::new();
+    assert!(tx.is_empty());
+    assert_eq!(tx.len(), 0);
+
+    tx.set_nx("tx_nx", "v")
+        .hdel("tx_h", "f")
+        .rpush("tx_l", &["item"]);
+
+    assert!(!tx.is_empty());
+    assert_eq!(tx.len(), 3);
+    assert_eq!(tx.operations().len(), 3);
+
+    tx.discard();
+    assert!(tx.is_empty());
+}
+
+#[tokio::test]
+async fn test_connection_and_manager_handles() {
+    use fred::interfaces::ClientLike;
+
+    let config = RedisConfig::default();
+    let target = config.get_connection(DEFAULT_CONNECTION_NAME).unwrap();
+    let driver_config = target.to_driver_config().unwrap();
+    let client = fred::types::Builder::from_config(driver_config)
+        .build()
+        .unwrap();
+    let conn = redis::RedisConnection::new("standalone_handle", client);
+
+    assert_eq!(conn.name(), "standalone_handle");
+    assert!(!conn.is_connected());
+    assert_eq!(
+        conn.raw_client().state(),
+        fred::types::ClientState::Disconnected
+    );
+    assert!(conn.pipeline().is_empty());
+    assert!(conn.transaction().is_empty());
+
+    let config = RedisConfig::default();
+    let manager = RedisManager::new(config);
+    assert_eq!(manager.config().len(), 1);
+
+    let default_mgr = RedisManager::default();
+    assert_eq!(default_mgr.config().len(), 1);
+
+    let unknown_conn = manager.connection("nonexistent").await;
+    assert!(unknown_conn.is_err());
+    assert!(matches!(
+        unknown_conn.unwrap_err(),
+        RedisError::Configuration(_)
+    ));
+
+    let unknown_sub = manager.subscriber("nonexistent").await;
+    assert!(matches!(unknown_sub, Err(RedisError::Configuration(_))));
+
+    assert!(manager.quit_all().await.is_ok());
+    assert!(manager.disconnect_all().await.is_ok());
+}
+
+#[tokio::test]
+async fn test_script_context_coverage_on_fake() {
+    let fake = RedisFake::new();
+    let script = RedisScript::new("test_script").with_simulation(|keys, args, context| {
+        let key = keys[0];
+        let arg = args[0];
+
+        context.set(key, arg);
+        assert!(context.exists(key));
+        assert_eq!(context.get(key), Some(arg.to_string()));
+
+        context.set_ex(key, "temp", 100);
+        assert!(context.ttl(key) > 0);
+
+        context.incr_by("counter", 10);
+        assert_eq!(context.get("counter"), Some("10".to_string()));
+
+        assert!(context.expire(key, 200));
+        assert!(context.del(key));
+        assert!(!context.exists(key));
+        assert_eq!(context.get(key), None);
+
+        Ok(ScriptOutput::String("simulation_ok".to_string()))
+    });
+
+    let res = fake
+        .eval_script(&script, &["script_key"], &["script_arg"])
+        .await
+        .unwrap();
+    assert_eq!(res, ScriptOutput::String("simulation_ok".to_string()));
+}

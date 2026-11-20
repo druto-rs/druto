@@ -83,4 +83,28 @@ fn test_temp_file_write_after_moved() {
         BodyParserError::FileAlreadyMoved
     );
     assert_eq!(temp.flush().unwrap_err(), BodyParserError::FileAlreadyMoved);
+
+    // read_initial_bytes directly from path when file handle is closed after persist
+    let bytes_after_move = temp.read_initial_bytes(5).unwrap();
+    assert_eq!(&bytes_after_move, b"First");
+}
+
+#[test]
+fn test_temp_file_custom_directory_and_invalid_persist() {
+    let custom_dir = tempfile::tempdir().unwrap();
+    let mut temp = TempFile::new(Some(custom_dir.path())).unwrap();
+    assert!(temp.path().starts_with(custom_dir.path()));
+    assert!(!temp.is_persisted());
+
+    temp.write_chunk(b"Custom directory payload").unwrap();
+    temp.flush().unwrap();
+
+    let initial = temp.read_initial_bytes(6).unwrap();
+    assert_eq!(&initial, b"Custom");
+
+    // Persisting to an existing directory itself as a file fails
+    let fail_target = custom_dir.path().to_path_buf();
+    let result = temp.persist_to(&fail_target);
+    assert!(result.is_err());
+    assert!(!temp.is_persisted());
 }

@@ -754,3 +754,32 @@ fn test_next_remaining_and_is_terminal() {
 
     assert_eq!(result, Ok("ok".to_string()));
 }
+
+#[test]
+fn test_next_already_called_error() {
+    use std::error::Error;
+
+    let pipeline: Pipeline<TestContext, String, AppError> = Pipeline::new().pipe_fn(|ctx, next| {
+        Box::pin(async move {
+            let first = next.run(ctx).await;
+            assert!(first.is_ok());
+            next.run(ctx).await
+        })
+    });
+
+    let mut ctx = TestContext::default();
+    let result = block_on(pipeline.run(
+        &mut ctx,
+        from_terminal(|target_ctx: &mut TestContext| {
+            let _ = target_ctx;
+            Box::pin(async move { Ok("ok".to_string()) })
+        }),
+    ));
+
+    assert_eq!(result, Err(PipelineError::NextAlreadyCalled));
+    assert!(
+        PipelineError::<AppError>::NextAlreadyCalled
+            .source()
+            .is_none()
+    );
+}
