@@ -2,8 +2,8 @@
 
 use std::collections::BTreeMap;
 
-use qs::{
-    QsValue,
+use khonj::{
+    Value,
     encoding::{encode_component, encode_key_preserving_brackets},
 };
 
@@ -101,13 +101,13 @@ impl ParsedMultipart {
         self.files.into_inner()
     }
 
-    /// Structures all text fields into nested maps and arrays using Druto's [`qs`] parser.
-    pub fn structured_fields(&self) -> Result<QsValue, BodyParserError> {
+    /// Structures all text fields into nested maps and arrays using the [`khonj`] parser.
+    pub fn structured_fields(&self) -> Result<Value, BodyParserError> {
         if self.text_fields.is_empty() {
-            return Ok(QsValue::Object(BTreeMap::new()));
+            return Ok(Value::Object(BTreeMap::new()));
         }
 
-        // Encode key-value pairs into query string representation for qs parsing
+        // Encode key-value pairs into query string representation for query string parsing
         let encoded_query = self
             .text_fields
             .iter()
@@ -119,6 +119,6 @@ impl ParsedMultipart {
             .collect::<Vec<_>>()
             .join("&");
 
-        qs::parse(&encoded_query).map_err(BodyParserError::from)
+        khonj::parse(&encoded_query).map_err(BodyParserError::from)
     }
 }

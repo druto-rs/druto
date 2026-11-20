@@ -114,8 +114,8 @@ impl From<serde_json::Error> for BodyParserError {
     }
 }
 
-impl From<qs::QsError> for BodyParserError {
-    fn from(error: qs::QsError) -> Self {
+impl From<khonj::Error> for BodyParserError {
+    fn from(error: khonj::Error) -> Self {
         Self::FormError(error.to_string())
     }
 }

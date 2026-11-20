@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use bodyparser::{FormFields, TempFile, UploadedFile, UploadedFiles};
-use qs::QsValue;
+use khonj::Value;
 
 fn make_test_file(field: &str, filename: &str) -> UploadedFile {
     let mut temp = TempFile::new(None).expect("failed to create tempfile");
@@ -66,7 +66,7 @@ fn test_form_fields_container() {
     let default_fields = FormFields::default();
     assert!(default_fields.get("name").is_none());
     assert_eq!(default_fields.raw().count(), 0);
-    assert!(matches!(default_fields.tree(), QsValue::Object(map) if map.is_empty()));
+    assert!(matches!(default_fields.tree(), Value::Object(map) if map.is_empty()));
 
     let raw_pairs = vec![
         ("user".to_string(), "alice".to_string()),
@@ -75,9 +75,9 @@ fn test_form_fields_container() {
     ];
 
     let mut map = BTreeMap::new();
-    map.insert("user".to_string(), QsValue::Scalar("alice".to_string()));
-    map.insert("role".to_string(), QsValue::Scalar("admin".to_string()));
-    let tree = QsValue::Object(map);
+    map.insert("user".to_string(), Value::Scalar("alice".to_string()));
+    map.insert("role".to_string(), Value::Scalar("admin".to_string()));
+    let tree = Value::Object(map);
 
     let form = FormFields::new(raw_pairs, tree);
 
@@ -94,5 +94,5 @@ fn test_form_fields_container() {
     assert_eq!(collected_raw[2], ("role", "admin"));
 
     // tree
-    assert!(matches!(form.tree(), QsValue::Object(m) if m.len() == 2));
+    assert!(matches!(form.tree(), Value::Object(m) if m.len() == 2));
 }

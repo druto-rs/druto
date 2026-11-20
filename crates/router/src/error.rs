@@ -2,9 +2,9 @@
 
 use std::fmt;
 
+use khonj::Error as QsError;
 use matcher::{MatcherError, Method};
 use pipeline::PipelineError;
-use qs::QsError;
 
 /// Errors produced during route registration, path compilation, request dispatch, or handler execution.
 #[derive(Debug, Clone, PartialEq, Eq)]

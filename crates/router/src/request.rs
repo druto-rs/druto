@@ -5,8 +5,8 @@ use std::{fmt, net::IpAddr, str::FromStr};
 use bytes::Bytes;
 use cookie::CookieJar;
 use crypto::UrlSigner;
+use khonj::from_str as qs_from_str;
 use matcher::Method;
-use qs::from_str as qs_from_str;
 use serde::de::DeserializeOwned;
 
 use crate::{

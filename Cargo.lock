@@ -181,9 +181,9 @@ version = "0.1.0"
 dependencies = [
  "bytes",
  "futures-util",
+ "khonj",
  "matcher",
  "pipeline",
- "qs",
  "router",
  "serde",
  "serde_json",
@@ -235,17 +235,6 @@ checksum = "7dafe3a8757b027e2be6e4e5601ed563c55989fcf1546e933c66c8eb3a058d35"
 dependencies = [
  "bytes",
  "either",
-]
-
-[[package]]
-name = "cache"
-version = "0.1.0"
-dependencies = [
- "kouta",
- "redis",
- "serde",
- "serde_json",
- "tokio",
 ]
 
 [[package]]
@@ -490,6 +479,10 @@ dependencies = [
 [[package]]
 name = "druto"
 version = "0.1.0"
+dependencies = [
+ "khonj",
+ "kouta",
+]
 
 [[package]]
 name = "either"
@@ -913,11 +906,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3bd1574e617a9a6c1f8f8181bd7e841e1f20e4277607ef28945765188d6284d4"
 
 [[package]]
+name = "khonj"
+version = "0.1.0"
+source = "git+https://github.com/Hitarashi/khonj.git?branch=main#f380f7eb6de4bc353574ea8074bba3d71f80e906"
+dependencies = [
+ "percent-encoding",
+ "serde",
+]
+
+[[package]]
 name = "kouta"
 version = "0.1.0"
 source = "git+https://github.com/Hitarashi/kouta.git?branch=main#d8d6180906f2b003514418a7d164c47170af5e57"
 dependencies = [
- "fred",
  "serde",
  "serde_json",
  "tokio",
@@ -1182,16 +1183,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "qs"
-version = "0.1.0"
-dependencies = [
- "percent-encoding",
- "proptest",
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "quick-error"
 version = "1.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1352,11 +1343,11 @@ dependencies = [
  "bytes",
  "cookie",
  "crypto",
+ "khonj",
  "matcher",
  "percent-encoding",
  "pipeline",
  "proptest",
- "qs",
  "regex",
  "serde",
  "serde_json",

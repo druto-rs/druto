@@ -14,7 +14,6 @@ cookie = { path = "crates/cookie" }
 crypto = { path = "crates/crypto" }
 matcher = { path = "crates/matcher" }
 pipeline = { path = "crates/pipeline" }
-qs = { path = "crates/qs" }
 redis = { path = "crates/redis" }
 router = { path = "crates/router" }
 session = { path = "crates/session" }
@@ -30,6 +29,7 @@ fred = { version = "10.1.0", default-features = false }
 futures-util = { version = "0.3.34", default-features = false }
 getrandom = "0.4.3"
 hmac = "0.13.0"
+khonj = { git = "https://github.com/Hitarashi/khonj.git", branch = "main" }
 kouta = { git = "https://github.com/Hitarashi/kouta.git", branch = "main" }
 percent-encoding = "2.3.2"
 proptest = "1.12.0"

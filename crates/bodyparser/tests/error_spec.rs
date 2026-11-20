@@ -85,7 +85,7 @@ fn test_body_parser_error_from_conversions() {
     let parser_json_err = BodyParserError::from(json_err.unwrap_err());
     assert!(matches!(parser_json_err, BodyParserError::JsonError(_)));
 
-    let qs_err = qs::QsError::InvalidSyntax("malformed bracket".to_string());
+    let qs_err = khonj::Error::InvalidSyntax("malformed bracket".to_string());
     let parser_qs_err = BodyParserError::from(qs_err);
     assert!(
         matches!(parser_qs_err, BodyParserError::FormError(ref msg) if msg.contains("malformed bracket"))

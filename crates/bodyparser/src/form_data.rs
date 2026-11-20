@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use qs::QsValue;
+use khonj::Value;
 
 use crate::uploaded_file::UploadedFile;
 
@@ -78,22 +78,22 @@ impl UploadedFiles {
 #[derive(Debug, Clone)]
 pub struct FormFields {
     raw_fields: Vec<(String, String)>,
-    tree: QsValue,
+    tree: Value,
 }
 
 impl Default for FormFields {
     fn default() -> Self {
         Self {
             raw_fields: Vec::new(),
-            tree: QsValue::Object(BTreeMap::new()),
+            tree: Value::Object(BTreeMap::new()),
         }
     }
 }
 
 impl FormFields {
-    /// Creates a new `FormFields` container from raw pairs and structured [`QsValue`].
+    /// Creates a new `FormFields` container from raw pairs and structured [`Value`].
     #[must_use]
-    pub fn new(raw_fields: Vec<(String, String)>, tree: QsValue) -> Self {
+    pub fn new(raw_fields: Vec<(String, String)>, tree: Value) -> Self {
         Self { raw_fields, tree }
     }
 
@@ -107,9 +107,9 @@ impl FormFields {
             .map(|(_, val)| val.as_str())
     }
 
-    /// Returns the parsed hierarchical [`QsValue`] tree.
+    /// Returns the parsed hierarchical [`Value`] tree.
     #[must_use]
-    pub fn tree(&self) -> &QsValue {
+    pub fn tree(&self) -> &Value {
         &self.tree
     }
 

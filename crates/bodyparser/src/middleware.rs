@@ -2,8 +2,8 @@
 
 use std::sync::Arc;
 
+use khonj::encoding::decode_component;
 use pipeline::{BoxFuture, Middleware, Next, PipelineError};
-use qs::encoding::decode_component;
 use router::{HeaderName, HttpContext, Response, RouterError};
 
 use crate::{

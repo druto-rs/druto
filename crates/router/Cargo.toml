@@ -11,11 +11,11 @@ cookie.workspace = true
 crypto.workspace = true
 matcher.workspace = true
 pipeline.workspace = true
-qs.workspace = true
 session.workspace = true
 
 # External Dependencies
 bytes.workspace = true
+khonj.workspace = true
 percent-encoding.workspace = true
 regex.workspace = true
 serde.workspace = true

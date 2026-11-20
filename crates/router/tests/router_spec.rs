@@ -2471,7 +2471,7 @@ fn test_error_conversions_and_display_complete() {
     let cookie_err: RouterError = cookie::CookieError::InvalidName("bad name".to_string()).into();
     assert!(matches!(cookie_err, RouterError::Internal(_)));
 
-    let qs_err: RouterError = qs::QsError::Custom("qs error".to_string()).into();
+    let qs_err: RouterError = khonj::Error::Custom("qs error".to_string()).into();
     assert!(matches!(qs_err, RouterError::DeserializationError(_)));
 
     let session_err: RouterError = session::SessionError::Store("storage err".to_string()).into();
