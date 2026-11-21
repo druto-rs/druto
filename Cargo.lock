@@ -89,6 +89,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53"
 
 [[package]]
+name = "barta"
+version = "0.1.0"
+source = "git+https://github.com/Hitarashi/barta.git?branch=main#6a1b9354173f46af7efd2f1be80fefbe1c6b503c"
+
+[[package]]
 name = "base64"
 version = "0.23.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -474,6 +479,7 @@ dependencies = [
 name = "druto"
 version = "0.1.0"
 dependencies = [
+ "barta",
  "borno",
  "gopon",
  "khonj",
@@ -502,13 +508,6 @@ checksum = "e35d6e78f4cebb90e51d543db8fe41528851d6deeef6ef21ebd4bfdc1e784776"
 dependencies = [
  "libc",
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "events"
-version = "0.1.0"
-dependencies = [
- "proptest",
 ]
 
 [[package]]

@@ -18,6 +18,7 @@ router = { path = "crates/router" }
 session = { path = "crates/session" }
 
 # External Dependencies
+barta = { git = "https://github.com/Hitarashi/barta.git", branch = "main" }
 base64 = "0.23.1"
 borno = { git = "https://github.com/Hitarashi/borno.git", branch = "main" }
 bytes = "1.12.2"
