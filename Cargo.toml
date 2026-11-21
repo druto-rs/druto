@@ -25,12 +25,9 @@ http = "1.5.0"
 jachai = { git = "https://github.com/Hitarashi/jachai.git", branch = "main" }
 khonj = { git = "https://github.com/Hitarashi/khonj.git", branch = "main" }
 kouta = { git = "https://github.com/Hitarashi/kouta.git", branch = "main" }
-lagam = { git = "https://github.com/Hitarashi/lagam.git", branch = "main", features = ["redis", "http"] }
 mishron = { git = "https://github.com/Hitarashi/mishron.git", branch = "main" }
 poribesh = { git = "https://github.com/Hitarashi/poribesh.git", branch = "main" }
 poth = { git = "https://github.com/Hitarashi/poth.git", branch = "main" }
-proptest = "1.12.0"
-redis = { package = "druto-redis", git = "https://github.com/druto-rs/redis.git", branch = "main" }
 router = { package = "druto-router", git = "https://github.com/druto-rs/router.git", branch = "main" }
 sebok = { git = "https://github.com/Hitarashi/sebok.git", branch = "main" }
 serde = { version = "1.0.229", default-features = false, features = ["derive", "alloc"] }
