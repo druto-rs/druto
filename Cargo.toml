@@ -18,9 +18,7 @@ router = { path = "crates/router" }
 session = { path = "crates/session" }
 
 # External Dependencies
-argon2 = "0.6.0"
 base64 = "0.23.1"
-bcrypt = "0.19.3"
 borno = { git = "https://github.com/Hitarashi/borno.git", branch = "main" }
 bytes = "1.12.2"
 fred = { version = "10.1.0", default-features = false }
@@ -29,6 +27,7 @@ getrandom = "0.4.3"
 gopon = { git = "https://github.com/Hitarashi/gopon.git", branch = "main" }
 khonj = { git = "https://github.com/Hitarashi/khonj.git", branch = "main" }
 kouta = { git = "https://github.com/Hitarashi/kouta.git", branch = "main" }
+mishron = { git = "https://github.com/Hitarashi/mishron.git", branch = "main" }
 percent-encoding = "2.3.2"
 poribesh = { git = "https://github.com/Hitarashi/poribesh.git", branch = "main" }
 proptest = "1.12.0"

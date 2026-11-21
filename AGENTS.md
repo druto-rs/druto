@@ -48,7 +48,6 @@ When working within a specific crate, consult its local `CONTEXT.md` and `AGENTS
 - **`crates/cors`**: [`CONTEXT.md`](crates/cors/CONTEXT.md) | [`AGENTS.md`](crates/cors/AGENTS.md)
 - **`crates/druto`**: [`CONTEXT.md`](crates/druto/CONTEXT.md) | [`AGENTS.md`](crates/druto/AGENTS.md)
 - **`crates/events`**: [`CONTEXT.md`](crates/events/CONTEXT.md) | [`AGENTS.md`](crates/events/AGENTS.md)
-- **`crates/hash`**: [`CONTEXT.md`](crates/hash/CONTEXT.md) | [`AGENTS.md`](crates/hash/AGENTS.md)
 - **`crates/limiter`**: [`CONTEXT.md`](crates/limiter/CONTEXT.md) | [`AGENTS.md`](crates/limiter/AGENTS.md)
 - **`crates/matcher`**: [`CONTEXT.md`](crates/matcher/CONTEXT.md) | [`AGENTS.md`](crates/matcher/AGENTS.md)
 - **`crates/pipeline`**: [`CONTEXT.md`](crates/pipeline/CONTEXT.md) | [`AGENTS.md`](crates/pipeline/AGENTS.md)

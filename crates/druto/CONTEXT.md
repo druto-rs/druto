@@ -22,10 +22,10 @@ inspired by Laravel and AdonisJS.
 - `cookie`: RFC 6265 cookies, signed and encrypted cookie jars.
 - `events`: Strongly typed asynchronous event dispatcher, wildcard pub/sub, and testing fakes.
 - `gopon`: Authenticated encryption, HMAC signing, key rotation, and signed URLs.
-- `hash`: Password hashing drivers (Argon2id, Bcrypt) and automatic rehash detection.
 - `khonj`: Nested bracket-notation query string parsing and serialization.
 - `kouta`: Unified multi-driver caching engine, multi-tier stores, and stampede protection.
 - `matcher`: Fast URL pattern matching and parameter extraction.
+- `mishron`: Password hashing drivers (Argon2id, Bcrypt) and automatic rehash detection.
 - `pipeline`: Asynchronous middleware onion execution.
 - `poribesh`: Environment variable loading, expansion, and boot-time schema validation.
 - `router`: HTTP routing, request/response models, middleware pipeline, and reverse URL generation.

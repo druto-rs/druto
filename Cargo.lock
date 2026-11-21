@@ -478,6 +478,7 @@ dependencies = [
  "gopon",
  "khonj",
  "kouta",
+ "mishron",
  "poribesh",
 ]
 
@@ -740,15 +741,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hash"
-version = "0.1.0"
-dependencies = [
- "argon2",
- "bcrypt",
- "subtle",
-]
-
-[[package]]
 name = "hashbrown"
 version = "0.17.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -996,6 +988,16 @@ dependencies = [
  "libc",
  "wasi",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "mishron"
+version = "0.1.0"
+source = "git+https://github.com/Hitarashi/mishron.git?branch=main#c04d1966e679ffe9511f63b51a44652a259e3dee"
+dependencies = [
+ "argon2",
+ "bcrypt",
+ "subtle",
 ]
 
 [[package]]
