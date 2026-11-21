@@ -951,6 +951,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "lagam"
+version = "0.1.0"
+source = "git+https://github.com/Hitarashi/lagam.git?branch=main#0e6595c6a522921efb6b622315a72662ab2d1436"
+dependencies = [
+ "fred",
+ "http",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.191"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -962,6 +973,7 @@ version = "0.1.0"
 dependencies = [
  "bytes",
  "dhap",
+ "lagam",
  "proptest",
  "redis",
  "router",
@@ -1388,6 +1400,7 @@ dependencies = [
  "gopon",
  "jachai",
  "khonj",
+ "lagam",
  "percent-encoding",
  "poth",
  "proptest",

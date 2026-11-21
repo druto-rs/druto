@@ -1,26 +1,15 @@
-//! Distributed Redis rate limiter store backed by atomic Lua scripts.
+//! Distributed Redis rate limiter store adapter connecting Druto Redis to Lagam.
 
-use std::{
-    sync::Arc,
-    time::{Duration, SystemTime, UNIX_EPOCH},
+use std::{sync::Arc, time::Duration};
+
+use lagam::{
+    Algorithm, BoxFuture, LimiterError, LimiterRedisClient, LimiterStore, RateLimitResult,
 };
-
 use redis::{
     RedisCommands,
-    error::RedisError,
-    script::{RedisScript, ScriptContext, ScriptOutput},
+    script::{RedisScript, ScriptOutput},
 };
 use serde::{Deserialize, Serialize};
-
-use crate::{
-    algorithm::Algorithm,
-    error::LimiterError,
-    result::RateLimitResult,
-    store::{BoxFuture, LimiterStore},
-};
-
-/// Default key prefix for limiter keys in Redis.
-pub const DEFAULT_REDIS_KEY_PREFIX: &str = "druto:limiter:";
 
 const LUA_RATE_LIMITER_SCRIPT: &str = r#"
 local key = KEYS[1]
@@ -155,8 +144,8 @@ fn create_rate_limiter_script() -> RedisScript {
     RedisScript::new(LUA_RATE_LIMITER_SCRIPT).with_simulation(
         |keys: &[&str],
          args: &[&str],
-         context: &mut dyn ScriptContext|
-         -> Result<ScriptOutput, RedisError> {
+         context: &mut dyn redis::script::ScriptContext|
+         -> Result<ScriptOutput, redis::error::RedisError> {
             let key = keys[0];
             let block_key = keys[1];
 
@@ -260,27 +249,29 @@ fn create_rate_limiter_script() -> RedisScript {
                     ]));
                 }
 
-                let (allowed, after) = if state.tokens >= amount as f64 {
+                if state.tokens >= amount as f64 {
                     state.tokens -= amount as f64;
                     if let Ok(serialized) = serde_json::to_string(&state) {
                         context.set_ex(key, &serialized, (window_ms / 1000).max(1) * 2);
                     }
-                    (1, reset_after)
-                } else {
-                    let retry_after =
-                        ((amount as f64 - state.tokens) / refill_rate * 1000.0) as u64;
-                    (0, retry_after)
-                };
+                    return Ok(ScriptOutput::Array(vec![
+                        ScriptOutput::Integer(1),
+                        ScriptOutput::Integer(state.tokens.floor() as i64),
+                        ScriptOutput::Integer(reset_after as i64),
+                        ScriptOutput::Integer(0),
+                    ]));
+                }
 
+                let retry_after = ((amount as f64 - state.tokens) / refill_rate * 1000.0) as u64;
                 return Ok(ScriptOutput::Array(vec![
-                    ScriptOutput::Integer(allowed),
+                    ScriptOutput::Integer(0),
                     ScriptOutput::Integer(state.tokens.floor() as i64),
-                    ScriptOutput::Integer(after as i64),
+                    ScriptOutput::Integer(retry_after as i64),
                     ScriptOutput::Integer(0),
                 ]));
             }
 
-            // 4. Sliding Window Counter
+            // 4. Sliding Window Counter (Default)
             let current_window = now_ms / window_ms;
             let time_into_win = now_ms % window_ms;
             let reset_after = window_ms - time_into_win;
@@ -291,13 +282,11 @@ fn create_rate_limiter_script() -> RedisScript {
                 .and_then(|s| serde_json::from_str(s).ok())
                 .unwrap_or_else(|| SimulationState {
                     curr_win: current_window,
-                    curr_cnt: 0,
-                    prev_cnt: 0,
                     ..Default::default()
                 });
 
             if state.curr_win == current_window {
-                // Same active window
+                // Current active window
             } else if state.curr_win + 1 == current_window {
                 state.prev_cnt = state.curr_cnt;
                 state.curr_cnt = 0;
@@ -309,10 +298,10 @@ fn create_rate_limiter_script() -> RedisScript {
             }
 
             let weight = 1.0 - (time_into_win as f64 / window_ms as f64);
-            let estimated = state.curr_cnt as f64 + (state.prev_cnt as f64 * weight);
+            let estimated = state.curr_cnt + (state.prev_cnt as f64 * weight).floor() as u64;
 
             if is_peek == 1 {
-                let remaining = limit.saturating_sub(estimated.floor() as u64);
+                let remaining = limit.saturating_sub(estimated);
                 let allowed = if remaining > 0 { 1 } else { 0 };
                 return Ok(ScriptOutput::Array(vec![
                     ScriptOutput::Integer(allowed),
@@ -322,7 +311,7 @@ fn create_rate_limiter_script() -> RedisScript {
                 ]));
             }
 
-            if estimated + amount as f64 <= limit as f64 {
+            if estimated.saturating_add(amount) <= limit {
                 state.curr_cnt = state.curr_cnt.saturating_add(amount);
                 if let Ok(serialized) = serde_json::to_string(&state) {
                     context.set_ex(key, &serialized, (window_ms / 1000).max(1) * 2);
@@ -346,82 +335,106 @@ fn create_rate_limiter_script() -> RedisScript {
     )
 }
 
-/// Distributed Redis-backed rate limiter store.
+/// Adapter implementing [`LimiterRedisClient`] for any type implementing [`RedisCommands`].
 #[derive(Clone)]
-pub struct RedisLimiterStore<C> {
+pub struct DrutoRedisClient<C> {
     client: Arc<C>,
-    prefix: String,
     script: RedisScript,
 }
 
-impl<C: RedisCommands + 'static> RedisLimiterStore<C> {
-    /// Creates a new `RedisLimiterStore` with the default prefix (`druto:limiter:`).
+impl<C: RedisCommands + 'static> DrutoRedisClient<C> {
+    /// Creates a new `DrutoRedisClient`.
     pub fn new(client: Arc<C>) -> Self {
         Self {
             client,
-            prefix: DEFAULT_REDIS_KEY_PREFIX.to_string(),
             script: create_rate_limiter_script(),
+        }
+    }
+}
+
+impl<C: RedisCommands + 'static> LimiterRedisClient for DrutoRedisClient<C> {
+    fn eval_limiter_script<'a>(
+        &'a self,
+        script: &'a str,
+        keys: &'a [&'a str],
+        args: &'a [&'a str],
+    ) -> BoxFuture<'a, Result<Vec<i64>, LimiterError>> {
+        let _ = script;
+        Box::pin(async move {
+            let output = self
+                .client
+                .eval_script(&self.script, keys, args)
+                .await
+                .map_err(|error| LimiterError::Store(error.to_string()))?;
+
+            match output {
+                ScriptOutput::Array(items) => {
+                    let mut result = Vec::with_capacity(items.len());
+                    for item in items {
+                        match item {
+                            ScriptOutput::Integer(val) => result.push(val),
+                            other => {
+                                return Err(LimiterError::Store(format!(
+                                    "Unexpected script output element: {other:?}"
+                                )));
+                            }
+                        }
+                    }
+                    Ok(result)
+                }
+                other => Err(LimiterError::Store(format!(
+                    "Unexpected script output type: {other:?}"
+                ))),
+            }
+        })
+    }
+
+    fn del_key<'a>(&'a self, key: &'a str) -> BoxFuture<'a, Result<(), LimiterError>> {
+        Box::pin(async move {
+            self.client
+                .del(key)
+                .await
+                .map_err(|error| LimiterError::Store(error.to_string()))?;
+            Ok(())
+        })
+    }
+
+    fn set_key_ex<'a>(
+        &'a self,
+        key: &'a str,
+        value: &'a str,
+        seconds: u64,
+    ) -> BoxFuture<'a, Result<(), LimiterError>> {
+        Box::pin(async move {
+            self.client
+                .set_ex(key, value, seconds)
+                .await
+                .map_err(|error| LimiterError::Store(error.to_string()))?;
+            Ok(())
+        })
+    }
+}
+
+/// Distributed Redis-backed rate limiter store for Druto.
+#[derive(Clone)]
+pub struct RedisLimiterStore<C> {
+    inner: lagam::RedisLimiterStore<DrutoRedisClient<C>>,
+}
+
+impl<C: RedisCommands + 'static> RedisLimiterStore<C> {
+    /// Creates a new `RedisLimiterStore` wrapping a Redis commands client with default prefix.
+    pub fn new(client: Arc<C>) -> Self {
+        let adapter = Arc::new(DrutoRedisClient::new(client));
+        Self {
+            inner: lagam::RedisLimiterStore::new(adapter),
         }
     }
 
     /// Creates a new `RedisLimiterStore` with a customized key prefix.
     pub fn with_prefix(client: Arc<C>, prefix: impl Into<String>) -> Self {
+        let adapter = Arc::new(DrutoRedisClient::new(client));
         Self {
-            client,
-            prefix: prefix.into(),
-            script: create_rate_limiter_script(),
-        }
-    }
-
-    fn key_for(&self, key: &str) -> String {
-        format!("{}{key}", self.prefix)
-    }
-
-    fn block_key_for(&self, key: &str) -> String {
-        format!("{}{key}:blocked", self.prefix)
-    }
-
-    fn parse_script_output(
-        output: ScriptOutput,
-        limit: u64,
-    ) -> Result<RateLimitResult, LimiterError> {
-        match output {
-            ScriptOutput::Array(items) if items.len() >= 4 => {
-                let allowed = match items[0] {
-                    ScriptOutput::Integer(val) => val == 1,
-                    _ => false,
-                };
-                let remaining = match items[1] {
-                    ScriptOutput::Integer(val) => val.max(0) as u64,
-                    _ => 0,
-                };
-                let reset_after_ms = match items[2] {
-                    ScriptOutput::Integer(val) => val.max(0) as u64,
-                    _ => 0,
-                };
-                let is_blocked = match items[3] {
-                    ScriptOutput::Integer(val) => val == 1,
-                    _ => false,
-                };
-
-                let reset_after = Duration::from_millis(reset_after_ms);
-                let retry_after = if !allowed || is_blocked {
-                    Some(reset_after)
-                } else {
-                    None
-                };
-
-                Ok(RateLimitResult::new(
-                    limit,
-                    remaining,
-                    reset_after,
-                    allowed,
-                    retry_after,
-                ))
-            }
-            _ => Err(LimiterError::Store(
-                "Malformed Lua script output from Redis".to_string(),
-            )),
+            inner: lagam::RedisLimiterStore::with_prefix(adapter, prefix),
         }
     }
 }
@@ -435,40 +448,7 @@ impl<C: RedisCommands + 'static> LimiterStore for RedisLimiterStore<C> {
         window: Duration,
         algorithm: Algorithm,
     ) -> BoxFuture<'a, Result<RateLimitResult, LimiterError>> {
-        Box::pin(async move {
-            let main_key = self.key_for(key);
-            let block_key = self.block_key_for(key);
-
-            let now_ms = SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .unwrap_or_default()
-                .as_millis() as u64;
-            let window_ms = window.as_millis().max(1) as u64;
-
-            let amount_str = amount.to_string();
-            let limit_str = limit.to_string();
-            let window_str = window_ms.to_string();
-            let now_str = now_ms.to_string();
-            let algo_str = algorithm.to_string();
-
-            let keys = [main_key.as_str(), block_key.as_str()];
-            let args = [
-                amount_str.as_str(),
-                limit_str.as_str(),
-                window_str.as_str(),
-                now_str.as_str(),
-                algo_str.as_str(),
-                "0",
-            ];
-
-            let output = self
-                .client
-                .eval_script(&self.script, &keys, &args)
-                .await
-                .map_err(|error| LimiterError::Store(format!("Redis execution failed: {error}")))?;
-
-            Self::parse_script_output(output, limit)
-        })
+        self.inner.consume(key, amount, limit, window, algorithm)
     }
 
     fn peek<'a>(
@@ -478,56 +458,11 @@ impl<C: RedisCommands + 'static> LimiterStore for RedisLimiterStore<C> {
         window: Duration,
         algorithm: Algorithm,
     ) -> BoxFuture<'a, Result<RateLimitResult, LimiterError>> {
-        Box::pin(async move {
-            let main_key = self.key_for(key);
-            let block_key = self.block_key_for(key);
-
-            let now_ms = SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .unwrap_or_default()
-                .as_millis() as u64;
-            let window_ms = window.as_millis().max(1) as u64;
-
-            let limit_str = limit.to_string();
-            let window_str = window_ms.to_string();
-            let now_str = now_ms.to_string();
-            let algo_str = algorithm.to_string();
-
-            let keys = [main_key.as_str(), block_key.as_str()];
-            let args = [
-                "1",
-                limit_str.as_str(),
-                window_str.as_str(),
-                now_str.as_str(),
-                algo_str.as_str(),
-                "1",
-            ];
-
-            let output = self
-                .client
-                .eval_script(&self.script, &keys, &args)
-                .await
-                .map_err(|error| LimiterError::Store(format!("Redis peek failed: {error}")))?;
-
-            Self::parse_script_output(output, limit)
-        })
+        self.inner.peek(key, limit, window, algorithm)
     }
 
     fn reset<'a>(&'a self, key: &'a str) -> BoxFuture<'a, Result<(), LimiterError>> {
-        Box::pin(async move {
-            let main_key = self.key_for(key);
-            let block_key = self.block_key_for(key);
-
-            self.client
-                .del(&main_key)
-                .await
-                .map_err(|error| LimiterError::Store(format!("Redis DEL failed: {error}")))?;
-            self.client
-                .del(&block_key)
-                .await
-                .map_err(|error| LimiterError::Store(format!("Redis DEL failed: {error}")))?;
-            Ok(())
-        })
+        self.inner.reset(key)
     }
 
     fn block<'a>(
@@ -535,15 +470,6 @@ impl<C: RedisCommands + 'static> LimiterStore for RedisLimiterStore<C> {
         key: &'a str,
         duration: Duration,
     ) -> BoxFuture<'a, Result<(), LimiterError>> {
-        Box::pin(async move {
-            let block_key = self.block_key_for(key);
-            let seconds = duration.as_secs().max(1);
-
-            self.client
-                .set_ex(&block_key, "1", seconds)
-                .await
-                .map_err(|error| LimiterError::Store(format!("Redis block failed: {error}")))?;
-            Ok(())
-        })
+        self.inner.block(key, duration)
     }
 }

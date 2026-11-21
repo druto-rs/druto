@@ -3,16 +3,12 @@
 use std::sync::Arc;
 
 use dhap::{BoxFuture, Error as DhapError, Middleware, Next};
+use lagam::{
+    HeaderMode, LimiterStore, MemoryLimiterStore, QuotaPolicy, RateLimitResult, constants,
+};
 use router::{HeaderName, HttpContext, Response, ResponseBody, RouterError, StatusCode};
 
-use crate::{
-    config::{HeaderMode, LimiterConfig, LimiterConfigBuilder},
-    constants,
-    policy::QuotaPolicy,
-    result::RateLimitResult,
-    store::LimiterStore,
-    stores::memory::MemoryLimiterStore,
-};
+use crate::config::{LimiterConfig, LimiterConfigBuilder};
 
 /// HTTP rate limiting and burst throttling middleware for the execution pipeline.
 #[derive(Clone)]

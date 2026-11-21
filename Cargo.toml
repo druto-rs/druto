@@ -29,6 +29,7 @@ gopon = { git = "https://github.com/Hitarashi/gopon.git", branch = "main" }
 jachai = { git = "https://github.com/Hitarashi/jachai.git", branch = "main" }
 khonj = { git = "https://github.com/Hitarashi/khonj.git", branch = "main" }
 kouta = { git = "https://github.com/Hitarashi/kouta.git", branch = "main" }
+lagam = { git = "https://github.com/Hitarashi/lagam.git", branch = "main", features = ["redis", "http"] }
 mishron = { git = "https://github.com/Hitarashi/mishron.git", branch = "main" }
 percent-encoding = "2.3.2"
 poribesh = { git = "https://github.com/Hitarashi/poribesh.git", branch = "main" }

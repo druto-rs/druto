@@ -170,3 +170,20 @@ impl From<bojha::BodyParserError> for RouterError {
         }
     }
 }
+
+impl From<lagam::LimiterError> for RouterError {
+    fn from(error: lagam::LimiterError) -> Self {
+        match error {
+            lagam::LimiterError::Store(message)
+            | lagam::LimiterError::StoreUnavailable(message) => {
+                Self::Internal(format!("Limiter error: {message}"))
+            }
+            lagam::LimiterError::Config(message) => {
+                Self::Internal(format!("Limiter configuration error: {message}"))
+            }
+            lagam::LimiterError::RateLimitExceeded(_) => {
+                Self::Internal("429 Too Many Requests".to_string())
+            }
+        }
+    }
+}

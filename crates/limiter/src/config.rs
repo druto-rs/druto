@@ -2,29 +2,17 @@
 
 use std::sync::Arc;
 
+pub use lagam::HeaderMode;
+use lagam::{QuotaPolicy, RateLimitResult};
 use router::{HttpContext, Response};
 
-use crate::{key::KeyResolver, policy::QuotaPolicy, result::RateLimitResult};
+use crate::key::KeyResolver;
 
 /// Dynamic policy derivation closure wrapped in an [`Arc`].
 pub type PolicyResolver = Arc<dyn Fn(&HttpContext) -> QuotaPolicy + Send + Sync>;
 
 /// Custom rejection response handler wrapped in an [`Arc`].
 pub type RejectionHandler = Arc<dyn Fn(&HttpContext, &RateLimitResult) -> Response + Send + Sync>;
-
-/// Format strategy for emitted HTTP rate limiting response headers.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum HeaderMode {
-    /// Emits both modern IETF `RateLimit-*` and legacy `X-RateLimit-*` headers.
-    #[default]
-    Both,
-    /// Emits only standardized IETF draft headers (`RateLimit-*`).
-    Standard,
-    /// Emits only legacy headers (`X-RateLimit-*`).
-    Legacy,
-    /// Suppresses all rate limiting headers.
-    None,
-}
 
 /// Comprehensive rate limiter configuration settings.
 #[derive(Clone)]

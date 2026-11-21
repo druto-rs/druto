@@ -18,6 +18,7 @@ futures-util = { workspace = true, features = ["alloc"] }
 gopon.workspace = true
 jachai.workspace = true
 khonj.workspace = true
+lagam.workspace = true
 percent-encoding.workspace = true
 poth.workspace = true
 regex.workspace = true
