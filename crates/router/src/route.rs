@@ -2,8 +2,8 @@
 
 use std::{collections::HashMap, sync::Arc};
 
-use matcher::{Constraint, Method};
 use pipeline::{BoxedMiddleware, Middleware};
+use poth::{Constraint, Method};
 
 use crate::{context::HttpContext, error::RouterError, handler::BoxedHandler, response::Response};
 

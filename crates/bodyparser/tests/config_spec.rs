@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use bodyparser::{BodyParserConfig, PayloadLimits};
-use matcher::Method;
+use poth::Method;
 
 #[test]
 fn test_body_parser_config_defaults() {

@@ -24,10 +24,10 @@ inspired by Laravel and AdonisJS.
 - `gopon`: Authenticated encryption, HMAC signing, key rotation, and signed URLs.
 - `khonj`: Nested bracket-notation query string parsing and serialization.
 - `kouta`: Unified multi-driver caching engine, multi-tier stores, and stampede protection.
-- `matcher`: Fast URL pattern matching and parameter extraction.
 - `mishron`: Password hashing drivers (Argon2id, Bcrypt) and automatic rehash detection.
 - `pipeline`: Asynchronous middleware onion execution.
 - `poribesh`: Environment variable loading, expansion, and boot-time schema validation.
+- `poth`: URL pattern matching, parameter extraction, and HTTP method routing.
 - `router`: HTTP routing, request/response models, middleware pipeline, and reverse URL generation.
 - `session`: Multi-driver HTTP session management, flash data, and session fixation defense.
 - *(Future)* `auth`, `validation`, `db`, `cli`.

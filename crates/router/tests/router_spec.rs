@@ -10,8 +10,8 @@ use std::{
 
 use bytes::Bytes;
 use gopon::{Key, KeyRing, UrlSigner};
-use matcher::Method;
 use pipeline::{BoxFuture as PipelineBoxFuture, Middleware, Next, PipelineError};
+use poth::Method;
 use proptest::prelude::*;
 use router::{
     BoxFuture, HeaderMap, HeaderName, HeaderValue, HttpContext, IntoResponse, Redirect, Request,
@@ -2420,17 +2420,17 @@ fn test_header_map_and_name_full_coverage() {
 
 #[test]
 fn test_error_conversions_and_display_complete() {
-    use matcher::MatcherError;
     use pipeline::PipelineError;
+    use poth::Error as PothError;
 
-    let missing_param = MatcherError::MissingParameter {
+    let missing_param = PothError::MissingParameter {
         name: "id".to_string(),
         route: "/users/:id".to_string(),
     };
     let err_missing: RouterError = missing_param.into();
     assert!(matches!(err_missing, RouterError::InvalidParams { .. }));
 
-    let conflicting = MatcherError::ConflictingRoute {
+    let conflicting = PothError::ConflictingRoute {
         existing: "/a".to_string(),
         new_pattern: "/b".to_string(),
         reason: "overlap".to_string(),
@@ -2438,14 +2438,14 @@ fn test_error_conversions_and_display_complete() {
     let err_conflict: RouterError = conflicting.into();
     assert!(matches!(err_conflict, RouterError::RouteConflict(_)));
 
-    let invalid_pattern = MatcherError::InvalidPattern {
+    let invalid_pattern = PothError::InvalidPattern {
         pattern: "/*".to_string(),
         reason: "wildcard error".to_string(),
     };
     let err_pattern: RouterError = invalid_pattern.into();
     assert!(matches!(err_pattern, RouterError::RouteConflict(_)));
 
-    let decode_error = MatcherError::DecodeError {
+    let decode_error = PothError::DecodeError {
         param: "p".to_string(),
         value: "%invalid".to_string(),
     };
@@ -2523,7 +2523,7 @@ fn test_error_conversions_and_display_complete() {
 
 #[test]
 fn test_url_generator_without_signer_and_accessors() {
-    let mut matcher = matcher::MethodMatcher::new();
+    let mut matcher = poth::MethodMatcher::new();
     matcher
         .insert_named("home", Method::Get, "/home", ())
         .expect("insert named");
@@ -2830,7 +2830,7 @@ fn test_response_status_and_url_generator_exhaustive() {
         "custom-name"
     );
 
-    let mut matcher = matcher::MethodMatcher::new();
+    let mut matcher = poth::MethodMatcher::new();
     matcher
         .insert_named("home", Method::Get, "/home", ())
         .expect("insert named");
@@ -2842,14 +2842,14 @@ fn test_response_status_and_url_generator_exhaustive() {
         .expect("temp url");
     assert!(temp_url.contains("signature="));
 
-    let method_err = RouterError::from(matcher::MatcherError::MethodNotAllowed {
+    let method_err = RouterError::from(poth::Error::MethodNotAllowed {
         method: Method::Post,
         path: "/test".to_string(),
         allowed: vec![Method::Get],
     });
     assert!(matches!(method_err, RouterError::MethodNotAllowed { .. }));
 
-    let constraint_err = RouterError::from(matcher::MatcherError::ConstraintFailed {
+    let constraint_err = RouterError::from(poth::Error::ConstraintFailed {
         param: "id".to_string(),
         value: "abc".to_string(),
         constraint: r"\d+".to_string(),

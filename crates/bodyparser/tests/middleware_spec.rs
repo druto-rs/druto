@@ -8,8 +8,8 @@ use std::sync::{
 use bodyparser::{
     BodyParserConfig, BodyParserMiddleware, FormFields, PayloadLimits, UploadedFiles,
 };
-use matcher::Method;
 use pipeline::{Pipeline, PipelineError, from_terminal};
+use poth::Method;
 use router::{HeaderName, HttpContext, Request, Response, RouterError, StatusCode};
 
 fn execute_pipeline(

@@ -8,7 +8,6 @@ rust-version.workspace = true
 [dependencies]
 # Workspace Crates
 cookie.workspace = true
-matcher.workspace = true
 pipeline.workspace = true
 session.workspace = true
 
@@ -17,6 +16,7 @@ bytes.workspace = true
 gopon.workspace = true
 khonj.workspace = true
 percent-encoding.workspace = true
+poth.workspace = true
 regex.workspace = true
 serde.workspace = true
 serde_json.workspace = true

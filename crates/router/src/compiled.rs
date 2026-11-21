@@ -2,8 +2,8 @@
 
 use std::sync::Arc;
 
-use matcher::{MatcherError, Method, MethodMatcher};
 use pipeline::{BoxedMiddleware, Pipeline, Terminal};
+use poth::{Error as PothError, Method, MethodMatcher};
 
 use crate::{
     context::HttpContext,
@@ -231,7 +231,7 @@ impl CompiledRouter {
                 payload.pipeline.run(ctx, terminal).await?;
                 Ok(())
             }
-            Err(MatcherError::MethodNotAllowed { allowed, .. }) => {
+            Err(PothError::MethodNotAllowed { allowed, .. }) => {
                 // RFC 9110 automatic OPTIONS response when no explicit OPTIONS route exists
                 if method == Method::Options {
                     let mut all_allowed = allowed;
@@ -255,7 +255,7 @@ impl CompiledRouter {
                     Err(RouterError::MethodNotAllowed { allowed })
                 }
             }
-            Err(MatcherError::NotFound { .. }) => {
+            Err(PothError::NotFound { .. }) => {
                 if let Some((ref fallback_pipeline, ref fallback_handler)) = self.inner.fallback {
                     let terminal = HandlerTerminal {
                         handler: Arc::clone(fallback_handler),

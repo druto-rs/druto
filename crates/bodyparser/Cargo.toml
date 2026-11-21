@@ -7,7 +7,6 @@ rust-version.workspace = true
 
 [dependencies]
 # Workspace Crates
-matcher.workspace = true
 pipeline.workspace = true
 router.workspace = true
 
@@ -15,6 +14,7 @@ router.workspace = true
 bytes.workspace = true
 futures-util = { workspace = true, features = ["alloc"] }
 khonj.workspace = true
+poth.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 tempfile.workspace = true

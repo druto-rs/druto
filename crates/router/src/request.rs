@@ -6,7 +6,7 @@ use bytes::Bytes;
 use cookie::CookieJar;
 use gopon::{KeyRing, UrlSigner};
 use khonj::from_str as qs_from_str;
-use matcher::Method;
+use poth::Method;
 use serde::de::DeserializeOwned;
 
 use crate::{

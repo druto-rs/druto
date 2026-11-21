@@ -3,8 +3,8 @@
 use std::fmt;
 
 use khonj::Error as QsError;
-use matcher::{MatcherError, Method};
 use pipeline::PipelineError;
+use poth::{Error as PothError, Method};
 
 /// Errors produced during route registration, path compilation, request dispatch, or handler execution.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -77,30 +77,30 @@ impl fmt::Display for RouterError {
 
 impl std::error::Error for RouterError {}
 
-impl From<MatcherError> for RouterError {
-    fn from(error: MatcherError) -> Self {
+impl From<PothError> for RouterError {
+    fn from(error: PothError) -> Self {
         match error {
-            MatcherError::NotFound { .. } | MatcherError::RouteNotFound { .. } => Self::NotFound,
-            MatcherError::MethodNotAllowed { allowed, .. } => Self::MethodNotAllowed { allowed },
-            MatcherError::ConstraintFailed {
+            PothError::NotFound { .. } | PothError::RouteNotFound { .. } => Self::NotFound,
+            PothError::MethodNotAllowed { allowed, .. } => Self::MethodNotAllowed { allowed },
+            PothError::ConstraintFailed {
                 param, constraint, ..
             } => Self::InvalidParams {
                 message: format!("Parameter '{param}' failed constraint '{constraint}'"),
             },
-            MatcherError::MissingParameter { name, route } => Self::InvalidParams {
+            PothError::MissingParameter { name, route } => Self::InvalidParams {
                 message: format!("Missing required parameter '{name}' for route '{route}'"),
             },
-            MatcherError::ConflictingRoute {
+            PothError::ConflictingRoute {
                 existing,
                 new_pattern,
                 reason,
             } => Self::RouteConflict(format!(
                 "Pattern '{new_pattern}' conflicts with existing '{existing}': {reason}"
             )),
-            MatcherError::InvalidPattern { pattern, reason } => {
+            PothError::InvalidPattern { pattern, reason } => {
                 Self::RouteConflict(format!("Invalid pattern '{pattern}': {reason}"))
             }
-            MatcherError::DecodeError { param, value } => Self::InvalidParams {
+            PothError::DecodeError { param, value } => Self::InvalidParams {
                 message: format!(
                     "Failed to percent-decode parameter '{param}' with value '{value}'"
                 ),

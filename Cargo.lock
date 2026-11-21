@@ -187,8 +187,8 @@ dependencies = [
  "bytes",
  "futures-util",
  "khonj",
- "matcher",
  "pipeline",
+ "poth",
  "router",
  "serde",
  "serde_json",
@@ -486,6 +486,7 @@ dependencies = [
  "kouta",
  "mishron",
  "poribesh",
+ "poth",
 ]
 
 [[package]]
@@ -958,15 +959,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d15f86d12da44cd8d4ec3c73984537eb7f4cadcb9776a575a0a8a05ca11005c"
 
 [[package]]
-name = "matcher"
-version = "0.1.0"
-dependencies = [
- "proptest",
- "regex",
- "serde",
-]
-
-[[package]]
 name = "memchr"
 version = "2.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1133,6 +1125,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d83eb9bc6d8e5cf568e7a1101d60ee05e81ed50ea106026f3d18deeb046d7661"
 dependencies = [
  "zerovec",
+]
+
+[[package]]
+name = "poth"
+version = "0.1.0"
+source = "git+https://github.com/Hitarashi/poth.git?branch=main#2794aa9ef9b4a5bb26296da463880e556e10d0db"
+dependencies = [
+ "regex",
 ]
 
 [[package]]
@@ -1350,9 +1350,9 @@ dependencies = [
  "cookie",
  "gopon",
  "khonj",
- "matcher",
  "percent-encoding",
  "pipeline",
+ "poth",
  "proptest",
  "regex",
  "serde",

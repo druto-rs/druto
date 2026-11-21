@@ -2,7 +2,7 @@
 
 use std::path::{Path, PathBuf};
 
-use matcher::Method;
+use poth::Method;
 
 use crate::limits::PayloadLimits;
 

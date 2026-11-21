@@ -2,8 +2,8 @@
 
 use std::sync::Arc;
 
-use matcher::Method;
 use pipeline::{BoxedMiddleware, Middleware};
+use poth::Method;
 
 use crate::{
     context::HttpContext,

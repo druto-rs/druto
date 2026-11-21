@@ -3,8 +3,8 @@
 use std::sync::Arc;
 
 use gopon::UrlSigner;
-use matcher::Method;
 use pipeline::{BoxedMiddleware, Middleware};
+use poth::Method;
 
 use crate::{
     compiled::CompiledRouter,

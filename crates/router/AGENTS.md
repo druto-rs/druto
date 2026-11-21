@@ -4,7 +4,7 @@
 
 This crate owns the HTTP routing engine, request/response models, middleware onion runner, and execution context
 (`HttpContext`).
-It bridges `matcher`, `pipeline`, `cookie`, `khonj`, `gopon`, and `session` without coupling directly to concrete
+It bridges `poth`, `pipeline`, `cookie`, `khonj`, `gopon`, and `session` without coupling directly to concrete
 transport socket listeners.
 
 ## Design Rules
@@ -18,10 +18,10 @@ transport socket listeners.
     - Dispatching requests operates on an immutable, thread-safe (`Send + Sync + 'static`) `CompiledRouter` generated
       by `Router::compile()`.
     - Route middleware chains must be pre-composed during compilation into `pipeline::Pipeline` instances (`Global` ➔
-      `Group (outer to inner)` ➔ `Route` ➔ `Terminal Handler`) stored in `matcher::MethodMatcher` to avoid
+      `Group (outer to inner)` ➔ `Route` ➔ `Terminal Handler`) stored in `poth::MethodMatcher` to avoid
       runtime hierarchy resolution overhead.
 3. **Deterministic Precedence**:
-    - Route compilation must rely on `matcher::MethodMatcher` to guarantee deterministic specificity hierarchy
+    - Route compilation must rely on `poth::MethodMatcher` to guarantee deterministic specificity hierarchy
       regardless of registration order.
 4. **Unified Handler Contract & `IntoResponse`**:
     - Handlers adhere to `async fn(&mut HttpContext) -> impl IntoResponse`.
@@ -42,7 +42,7 @@ transport socket listeners.
       and `request.method()`.
 9. **Reverse URL & Cryptographic Signing**:
     - Reverse URL generation must strictly validate required parameters and URL-encode dynamic values using
-      `matcher::MethodMatcher::build_path`.
+      `poth::MethodMatcher::build_path`.
     - Integrate `gopon::UrlSigner` into `UrlGenerator` and expose signature checks on `Request`.
 10. **Automatic RFC 9110 Compliance & Error Mapping**:
     - Handle automatic `OPTIONS` (`204 No Content` + `Allow` header), automatic `HEAD` (fallback to `GET` + body

@@ -6,7 +6,7 @@ use std::{
 };
 
 use gopon::UrlSigner;
-use matcher::MethodMatcher;
+use poth::MethodMatcher;
 
 use crate::error::RouterError;
 

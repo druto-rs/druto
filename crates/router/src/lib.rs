@@ -5,7 +5,7 @@
 //! - **Two-Phase Routing Engine**: Route registration via mutable builder [`Router`], followed by
 //!   compilation into a frozen, thread-safe [`CompiledRouter`].
 //! - **Zero-Allocation Dispatch**: Flattened middleware stacks pre-compiled into [`pipeline::Pipeline`] instances
-//!   stored inside [`matcher::MethodMatcher`].
+//!   stored inside [`poth::MethodMatcher`].
 //! - **Unified Context & Pipeline Onion**: Handlers and middleware operate over [`HttpContext`], integrating
 //!   cookies, sessions, request-scoped extensions, and parameters.
 //! - **RESTful Resource Controllers**: Conventional 7-action routing with [`ResourceController`] and [`RouteResource`].
@@ -40,7 +40,7 @@ pub use group::RouteGroup;
 pub use handler::{BoxFuture, BoxedHandler, Handler, from_fn, from_handler};
 pub use header::{HeaderMap, HeaderName, HeaderValue};
 pub use into_response::IntoResponse;
-pub use matcher::{BuiltinConstraint, Constraint, Method};
+pub use poth::{BuiltinConstraint, Constraint, Method};
 pub use request::{Request, RequestBuilder, RouteParams};
 pub use resource::{ResourceAction, ResourceController, RouteResource};
 pub use response::{Redirect, Response, ResponseBody};

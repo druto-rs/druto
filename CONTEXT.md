@@ -18,6 +18,7 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 |------------------------------|-------------------------------------------------------------------|-------------------|--------------------------|---------------------------------------|
 | **Layer 0: Primitives**      | Path pattern matching, parameter extraction & HTTP method routing | `matcher`         | `@poppinss/matchit`      | `illuminate/routing` (trie)           |
 | **Layer 0: Primitives**      | Async onion middleware pipeline                                   | `pipeline`        | `@poppinss/middleware`   | `illuminate/pipeline`                 |
+| **Layer 0: Primitives**      | URL pattern matching, parameter extraction & method routing       | `poth` (ext)      | `@adonisjs/http-server` (Route) | `illuminate/routing` (trie)   |
 | **Layer 0: Primitives**      | String inflection, pluralization, casing                          | `borno` (ext)     | `@poppinss/string`       | `illuminate/support` (Str/Pluralizer) |
 | **Layer 0: Primitives**      | Nested bracket-notation query string parser & serializer          | `khonj` (ext)     | `@poppinss/qs`           | `illuminate/http` (query parser)      |
 | **Layer 0: Primitives**      | Typed asynchronous pub/sub event dispatcher & testing fakes       | `barta` (ext)     | `@adonisjs/events`       | `illuminate/events`                   |
@@ -50,7 +51,6 @@ crates/
 ├── cors/        # Cross-Origin Resource Sharing (CORS) preflight and header negotiation
 ├── druto/       # Framework umbrella facade
 ├── limiter/     # Rate limiting, token bucket, sliding window, and HTTP headers
-├── matcher/     # Route pattern matching and parameter extraction
 ├── pipeline/    # Asynchronous middleware pipeline and execution runner
 ├── redis/       # Asynchronous Redis client manager, connection pooling, and pub/sub
 ├── router/      # HTTP routing, request/response, groups, context, URL generation
