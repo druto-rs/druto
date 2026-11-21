@@ -2,7 +2,7 @@
 
 use std::time::Duration;
 
-use cookie::{Cookie, SameSite};
+use chirkut::{Cookie, SameSite};
 
 use crate::error::SessionError;
 

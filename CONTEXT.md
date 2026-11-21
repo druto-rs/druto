@@ -25,7 +25,7 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 | **Layer 0: Primitives**      | AEAD encryption, HMAC signing, key rotation, signed URLs          | `gopon` (ext)     | `@boringnode/encryption` | `illuminate/encryption`               |
 | **Layer 0: Primitives**      | Password hashing drivers (Argon2id, Bcrypt), rehash detection     | `mishron` (ext)   | `@adonisjs/hash`         | `illuminate/hashing`                  |
 | **Layer 1: Configuration**   | .env parsing & boot-time schema validation                        | `poribesh` (ext)  | `@adonisjs/env`          | `Dotenv` + `config`                   |
-| **Layer 2: State & Storage** | RFC 6265 cookies, signed & encrypted cookie jars                  | `cookie`          | `@adonisjs/http-server`  | `illuminate/cookie`                   |
+| **Layer 2: State & Storage** | RFC 6265 cookies, signed & encrypted cookie jars                  | `chirkut` (ext)   | `@adonisjs/http-server`  | `illuminate/cookie`                   |
 | **Layer 2: State & Storage** | Multi-driver session management & flash data                      | `session`         | `@adonisjs/session`      | `illuminate/session`                  |
 | **Layer 2: State & Storage** | Asynchronous Redis connection manager, pooling & pub/sub          | `redis`           | `@adonisjs/redis`        | `illuminate/redis`                    |
 | **Layer 2: State & Storage** | Unified multi-driver cache, tiered L1/L2, stampede defense & tags | `kouta` (ext)     | `@adonisjs/cache`        | `illuminate/cache`                    |
@@ -47,7 +47,6 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 crates/
 ├── auth/        # Authentication guards, session/token authenticators, user identity
 ├── bodyparser/  # Streaming multipart parser, file uploads, body size enforcement
-├── cookie/      # RFC 6265 cookies, plain, signed, and encrypted cookie jars
 ├── cors/        # Cross-Origin Resource Sharing (CORS) preflight and header negotiation
 ├── druto/       # Framework umbrella facade
 ├── limiter/     # Rate limiting, token bucket, sliding window, and HTTP headers

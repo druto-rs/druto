@@ -297,6 +297,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "chirkut"
+version = "0.1.0"
+source = "git+https://github.com/Hitarashi/chirkut.git?branch=main#14193d98e8798dde5742fd2a376d09f71f895d20"
+dependencies = [
+ "gopon",
+ "time",
+]
+
+[[package]]
 name = "cipher"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -318,15 +327,6 @@ name = "const-oid"
 version = "0.10.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be95d4a884358a21a199689323c29e9256b4a1b315e22f183d155422041d3a9a"
-
-[[package]]
-name = "cookie"
-version = "0.1.0"
-dependencies = [
- "gopon",
- "proptest",
- "time",
-]
 
 [[package]]
 name = "cookie-factory"
@@ -1361,7 +1361,7 @@ name = "router"
 version = "0.1.0"
 dependencies = [
  "bytes",
- "cookie",
+ "chirkut",
  "dhap",
  "futures-util",
  "gopon",
@@ -1547,7 +1547,7 @@ name = "session"
 version = "0.1.0"
 dependencies = [
  "base64",
- "cookie",
+ "chirkut",
  "dhap",
  "getrandom 0.4.3",
  "gopon",
@@ -1596,7 +1596,7 @@ name = "shield"
 version = "0.1.0"
 dependencies = [
  "base64",
- "cookie",
+ "chirkut",
  "dhap",
  "getrandom 0.4.3",
  "gopon",

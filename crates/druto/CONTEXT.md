@@ -20,7 +20,7 @@ inspired by Laravel and AdonisJS.
 
 - `barta`: In-process pub/sub event dispatcher, wildcard topic routing, and testing fakes.
 - `borno`: Grammatical inflections, casing transformations, and string conventions.
-- `cookie`: RFC 6265 cookies, signed and encrypted cookie jars.
+- `chirkut`: RFC 6265bis cookies, signed and encrypted cookie jars.
 - `gopon`: Authenticated encryption, HMAC signing, key rotation, and signed URLs.
 - `jachai`: Universal declarative schema definition, validation, sanitization, and structured error reporting.
 - `khonj`: Nested bracket-notation query string parsing and serialization.

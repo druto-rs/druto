@@ -10,7 +10,7 @@ use std::{
     time::Duration,
 };
 
-use cookie::{Cookie, CookieJar, SameSite};
+use chirkut::{Cookie, CookieJar, SameSite};
 use dhap::{Pipeline, from_terminal};
 use gopon::{Encrypter, Key, KeyRing};
 use proptest::prelude::*;
@@ -1659,7 +1659,7 @@ proptest! {
 mod redis_store_tests {
     use std::{collections::HashMap, sync::Arc, time::Duration};
 
-    use cookie::{Cookie, CookieJar};
+    use chirkut::{Cookie, CookieJar};
     use dhap::{Pipeline, from_terminal};
     use redis::{RedisCommands, RedisFake};
     use serde_json::json;

@@ -11,7 +11,7 @@ use std::{
 };
 
 use base64::prelude::*;
-use cookie::SameSite;
+use chirkut::SameSite;
 use dhap::{Error as DhapError, Pipeline, from_terminal};
 use gopon::Key;
 use router::{HeaderName, HttpContext, Method, Request, Response, RouterError, StatusCode};

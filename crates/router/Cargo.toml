@@ -7,12 +7,12 @@ rust-version.workspace = true
 
 [dependencies]
 # Workspace Crates
-cookie.workspace = true
 dhap.workspace = true
 session.workspace = true
 
 # External Dependencies
 bytes.workspace = true
+chirkut.workspace = true
 futures-util = { workspace = true, features = ["alloc"] }
 gopon.workspace = true
 jachai.workspace = true

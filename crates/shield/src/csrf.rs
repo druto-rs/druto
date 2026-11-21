@@ -3,7 +3,7 @@
 use std::{fmt, sync::Arc};
 
 use base64::prelude::*;
-use cookie::{Cookie, SameSite};
+use chirkut::{Cookie, SameSite};
 use gopon::{HmacSigner, Key};
 use router::{HttpContext, Response, StatusCode};
 use session::SessionContext;

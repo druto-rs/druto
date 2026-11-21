@@ -3,7 +3,7 @@
 use std::{fmt, net::IpAddr, str::FromStr};
 
 use bytes::Bytes;
-use cookie::CookieJar;
+use chirkut::CookieJar;
 use gopon::{KeyRing, UrlSigner};
 use khonj::from_str as qs_from_str;
 use poth::Method;

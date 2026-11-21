@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use cookie::CookieJar;
+use chirkut::CookieJar;
 use dhap::{BoxFuture, Error as DhapError, Middleware, Next};
 
 use crate::{error::SessionError, manager::SessionManager, session::Session};

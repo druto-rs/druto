@@ -1,6 +1,6 @@
 //! Request-scoped execution context passed through middleware to route handlers.
 
-use cookie::CookieJar;
+use chirkut::CookieJar;
 use session::{Session, SessionContext};
 
 use crate::{extensions::Extensions, header::HeaderName, request::Request, response::Response};

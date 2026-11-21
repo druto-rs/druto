@@ -1597,7 +1597,7 @@ fn test_error_display_and_conversions_exhaustive() {
     let from_crypto: RouterError = gopon::Error::InvalidSignature.into();
     assert!(matches!(from_crypto, RouterError::InvalidSignature));
 
-    let from_cookie: RouterError = cookie::CookieError::InvalidName("bad".to_string()).into();
+    let from_cookie: RouterError = chirkut::CookieError::InvalidName("bad".to_string()).into();
     assert!(matches!(from_cookie, RouterError::Internal(_)));
 
     let from_session: RouterError = session::SessionError::Serialization("err".to_string()).into();
@@ -2468,7 +2468,7 @@ fn test_error_conversions_and_display_complete() {
     let crypto_other_err: RouterError = gopon::Error::AuthenticationFailed.into();
     assert!(matches!(crypto_other_err, RouterError::Internal(_)));
 
-    let cookie_err: RouterError = cookie::CookieError::InvalidName("bad name".to_string()).into();
+    let cookie_err: RouterError = chirkut::CookieError::InvalidName("bad name".to_string()).into();
     assert!(matches!(cookie_err, RouterError::Internal(_)));
 
     let qs_err: RouterError = khonj::Error::Custom("qs error".to_string()).into();
@@ -2687,7 +2687,7 @@ fn test_router_with_config_and_base_url() {
 fn test_context_and_request_extended_coverage() {
     let mut ctx = HttpContext::new(Request::builder().build());
     let cookie_jar_mut_ref = ctx.cookie_jar_mut();
-    cookie_jar_mut_ref.set(cookie::Cookie::new("session_token", "abc").expect("cookie"));
+    cookie_jar_mut_ref.set(chirkut::Cookie::new("session_token", "abc").expect("cookie"));
     assert_eq!(
         ctx.cookie_jar().get("session_token").expect("get cookie"),
         Some("abc".to_string())

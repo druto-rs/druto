@@ -2,7 +2,7 @@
 
 use std::{future::ready, sync::Arc, time::Duration};
 
-use cookie::security::ENCRYPTED_PREFIX;
+use chirkut::security::ENCRYPTED_PREFIX;
 use gopon::Encrypter;
 
 use crate::{

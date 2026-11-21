@@ -137,8 +137,8 @@ impl From<gopon::Error> for RouterError {
     }
 }
 
-impl From<cookie::CookieError> for RouterError {
-    fn from(error: cookie::CookieError) -> Self {
+impl From<chirkut::CookieError> for RouterError {
+    fn from(error: chirkut::CookieError) -> Self {
         Self::Internal(error.to_string())
     }
 }

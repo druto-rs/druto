@@ -10,7 +10,6 @@ rust-version = "1.95"
 
 [workspace.dependencies]
 # Workspace Crates
-cookie = { path = "crates/cookie" }
 redis = { path = "crates/redis" }
 router = { path = "crates/router" }
 session = { path = "crates/session" }
@@ -20,6 +19,7 @@ barta = { git = "https://github.com/Hitarashi/barta.git", branch = "main" }
 base64 = "0.23.1"
 borno = { git = "https://github.com/Hitarashi/borno.git", branch = "main" }
 bytes = "1.12.2"
+chirkut = { git = "https://github.com/Hitarashi/chirkut.git", branch = "main" }
 dhap = { git = "https://github.com/Hitarashi/dhap.git", branch = "main" }
 fred = { version = "10.1.0", default-features = false }
 futures-util = { version = "0.3.34", default-features = false }

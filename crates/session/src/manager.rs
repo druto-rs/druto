@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use cookie::CookieJar;
+use chirkut::CookieJar;
 
 use crate::{
     config::SessionConfig,
