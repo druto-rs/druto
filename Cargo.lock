@@ -548,6 +548,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "druto-session"
+version = "0.1.0"
+source = "git+https://github.com/druto-rs/session.git?branch=main#65ec74988a014851530d66d42b7eaef705e44851"
+dependencies = [
+ "base64",
+ "chirkut",
+ "dhap",
+ "getrandom 0.4.3",
+ "gopon",
+ "serde",
+ "serde_json",
+ "time",
+]
+
+[[package]]
 name = "either"
 version = "1.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1458,6 +1473,7 @@ dependencies = [
  "bytes",
  "chirkut",
  "dhap",
+ "druto-session",
  "futures-util",
  "gopon",
  "jachai",
@@ -1469,7 +1485,6 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
- "session",
  "tokio",
 ]
 
@@ -1573,22 +1588,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "session"
-version = "0.1.0"
-dependencies = [
- "base64",
- "chirkut",
- "dhap",
- "druto-redis",
- "getrandom 0.4.3",
- "gopon",
- "proptest",
- "serde",
- "serde_json",
- "time",
-]
-
-[[package]]
 name = "sha-1"
 version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1628,11 +1627,11 @@ dependencies = [
  "base64",
  "chirkut",
  "dhap",
+ "druto-session",
  "getrandom 0.4.3",
  "gopon",
  "router",
  "serde_json",
- "session",
  "subtle",
 ]
 
