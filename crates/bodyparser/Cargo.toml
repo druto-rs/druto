@@ -7,11 +7,11 @@ rust-version.workspace = true
 
 [dependencies]
 # Workspace Crates
-pipeline.workspace = true
 router.workspace = true
 
 # External Dependencies
 bytes.workspace = true
+dhap.workspace = true
 futures-util = { workspace = true, features = ["alloc"] }
 khonj.workspace = true
 poth.workspace = true

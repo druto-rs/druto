@@ -11,6 +11,7 @@ use std::{
     time::Duration,
 };
 
+use dhap::{Error as DhapError, Pipeline, from_terminal};
 #[cfg(feature = "redis")]
 use limiter::RedisLimiterStore;
 use limiter::{
@@ -18,7 +19,6 @@ use limiter::{
     LimiterMiddleware, LimiterRegistry, LimiterStore, MemoryLimiterStore, MultiLimiter,
     QuotaPolicy, RateLimitResult, TierConfig, TieredLimiterStore, constants,
 };
-use pipeline::{Pipeline, PipelineError, from_terminal};
 use proptest::prelude::*;
 #[cfg(feature = "redis")]
 use redis::fake::RedisFake;
@@ -75,7 +75,7 @@ fn execute_pipeline(
     middleware: LimiterMiddleware,
     ctx: &mut HttpContext,
     called: Arc<AtomicBool>,
-) -> Result<Response, PipelineError<RouterError>> {
+) -> Result<Response, DhapError<RouterError>> {
     let pipeline = Pipeline::new().pipe(middleware);
     let terminal = from_terminal(move |ctx: &mut HttpContext| {
         called.store(true, Ordering::SeqCst);

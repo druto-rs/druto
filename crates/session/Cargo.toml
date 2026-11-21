@@ -12,11 +12,11 @@ redis = ["dep:redis"]
 [dependencies]
 # Workspace Crates
 cookie.workspace = true
-pipeline.workspace = true
 redis = { workspace = true, optional = true }
 
 # External Dependencies
 base64.workspace = true
+dhap.workspace = true
 getrandom.workspace = true
 gopon.workspace = true
 serde.workspace = true

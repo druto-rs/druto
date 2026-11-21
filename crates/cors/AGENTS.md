@@ -27,5 +27,5 @@ and intermediate cache defense (`Vary` header management).
       `Vary: Access-Control-Request-Headers`.
 
 4. **Pipeline & Router Integration**:
-    - Implement `pipeline::Middleware<HttpContext, Response, RouterError>`.
+    - Implement `dhap::Middleware<HttpContext, Response, RouterError>`.
     - Non-destructive header manipulation: augment existing headers without wiping headers set by upstream layers.

@@ -8,7 +8,7 @@ rust-version.workspace = true
 [dependencies]
 # Workspace Crates
 cookie.workspace = true
-pipeline.workspace = true
+dhap.workspace = true
 session.workspace = true
 
 # External Dependencies

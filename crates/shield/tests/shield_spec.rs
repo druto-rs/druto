@@ -12,8 +12,8 @@ use std::{
 
 use base64::prelude::*;
 use cookie::SameSite;
+use dhap::{Error as DhapError, Pipeline, from_terminal};
 use gopon::Key;
-use pipeline::{Pipeline, PipelineError, from_terminal};
 use router::{HeaderName, HttpContext, Method, Request, Response, RouterError, StatusCode};
 use session::{Session, SessionContext, SessionId};
 use shield::{
@@ -849,7 +849,7 @@ fn test_csrf_middleware_failure_mode_error() {
     let result = block_on(pipeline.run(&mut ctx, terminal));
     assert!(result.is_err());
     match result.unwrap_err() {
-        PipelineError::Execution(RouterError::InvalidSignature) => {}
+        DhapError::Execution(RouterError::InvalidSignature) => {}
         other => panic!("Unexpected error: {other:?}"),
     }
 }

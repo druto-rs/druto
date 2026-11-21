@@ -7,10 +7,10 @@ rust-version.workspace = true
 
 [dependencies]
 # Workspace Crates
-pipeline.workspace = true
 router.workspace = true
 
 # External Dependencies
+dhap.workspace = true
 regex.workspace = true
 
 [dev-dependencies]

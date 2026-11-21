@@ -3,8 +3,8 @@
 ## Purpose
 
 `session` provides multi-driver HTTP session management, flash message storage, and session fixation defense for the
-Druto framework. It allows stateful user interactions across HTTP requests by bridging `cookie`, `crypto`, and
-`pipeline` without binding to concrete HTTP server implementations.
+Druto framework. It allows stateful user interactions across HTTP requests by bridging `cookie`, `gopon`, and
+`dhap` without binding to concrete HTTP server implementations.
 
 ## Architecture Overview
 
@@ -96,10 +96,10 @@ complying with RFC 6265bis HTTP State Management Mechanism specifications.
         - `expire_on_close: bool` (default: `false`, browser session without cookie `Max-Age` while keeping server TTL)
 
 5. **Pipeline Middleware Integration**:
-    - Integrates cleanly with `crates/pipeline` and `crates/cookie::CookieJar`:
+    - Integrates cleanly with `dhap` and `crates/cookie::CookieJar`:
         - Direct lifecycle primitives: `SessionManager::start(&cookie_jar)` and
           `SessionManager::commit(session, &mut cookie_jar)`.
-        - Generic middleware: `struct SessionMiddleware<Store>` implementing `pipeline::Middleware<C, Output, Error>`
+        - Generic middleware: `struct SessionMiddleware<Store>` implementing `dhap::Middleware<C, Output, Error>`
           bounded by
           `trait SessionContext` (`cookie_jar_mut()`, `set_session()`, `session_mut()`, `take_session()`).
         - Includes built-in `TestSessionContext` for end-to-end pipeline testing.

@@ -3,7 +3,7 @@
 ## Purpose
 
 `router` is the HTTP routing, request/response, and execution context layer for the Druto web framework. It bridges
-`poth` (radix trie route matching), `pipeline` (middleware execution), `cookie` (cookie jars), `khonj` (nested query
+`poth` (radix trie route matching), `dhap` (middleware execution), `cookie` (cookie jars), `khonj` (nested query
 parameter parsing), `gopon` (signed URLs), and `session` (session state) into a cohesive, developer-friendly, and
 high-performance HTTP layer.
 
@@ -44,7 +44,7 @@ Following the pattern in AdonisJS, Topcoat, and Cot, routing operates in two dis
     - Compiling the router (`router.compile()`) freezes all route definitions into an immutable, thread-safe
       (`Send + Sync + 'static`) dispatch engine.
     - Route patterns are compiled into `poth::MethodMatcher`.
-    - Group and route middleware stacks are flattened and pre-composed with `pipeline::Pipeline` per route (`Global` ➔
+    - Group and route middleware stacks are flattened and pre-composed with `dhap::Pipeline` per route (`Global` ➔
       `Group (outer to inner)` ➔ `Route` ➔ `Terminal Handler`), eliminating dynamic hierarchy
       traversals and per-request allocations during request handling.
     - Fast, zero-allocation path parameter lookups directly borrowing slices from the request URI.

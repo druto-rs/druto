@@ -185,9 +185,9 @@ name = "bodyparser"
 version = "0.1.0"
 dependencies = [
  "bytes",
+ "dhap",
  "futures-util",
  "khonj",
- "pipeline",
  "poth",
  "router",
  "serde",
@@ -360,7 +360,7 @@ checksum = "7f8f80099a98041a3d1622845c271458a2d73e688351bf3cb999266764b81d48"
 name = "cors"
 version = "0.1.0"
 dependencies = [
- "pipeline",
+ "dhap",
  "proptest",
  "regex",
  "router",
@@ -443,6 +443,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e9de72ce2ad1f90dc62fa25f0f430ef85eb4b0d8fa0be4f30373bc40a21d28e"
 
 [[package]]
+name = "dhap"
+version = "0.1.0"
+source = "git+https://github.com/Hitarashi/dhap.git?branch=main#ef842ba8a96b79b47c6709bcaf2acee8dda239bf"
+
+[[package]]
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -481,6 +486,7 @@ version = "0.1.0"
 dependencies = [
  "barta",
  "borno",
+ "dhap",
  "gopon",
  "khonj",
  "kouta",
@@ -923,7 +929,7 @@ name = "limiter"
 version = "0.1.0"
 dependencies = [
  "bytes",
- "pipeline",
+ "dhap",
  "proptest",
  "redis",
  "router",
@@ -1083,10 +1089,6 @@ name = "pin-project-lite"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd"
-
-[[package]]
-name = "pipeline"
-version = "0.1.0"
 
 [[package]]
 name = "poly1305"
@@ -1348,10 +1350,10 @@ version = "0.1.0"
 dependencies = [
  "bytes",
  "cookie",
+ "dhap",
  "gopon",
  "khonj",
  "percent-encoding",
- "pipeline",
  "poth",
  "proptest",
  "regex",
@@ -1531,9 +1533,9 @@ version = "0.1.0"
 dependencies = [
  "base64",
  "cookie",
+ "dhap",
  "getrandom 0.4.3",
  "gopon",
- "pipeline",
  "proptest",
  "redis",
  "serde",
@@ -1580,9 +1582,9 @@ version = "0.1.0"
 dependencies = [
  "base64",
  "cookie",
+ "dhap",
  "getrandom 0.4.3",
  "gopon",
- "pipeline",
  "router",
  "serde_json",
  "session",

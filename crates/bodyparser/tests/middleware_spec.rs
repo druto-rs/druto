@@ -8,7 +8,7 @@ use std::sync::{
 use bodyparser::{
     BodyParserConfig, BodyParserMiddleware, FormFields, PayloadLimits, UploadedFiles,
 };
-use pipeline::{Pipeline, PipelineError, from_terminal};
+use dhap::{Error as DhapError, Pipeline, from_terminal};
 use poth::Method;
 use router::{HeaderName, HttpContext, Request, Response, RouterError, StatusCode};
 
@@ -16,7 +16,7 @@ fn execute_pipeline(
     middleware: BodyParserMiddleware,
     ctx: &mut HttpContext,
     called: Arc<AtomicBool>,
-) -> Result<Response, PipelineError<RouterError>> {
+) -> Result<Response, DhapError<RouterError>> {
     let pipeline = Pipeline::new().pipe(middleware);
     let terminal = from_terminal(move |ctx: &mut HttpContext| {
         called.store(true, Ordering::SeqCst);
@@ -70,7 +70,7 @@ fn test_middleware_json_size_limit_exceeded() {
     assert!(!called.load(Ordering::SeqCst));
 
     match result.unwrap_err() {
-        PipelineError::Execution(RouterError::PayloadTooLarge {
+        DhapError::Execution(RouterError::PayloadTooLarge {
             max_bytes,
             received_bytes,
         }) => {

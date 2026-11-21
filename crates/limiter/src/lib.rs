@@ -1,7 +1,7 @@
 //! Rate limiting, traffic throttling, burst management, and standardized HTTP response headers for Druto.
 //!
 //! Provides algorithmic rate limiting engines, pluggable storage backends (including hybrid memory/Redis tiers),
-//! and pipeline middleware complying with RFC 6585 and IETF RateLimit header field specifications.
+//! and execution middleware complying with RFC 6585 and IETF RateLimit header field specifications.
 
 pub mod algorithm;
 pub mod config;

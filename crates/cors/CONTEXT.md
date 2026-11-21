@@ -3,7 +3,7 @@
 ## Vision & Scope
 
 The `cors` crate provides standard Cross-Origin Resource Sharing (CORS) enforcement, preflight negotiation, and header
-management for the Druto web framework. It operates as an asynchronous onion middleware layer on top of `pipeline` and
+management for the Druto web framework. It operates as an asynchronous onion middleware layer on top of `dhap` and
 `router`, handling both preflight `OPTIONS` requests and actual cross-origin HTTP requests in accordance with the
 [W3C CORS Specification](https://www.w3.org/TR/cors/) and [RFC 6454](https://datatracker.ietf.org/doc/html/rfc6454).
 
@@ -74,7 +74,7 @@ The crate synthesizes architectural patterns from industry-standard frameworks:
       ensure intermediate caches (CDNs, proxies) do not serve preflight responses across disparate clients.
 
 6. **Pipeline Middleware Integration**:
-    - Implements `pipeline::Middleware<HttpContext, Response, RouterError>`, allowing seamless attachment as global
+    - Implements `dhap::Middleware<HttpContext, Response, RouterError>`, allowing seamless attachment as global
       middleware or route-group middleware within the Druto pipeline.
 
 ## Boundaries & Non-Responsibilities
@@ -93,4 +93,4 @@ The crate synthesizes architectural patterns from industry-standard frameworks:
 - `enum OriginPolicy`: Strongly typed origin matching strategies (`Any`, `Exact`, `Pattern`, `Mirror`, `Dynamic`).
 - `enum HeaderPolicy`: Allowed headers strategies (`Mirror`, `List(Vec<HeaderName>)`).
 - `enum MethodPolicy`: Allowed HTTP methods strategies (`Any`, `List(Vec<Method>)`).
-- `struct CorsMiddleware`: Pipeline middleware implementing `pipeline::Middleware<HttpContext, Response, RouterError>`.
+- `struct CorsMiddleware`: Pipeline middleware implementing `dhap::Middleware<HttpContext, Response, RouterError>`.

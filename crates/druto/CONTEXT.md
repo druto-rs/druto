@@ -25,7 +25,7 @@ inspired by Laravel and AdonisJS.
 - `khonj`: Nested bracket-notation query string parsing and serialization.
 - `kouta`: Unified multi-driver caching engine, multi-tier stores, and stampede protection.
 - `mishron`: Password hashing drivers (Argon2id, Bcrypt) and automatic rehash detection.
-- `pipeline`: Asynchronous middleware onion execution.
+- `dhap`: Asynchronous middleware onion execution.
 - `poribesh`: Environment variable loading, expansion, and boot-time schema validation.
 - `poth`: URL pattern matching, parameter extraction, and HTTP method routing.
 - `router`: HTTP routing, request/response models, middleware pipeline, and reverse URL generation.

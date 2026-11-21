@@ -4,7 +4,7 @@
 
 The `limiter` crate provides traffic throttling, rate limiting, burst management, and standardized HTTP rate limit
 headers for the Druto web framework. It operates as both a standalone, HTTP-agnostic rate limiting engine and an
-asynchronous onion middleware integrating with `pipeline` and `router`. It protects endpoints against brute-force
+asynchronous onion middleware integrating with `dhap` and `router`. It protects endpoints against brute-force
 attacks, credential stuffing, scraping, and denial-of-service conditions while providing fine-grained quota management
 for multi-tier APIs.
 
@@ -42,7 +42,7 @@ The crate synthesizes proven rate-limiting paradigms from industry standards and
       `RateLimitResult`. Usable outside HTTP servers for background jobs, webhook throttling, or external API client
       pacing.
     - **HTTP Integration Layer**: `LimiterMiddleware` implementing
-      `pipeline::Middleware<HttpContext, Response, RouterError>`.
+      `dhap::Middleware<HttpContext, Response, RouterError>`.
 
 2. **Core Algorithms**:
     - **Sliding Window Counter (Default)**: Approximated rolling window combining current and prior window counts
@@ -153,7 +153,7 @@ The crate synthesizes proven rate-limiting paradigms from industry standards and
 - `struct Limiter`: Rate limiting coordinator executing rules against a chosen store.
 - `struct LimiterConfig` & `LimiterConfigBuilder`: Configuration options for rate limiting rules and policies.
 - `struct LimiterRegistry`: Central catalog for defining and looking up named limiter policies.
-- `struct LimiterMiddleware`: Middleware implementation for `crates/pipeline`.
+- `struct LimiterMiddleware`: Middleware implementation for `dhap`.
 - `enum HeaderMode`: Header emission strategy (`Both`, `Standard`, `Legacy`, `None`).
 - `enum Algorithm`: Rate limiting algorithm (`SlidingWindow`, `FixedWindow`, `TokenBucket`).
 - `enum QuotaPolicy`: Dynamic policy result (`Limit(TierConfig)`, `Unlimited`).

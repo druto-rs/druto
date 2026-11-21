@@ -2,7 +2,7 @@
 
 use std::{collections::HashMap, sync::Arc};
 
-use pipeline::{BoxedMiddleware, Middleware};
+use dhap::{BoxedMiddleware, Middleware};
 use poth::{Constraint, Method};
 
 use crate::{context::HttpContext, error::RouterError, handler::BoxedHandler, response::Response};

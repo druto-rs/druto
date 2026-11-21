@@ -11,12 +11,12 @@ redis = ["dep:redis"]
 
 [dependencies]
 # Workspace Crates
-pipeline.workspace = true
 router.workspace = true
 redis = { workspace = true, optional = true }
 
 # External Dependencies
 bytes.workspace = true
+dhap.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 

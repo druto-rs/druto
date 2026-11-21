@@ -21,7 +21,7 @@ It operates across two complementary layers:
 - **Core Parser Engine (HTTP- & Runtime-Agnostic)**: Standalone streaming multipart, URL-encoded form, JSON, and raw
   text
   parsers, `UploadedFile` lifecycle primitives, magic-byte MIME sniffer, and byte-counting limit guards.
-- **HTTP Middleware Integration**: `BodyParserMiddleware` integrating with `pipeline` and `router`, automatically
+- **HTTP Middleware Integration**: `BodyParserMiddleware` integrating with `dhap` and `router`, automatically
   inspecting incoming `Content-Type` headers, streaming payloads to memory or temporary disk storage, and exposing
   structured fields and uploaded files to downstream handlers.
 
@@ -132,7 +132,7 @@ The crate synthesizes proven body ingestion architectures from framework designs
 - `struct BodyParserConfig` & `struct BodyParserConfigBuilder`: Configuration options for JSON, form, text, and
   multipart parsers.
 - `struct BodyParserMiddleware`: Asynchronous onion middleware implementing
-  `pipeline::Middleware<HttpContext, Response, RouterError>`.
+  `dhap::Middleware<HttpContext, Response, RouterError>`.
 - `struct FileValidator`: Fluent rules for allowed extensions, MIME types, and size bounds.
 - `enum FileError`: Granular file-level validation errors (`SizeLimitExceeded`, `InvalidExtension`, `InvalidMimeType`,
   `MimeMismatch`).

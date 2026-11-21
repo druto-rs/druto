@@ -8,6 +8,7 @@ rust-version.workspace = true
 [dependencies]
 barta.workspace = true
 borno.workspace = true
+dhap.workspace = true
 gopon.workspace = true
 khonj.workspace = true
 kouta.workspace = true

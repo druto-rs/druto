@@ -9,8 +9,8 @@ use std::{
 };
 
 use bytes::Bytes;
+use dhap::{BoxFuture as DhapBoxFuture, Error as DhapError, Middleware, Next};
 use gopon::{Key, KeyRing, UrlSigner};
-use pipeline::{BoxFuture as PipelineBoxFuture, Middleware, Next, PipelineError};
 use poth::Method;
 use proptest::prelude::*;
 use router::{
@@ -1109,7 +1109,7 @@ impl Middleware<HttpContext, Response, RouterError> for OrderTrackingMiddleware 
         &'a self,
         ctx: &'a mut HttpContext,
         next: Next<HttpContext, Response, RouterError>,
-    ) -> PipelineBoxFuture<'a, Result<Response, PipelineError<RouterError>>> {
+    ) -> DhapBoxFuture<'a, Result<Response, DhapError<RouterError>>> {
         Box::pin(async move {
             self.order
                 .lock()
@@ -1170,7 +1170,7 @@ impl Middleware<HttpContext, Response, RouterError> for ShortCircuitAuthMiddlewa
         &'a self,
         ctx: &'a mut HttpContext,
         next: Next<HttpContext, Response, RouterError>,
-    ) -> PipelineBoxFuture<'a, Result<Response, PipelineError<RouterError>>> {
+    ) -> DhapBoxFuture<'a, Result<Response, DhapError<RouterError>>> {
         let _ = next;
         Box::pin(async move {
             ctx.response.set_status(StatusCode::UNAUTHORIZED);
@@ -1215,7 +1215,7 @@ fn test_extensions_propagation_from_middleware_to_handler() {
             &'a self,
             ctx: &'a mut HttpContext,
             next: Next<HttpContext, Response, RouterError>,
-        ) -> PipelineBoxFuture<'a, Result<Response, PipelineError<RouterError>>> {
+        ) -> DhapBoxFuture<'a, Result<Response, DhapError<RouterError>>> {
             Box::pin(async move {
                 ctx.extensions.insert(TestUserId(777));
                 next.run(ctx).await
@@ -1603,10 +1603,10 @@ fn test_error_display_and_conversions_exhaustive() {
     let from_session: RouterError = session::SessionError::Serialization("err".to_string()).into();
     assert!(matches!(from_session, RouterError::Internal(_)));
 
-    let from_pipe_next: RouterError = PipelineError::<RouterError>::NextAlreadyCalled.into();
+    let from_pipe_next: RouterError = DhapError::<RouterError>::NextAlreadyCalled.into();
     assert!(matches!(from_pipe_next, RouterError::Pipeline(_)));
 
-    let from_pipe_exec: RouterError = PipelineError::Execution(RouterError::NotFound).into();
+    let from_pipe_exec: RouterError = DhapError::Execution(RouterError::NotFound).into();
     assert!(matches!(from_pipe_exec, RouterError::NotFound));
 }
 
@@ -1954,7 +1954,7 @@ impl Middleware<HttpContext, Response, RouterError> for PassthroughTestMiddlewar
         &'a self,
         ctx: &'a mut HttpContext,
         next: Next<HttpContext, Response, RouterError>,
-    ) -> PipelineBoxFuture<'a, Result<Response, PipelineError<RouterError>>> {
+    ) -> DhapBoxFuture<'a, Result<Response, DhapError<RouterError>>> {
         Box::pin(async move { next.run(ctx).await })
     }
 }
@@ -2420,7 +2420,7 @@ fn test_header_map_and_name_full_coverage() {
 
 #[test]
 fn test_error_conversions_and_display_complete() {
-    use pipeline::PipelineError;
+    use dhap::Error as DhapError;
     use poth::Error as PothError;
 
     let missing_param = PothError::MissingParameter {
@@ -2452,7 +2452,7 @@ fn test_error_conversions_and_display_complete() {
     let err_decode: RouterError = decode_error.into();
     assert!(matches!(err_decode, RouterError::InvalidParams { .. }));
 
-    let pipeline_err: RouterError = PipelineError::NextAlreadyCalled.into();
+    let pipeline_err: RouterError = DhapError::NextAlreadyCalled.into();
     assert!(matches!(pipeline_err, RouterError::Pipeline(_)));
 
     let crypto_sig_err: RouterError = gopon::Error::InvalidSignature.into();
@@ -2579,7 +2579,7 @@ impl Middleware<HttpContext, Response, RouterError> for HeaderAppendingMiddlewar
         &'a self,
         ctx: &'a mut HttpContext,
         next: Next<HttpContext, Response, RouterError>,
-    ) -> PipelineBoxFuture<'a, Result<Response, PipelineError<RouterError>>> {
+    ) -> DhapBoxFuture<'a, Result<Response, DhapError<RouterError>>> {
         Box::pin(async move {
             ctx.response_mut()
                 .set_header(HeaderName::from("x-global"), "applied");
@@ -2594,7 +2594,7 @@ impl Middleware<HttpContext, Response, RouterError> for PassthroughMiddleware {
         &'a self,
         ctx: &'a mut HttpContext,
         next: Next<HttpContext, Response, RouterError>,
-    ) -> PipelineBoxFuture<'a, Result<Response, PipelineError<RouterError>>> {
+    ) -> DhapBoxFuture<'a, Result<Response, DhapError<RouterError>>> {
         Box::pin(async move { next.run(ctx).await })
     }
 }

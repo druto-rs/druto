@@ -38,7 +38,7 @@ backends (including hybrid tiered memory+redis stores), and HTTP rate limit head
     - Avoid heap allocations in hot-path key evaluation when possible.
 
 5. **Pipeline & Router Integration**:
-    - Implement `pipeline::Middleware<HttpContext, Response, RouterError>`.
+    - Implement `dhap::Middleware<HttpContext, Response, RouterError>`.
     - Provide both direct route builders and `LimiterRegistry` named policies.
     - Support `MultiLimiter` combinations (e.g. node-level burst memory limit + global Redis quota).
     - Support `dry_run` mode and inject `RateLimitResult` into `HttpContext::extensions`.

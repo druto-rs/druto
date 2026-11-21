@@ -4,7 +4,7 @@
 //!
 //! - **Two-Phase Routing Engine**: Route registration via mutable builder [`Router`], followed by
 //!   compilation into a frozen, thread-safe [`CompiledRouter`].
-//! - **Zero-Allocation Dispatch**: Flattened middleware stacks pre-compiled into [`pipeline::Pipeline`] instances
+//! - **Zero-Allocation Dispatch**: Flattened middleware stacks pre-compiled into [`dhap::Pipeline`] instances
 //!   stored inside [`poth::MethodMatcher`].
 //! - **Unified Context & Pipeline Onion**: Handlers and middleware operate over [`HttpContext`], integrating
 //!   cookies, sessions, request-scoped extensions, and parameters.

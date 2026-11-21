@@ -16,7 +16,7 @@ use cors::{
     ACCESS_CONTROL_REQUEST_HEADERS, ACCESS_CONTROL_REQUEST_METHOD, CorsConfig, CorsConfigBuilder,
     CorsMiddleware, HeaderPolicy, MethodPolicy, ORIGIN, OriginPolicy, VARY, matches_path,
 };
-use pipeline::{Pipeline, PipelineError, from_terminal};
+use dhap::{Error as DhapError, Pipeline, from_terminal};
 use proptest::prelude::*;
 use router::{
     HeaderMap, HeaderName, HttpContext, Method, Request, Response, ResponseBody, Router,
@@ -63,7 +63,7 @@ fn execute_pipeline(
     middleware: CorsMiddleware,
     ctx: &mut HttpContext,
     called: Arc<AtomicBool>,
-) -> Result<Response, PipelineError<RouterError>> {
+) -> Result<Response, DhapError<RouterError>> {
     let pipeline = Pipeline::new().pipe(middleware);
     let terminal = from_terminal(move |ctx: &mut HttpContext| {
         called.store(true, Ordering::SeqCst);

@@ -3,7 +3,7 @@
 use std::sync::Arc;
 
 use cookie::CookieJar;
-use pipeline::{BoxFuture, Middleware, Next, PipelineError};
+use dhap::{BoxFuture, Error as DhapError, Middleware, Next};
 
 use crate::{error::SessionError, manager::SessionManager, session::Session};
 
@@ -58,7 +58,7 @@ where
         &'a self,
         ctx: &'a mut Context,
         next: Next<Context, Output, Error>,
-    ) -> BoxFuture<'a, Result<Output, PipelineError<Error>>> {
+    ) -> BoxFuture<'a, Result<Output, DhapError<Error>>> {
         Box::pin(async move {
             let session = self
                 .manager

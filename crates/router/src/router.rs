@@ -2,8 +2,8 @@
 
 use std::sync::Arc;
 
+use dhap::{BoxedMiddleware, Middleware};
 use gopon::UrlSigner;
-use pipeline::{BoxedMiddleware, Middleware};
 use poth::Method;
 
 use crate::{

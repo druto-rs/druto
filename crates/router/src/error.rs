@@ -2,8 +2,8 @@
 
 use std::fmt;
 
+use dhap::Error as DhapError;
 use khonj::Error as QsError;
-use pipeline::PipelineError;
 use poth::{Error as PothError, Method};
 
 /// Errors produced during route registration, path compilation, request dispatch, or handler execution.
@@ -109,13 +109,13 @@ impl From<PothError> for RouterError {
     }
 }
 
-impl From<PipelineError<Self>> for RouterError {
-    fn from(error: PipelineError<Self>) -> Self {
+impl From<DhapError<Self>> for RouterError {
+    fn from(error: DhapError<Self>) -> Self {
         match error {
-            PipelineError::NextAlreadyCalled => {
+            DhapError::NextAlreadyCalled => {
                 Self::Pipeline("Middleware step next was invoked more than once".to_string())
             }
-            PipelineError::Execution(inner) => inner,
+            DhapError::Execution(inner) => inner,
         }
     }
 }

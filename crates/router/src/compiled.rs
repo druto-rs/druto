@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use pipeline::{BoxedMiddleware, Pipeline, Terminal};
+use dhap::{BoxFuture, BoxedMiddleware, Pipeline, Terminal};
 use poth::{Error as PothError, Method, MethodMatcher};
 
 use crate::{
@@ -34,7 +34,7 @@ impl Terminal<HttpContext, crate::response::Response, RouterError> for HandlerTe
     fn call(
         self,
         ctx: &mut HttpContext,
-    ) -> pipeline::BoxFuture<'_, Result<crate::response::Response, RouterError>> {
+    ) -> BoxFuture<'_, Result<crate::response::Response, RouterError>> {
         Box::pin(async move {
             self.handler.call(ctx).await?;
             Ok(ctx.response.clone())

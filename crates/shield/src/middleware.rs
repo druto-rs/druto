@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use pipeline::{BoxFuture, Middleware, Next, PipelineError};
+use dhap::{BoxFuture, Error as DhapError, Middleware, Next};
 use router::{HttpContext, Response, RouterError};
 
 use crate::{
@@ -132,7 +132,7 @@ impl Middleware<HttpContext, Response, RouterError> for ShieldMiddleware {
         &'a self,
         ctx: &'a mut HttpContext,
         next: Next<HttpContext, Response, RouterError>,
-    ) -> BoxFuture<'a, Result<Response, PipelineError<RouterError>>> {
+    ) -> BoxFuture<'a, Result<Response, DhapError<RouterError>>> {
         Box::pin(async move {
             // 1. Handle CSRF verification and token lifecycle.
             let mut csrf_token_for_cookie = None;
@@ -142,7 +142,7 @@ impl Middleware<HttpContext, Response, RouterError> for ShieldMiddleware {
 
                 let secret = csrf
                     .resolve_or_init_secret(ctx)
-                    .map_err(|err| PipelineError::Execution(RouterError::from(err)))?;
+                    .map_err(|err| DhapError::Execution(RouterError::from(err)))?;
 
                 if !is_exempt {
                     let maybe_token = csrf.extract_token(ctx);
@@ -154,9 +154,9 @@ impl Middleware<HttpContext, Response, RouterError> for ShieldMiddleware {
                     if !is_valid {
                         return match csrf.failure_mode {
                             CsrfFailureMode::Response403 => Ok(csrf.forbidden_response()),
-                            CsrfFailureMode::Error => Err(PipelineError::Execution(
-                                RouterError::from(ShieldError::InvalidCsrfToken),
-                            )),
+                            CsrfFailureMode::Error => Err(DhapError::Execution(RouterError::from(
+                                ShieldError::InvalidCsrfToken,
+                            ))),
                         };
                     }
                 }
@@ -164,7 +164,7 @@ impl Middleware<HttpContext, Response, RouterError> for ShieldMiddleware {
                 // Generate fresh per-request token and store in extensions.
                 let fresh_token = csrf
                     .generate_token(&secret)
-                    .map_err(|err| PipelineError::Execution(RouterError::from(err)))?;
+                    .map_err(|err| DhapError::Execution(RouterError::from(err)))?;
                 ctx.extensions.insert(fresh_token.clone());
                 csrf.attach_xsrf_cookie(ctx, &fresh_token);
                 csrf_token_for_cookie = Some((csrf.clone(), fresh_token));
@@ -179,7 +179,7 @@ impl Middleware<HttpContext, Response, RouterError> for ShieldMiddleware {
                 .is_some_and(|c| c.enabled && c.generate_nonce)
             {
                 let nonce = CspNonce::generate()
-                    .map_err(|err| PipelineError::Execution(RouterError::from(err)))?;
+                    .map_err(|err| DhapError::Execution(RouterError::from(err)))?;
                 ctx.extensions.insert(nonce.clone());
                 active_nonce = Some(nonce);
             }
@@ -251,7 +251,7 @@ impl Middleware<HttpContext, Response, RouterError> for SecurityHeadersMiddlewar
         &'a self,
         ctx: &'a mut HttpContext,
         next: Next<HttpContext, Response, RouterError>,
-    ) -> BoxFuture<'a, Result<Response, PipelineError<RouterError>>> {
+    ) -> BoxFuture<'a, Result<Response, DhapError<RouterError>>> {
         Box::pin(async move {
             let mut response = next.run(ctx).await?;
             self.config.apply(&mut response);
@@ -299,7 +299,7 @@ impl Middleware<HttpContext, Response, RouterError> for CspMiddleware {
         &'a self,
         ctx: &'a mut HttpContext,
         next: Next<HttpContext, Response, RouterError>,
-    ) -> BoxFuture<'a, Result<Response, PipelineError<RouterError>>> {
+    ) -> BoxFuture<'a, Result<Response, DhapError<RouterError>>> {
         Box::pin(async move {
             if !self.config.enabled {
                 return next.run(ctx).await;
@@ -308,7 +308,7 @@ impl Middleware<HttpContext, Response, RouterError> for CspMiddleware {
             let mut active_nonce = None;
             if self.config.generate_nonce {
                 let nonce = CspNonce::generate()
-                    .map_err(|err| PipelineError::Execution(RouterError::from(err)))?;
+                    .map_err(|err| DhapError::Execution(RouterError::from(err)))?;
                 ctx.extensions.insert(nonce.clone());
                 active_nonce = Some(nonce);
             }
@@ -359,7 +359,7 @@ impl Middleware<HttpContext, Response, RouterError> for CsrfMiddleware {
         &'a self,
         ctx: &'a mut HttpContext,
         next: Next<HttpContext, Response, RouterError>,
-    ) -> BoxFuture<'a, Result<Response, PipelineError<RouterError>>> {
+    ) -> BoxFuture<'a, Result<Response, DhapError<RouterError>>> {
         Box::pin(async move {
             if !self.config.enabled {
                 return next.run(ctx).await;
@@ -371,7 +371,7 @@ impl Middleware<HttpContext, Response, RouterError> for CsrfMiddleware {
             let secret = self
                 .config
                 .resolve_or_init_secret(ctx)
-                .map_err(|err| PipelineError::Execution(RouterError::from(err)))?;
+                .map_err(|err| DhapError::Execution(RouterError::from(err)))?;
 
             if !is_exempt {
                 let maybe_token = self.config.extract_token(ctx);
@@ -383,7 +383,7 @@ impl Middleware<HttpContext, Response, RouterError> for CsrfMiddleware {
                 if !is_valid {
                     return match self.config.failure_mode {
                         CsrfFailureMode::Response403 => Ok(self.config.forbidden_response()),
-                        CsrfFailureMode::Error => Err(PipelineError::Execution(RouterError::from(
+                        CsrfFailureMode::Error => Err(DhapError::Execution(RouterError::from(
                             ShieldError::InvalidCsrfToken,
                         ))),
                     };
@@ -394,7 +394,7 @@ impl Middleware<HttpContext, Response, RouterError> for CsrfMiddleware {
             let fresh_token = self
                 .config
                 .generate_token(&secret)
-                .map_err(|err| PipelineError::Execution(RouterError::from(err)))?;
+                .map_err(|err| DhapError::Execution(RouterError::from(err)))?;
             ctx.extensions.insert(fresh_token.clone());
             self.config.attach_xsrf_cookie(ctx, &fresh_token);
 

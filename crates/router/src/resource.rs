@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use pipeline::{BoxedMiddleware, Middleware};
+use dhap::{BoxedMiddleware, Middleware};
 use poth::Method;
 
 use crate::{

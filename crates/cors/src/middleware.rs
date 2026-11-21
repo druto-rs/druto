@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use pipeline::{BoxFuture, Middleware, Next, PipelineError};
+use dhap::{BoxFuture, Error as DhapError, Middleware, Next};
 use router::{HeaderName, HttpContext, Method, Response, ResponseBody, RouterError};
 
 use crate::{
@@ -54,7 +54,7 @@ impl CorsMiddleware {
         &self,
         ctx: &mut HttpContext,
         next: Next<HttpContext, Response, RouterError>,
-    ) -> Result<Response, PipelineError<RouterError>> {
+    ) -> Result<Response, DhapError<RouterError>> {
         // 1. Bypass if CORS middleware is disabled.
         if !self.config.enabled {
             return next.run(ctx).await;
@@ -92,7 +92,7 @@ impl CorsMiddleware {
         ctx: &mut HttpContext,
         origin: &str,
         requested_method_raw: &str,
-    ) -> Result<Response, PipelineError<RouterError>> {
+    ) -> Result<Response, DhapError<RouterError>> {
         // Evaluate origin policy
         let allow_origin = match self.config.compute_allow_origin(origin, ctx) {
             Some(allowed) => allowed,
@@ -190,7 +190,7 @@ impl CorsMiddleware {
         ctx: &mut HttpContext,
         origin: &str,
         next: Next<HttpContext, Response, RouterError>,
-    ) -> Result<Response, PipelineError<RouterError>> {
+    ) -> Result<Response, DhapError<RouterError>> {
         let allow_origin = self.config.compute_allow_origin(origin, ctx);
 
         // If origin is not allowed, proceed without setting CORS headers so browser blocks response.
@@ -267,7 +267,7 @@ impl Middleware<HttpContext, Response, RouterError> for CorsMiddleware {
         &'a self,
         ctx: &'a mut HttpContext,
         next: Next<HttpContext, Response, RouterError>,
-    ) -> BoxFuture<'a, Result<Response, PipelineError<RouterError>>> {
+    ) -> BoxFuture<'a, Result<Response, DhapError<RouterError>>> {
         Box::pin(async move { self.execute(ctx, next).await })
     }
 }

@@ -11,8 +11,8 @@ use std::{
 };
 
 use cookie::{Cookie, CookieJar, SameSite};
+use dhap::{Pipeline, from_terminal};
 use gopon::{Encrypter, Key, KeyRing};
-use pipeline::{Pipeline, from_terminal};
 use proptest::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -1660,7 +1660,7 @@ mod redis_store_tests {
     use std::{collections::HashMap, sync::Arc, time::Duration};
 
     use cookie::{Cookie, CookieJar};
-    use pipeline::{Pipeline, from_terminal};
+    use dhap::{Pipeline, from_terminal};
     use redis::{RedisCommands, RedisFake};
     use serde_json::json;
     use session::{

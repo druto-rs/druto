@@ -62,7 +62,7 @@ pub enum CsrfFailureMode {
     /// Responds immediately with HTTP 403 Forbidden without invoking downstream handlers.
     #[default]
     Response403,
-    /// Aborts execution by returning a pipeline execution error.
+    /// Aborts execution by returning an execution error.
     Error,
 }
 

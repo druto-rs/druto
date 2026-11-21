@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use pipeline::{BoxFuture, Middleware, Next, PipelineError};
+use dhap::{BoxFuture, Error as DhapError, Middleware, Next};
 use router::{HeaderName, HttpContext, Response, ResponseBody, RouterError, StatusCode};
 
 use crate::{
@@ -14,7 +14,7 @@ use crate::{
     stores::memory::MemoryLimiterStore,
 };
 
-/// HTTP rate limiting and burst throttling middleware for the Druto pipeline.
+/// HTTP rate limiting and burst throttling middleware for the execution pipeline.
 #[derive(Clone)]
 pub struct LimiterMiddleware {
     config: Arc<LimiterConfig>,
@@ -123,7 +123,7 @@ impl LimiterMiddleware {
         &self,
         ctx: &mut HttpContext,
         next: Next<HttpContext, Response, RouterError>,
-    ) -> Result<Response, PipelineError<RouterError>> {
+    ) -> Result<Response, DhapError<RouterError>> {
         // 1. Bypass if rate limiting middleware is globally disabled.
         if !self.config.enabled {
             return next.run(ctx).await;
@@ -166,7 +166,7 @@ impl LimiterMiddleware {
                         // Fail-open: bypass rate limiting and allow request downstream
                         return next.run(ctx).await;
                     }
-                    return Err(PipelineError::Execution(RouterError::from(error)));
+                    return Err(DhapError::Execution(RouterError::from(error)));
                 }
             };
 
@@ -223,7 +223,7 @@ impl Middleware<HttpContext, Response, RouterError> for LimiterMiddleware {
         &'a self,
         ctx: &'a mut HttpContext,
         next: Next<HttpContext, Response, RouterError>,
-    ) -> BoxFuture<'a, Result<Response, PipelineError<RouterError>>> {
+    ) -> BoxFuture<'a, Result<Response, DhapError<RouterError>>> {
         Box::pin(self.execute(ctx, next))
     }
 }

@@ -3,7 +3,7 @@
 ## Scope
 
 This crate owns HTTP session state management, multi-driver storage backends, flash data, and session fixation defense.
-It bridges `cookie`, `crypto`, and `pipeline` without binding to concrete HTTP server implementations.
+It bridges `cookie`, `gopon`, and `dhap` without binding to concrete HTTP server implementations.
 
 ## Design Rules
 
@@ -49,5 +49,5 @@ It bridges `cookie`, `crypto`, and `pipeline` without binding to concrete HTTP s
   encrypted cookie payload
   causes decryption failure and falls back to a fresh session without panicking, and payloads over 3800 bytes return
   `PayloadTooLarge`.
-- **Pipeline Integration**: Test end-to-end middleware execution using `pipeline::Pipeline` with `SessionMiddleware` and
+- **Pipeline Integration**: Test end-to-end middleware execution using `dhap::Pipeline` with `SessionMiddleware` and
   `TestSessionContext`.

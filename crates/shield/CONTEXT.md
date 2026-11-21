@@ -73,7 +73,7 @@ The crate synthesizes security patterns conforming to modern web standards:
       explicitly configured.
 
 4. **Pipeline Middleware Integration**:
-    - Implements `pipeline::Middleware<HttpContext, Response, RouterError>`, usable as an all-in-one `ShieldMiddleware`
+    - Implements `dhap::Middleware<HttpContext, Response, RouterError>`, usable as an all-in-one `ShieldMiddleware`
       or modular individual guard layers (`CsrfMiddleware`, `CspMiddleware`, `SecurityHeadersMiddleware`).
 
 ## Boundaries & Non-Responsibilities

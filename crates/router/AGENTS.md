@@ -4,7 +4,7 @@
 
 This crate owns the HTTP routing engine, request/response models, middleware onion runner, and execution context
 (`HttpContext`).
-It bridges `poth`, `pipeline`, `cookie`, `khonj`, `gopon`, and `session` without coupling directly to concrete
+It bridges `poth`, `dhap`, `cookie`, `khonj`, `gopon`, and `session` without coupling directly to concrete
 transport socket listeners.
 
 ## Design Rules
@@ -17,7 +17,7 @@ transport socket listeners.
     - Route registration takes place in a mutable builder phase (`Router`, `RouteGroup`, `RouteResource`).
     - Dispatching requests operates on an immutable, thread-safe (`Send + Sync + 'static`) `CompiledRouter` generated
       by `Router::compile()`.
-    - Route middleware chains must be pre-composed during compilation into `pipeline::Pipeline` instances (`Global` ➔
+    - Route middleware chains must be pre-composed during compilation into `dhap::Pipeline` instances (`Global` ➔
       `Group (outer to inner)` ➔ `Route` ➔ `Terminal Handler`) stored in `poth::MethodMatcher` to avoid
       runtime hierarchy resolution overhead.
 3. **Deterministic Precedence**:
@@ -33,7 +33,7 @@ transport socket listeners.
     - Handlers and middleware inspect bodies non-destructively: `&request.json::<T>()`, `&request.bytes()`, etc.
     - Explicit streaming is supported for large file uploads.
 6. **Middleware Onion & SessionContext**:
-    - Middleware execution must integrate with `pipeline::Pipeline`.
+    - Middleware execution must integrate with `dhap::Pipeline`.
     - `HttpContext` must implement `session::SessionContext` so `SessionMiddleware` attaches sessions seamlessly.
 7. **Type-Safe Request Extensions**:
     - `HttpContext` must provide an `Extensions` type map (`TypeId`-indexed) for cross-cutting middleware data.

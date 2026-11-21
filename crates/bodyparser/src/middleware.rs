@@ -2,8 +2,8 @@
 
 use std::sync::Arc;
 
+use dhap::{BoxFuture, Error as DhapError, Middleware, Next};
 use khonj::encoding::decode_component;
-use pipeline::{BoxFuture, Middleware, Next, PipelineError};
 use router::{HeaderName, HttpContext, Response, RouterError};
 
 use crate::{
@@ -54,7 +54,7 @@ impl Middleware<HttpContext, Response, RouterError> for BodyParserMiddleware {
         &'a self,
         ctx: &'a mut HttpContext,
         next: Next<HttpContext, Response, RouterError>,
-    ) -> BoxFuture<'a, Result<Response, PipelineError<RouterError>>> {
+    ) -> BoxFuture<'a, Result<Response, DhapError<RouterError>>> {
         Box::pin(async move {
             // 1. Bypass if the HTTP method is not permitted for body parsing (e.g. GET, HEAD)
             if !self.config.is_method_allowed(ctx.request.intended_method()) {
@@ -80,7 +80,7 @@ impl Middleware<HttpContext, Response, RouterError> for BodyParserMiddleware {
                 }
 
                 let boundary = extract_boundary(&content_type)
-                    .map_err(|error| PipelineError::Execution(RouterError::from(error)))?;
+                    .map_err(|error| DhapError::Execution(RouterError::from(error)))?;
 
                 let mut parser = MultipartParser::new(boundary, *self.config.limits());
                 if let Some(temp_dir) = self.config.temp_dir() {
@@ -89,11 +89,11 @@ impl Middleware<HttpContext, Response, RouterError> for BodyParserMiddleware {
 
                 let parsed = parser
                     .parse_slice(ctx.request.body())
-                    .map_err(|error| PipelineError::Execution(RouterError::from(error)))?;
+                    .map_err(|error| DhapError::Execution(RouterError::from(error)))?;
 
                 let structured_tree = parsed
                     .structured_fields()
-                    .map_err(|error| PipelineError::Execution(RouterError::from(error)))?;
+                    .map_err(|error| DhapError::Execution(RouterError::from(error)))?;
 
                 let raw_pairs: Vec<(String, String)> = parsed
                     .text_fields()
@@ -107,10 +107,10 @@ impl Middleware<HttpContext, Response, RouterError> for BodyParserMiddleware {
                 ctx.extensions.insert(uploaded_files);
             } else if content_type.starts_with("application/json") {
                 parse_json_value(ctx.request.body(), self.config.limits())
-                    .map_err(|error| PipelineError::Execution(RouterError::from(error)))?;
+                    .map_err(|error| DhapError::Execution(RouterError::from(error)))?;
             } else if content_type.starts_with("application/x-www-form-urlencoded") {
                 let tree = parse_form_value(ctx.request.body(), self.config.limits())
-                    .map_err(|error| PipelineError::Execution(RouterError::from(error)))?;
+                    .map_err(|error| DhapError::Execution(RouterError::from(error)))?;
 
                 let raw_query = std::str::from_utf8(ctx.request.body()).unwrap_or("");
                 let raw_pairs: Vec<(String, String)> = raw_query
@@ -126,7 +126,7 @@ impl Middleware<HttpContext, Response, RouterError> for BodyParserMiddleware {
                 ctx.extensions.insert(form_fields);
             } else if content_type.starts_with("text/") {
                 parse_text(ctx.request.body(), self.config.limits())
-                    .map_err(|error| PipelineError::Execution(RouterError::from(error)))?;
+                    .map_err(|error| DhapError::Execution(RouterError::from(error)))?;
             }
 
             next.run(ctx).await

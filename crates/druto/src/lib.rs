@@ -2,6 +2,7 @@
 
 pub use barta;
 pub use borno;
+pub use dhap;
 pub use gopon;
 pub use khonj;
 pub use kouta;
