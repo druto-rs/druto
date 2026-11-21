@@ -215,8 +215,8 @@ version = "0.1.0"
 dependencies = [
  "bojha",
  "dhap",
+ "druto-router",
  "poth",
- "router",
  "tempfile",
  "tokio",
 ]
@@ -383,9 +383,9 @@ name = "cors"
 version = "0.1.0"
 dependencies = [
  "dhap",
+ "druto-router",
  "proptest",
  "regex",
- "router",
  "serde_json",
 ]
 
@@ -517,6 +517,7 @@ dependencies = [
  "borno",
  "bytes",
  "dhap",
+ "druto-router",
  "futures-io",
  "futures-util",
  "gopon",
@@ -527,7 +528,6 @@ dependencies = [
  "mishron",
  "poribesh",
  "poth",
- "router",
  "sebok",
  "serde",
  "serde_json",
@@ -545,6 +545,28 @@ dependencies = [
  "serde_json",
  "sha1",
  "tokio",
+]
+
+[[package]]
+name = "druto-router"
+version = "0.1.0"
+source = "git+https://github.com/druto-rs/router.git?branch=main#4b644987c6a9093b603e9739f016c2a514020e95"
+dependencies = [
+ "bojha",
+ "bytes",
+ "chirkut",
+ "dhap",
+ "druto-session",
+ "futures-util",
+ "gopon",
+ "jachai",
+ "khonj",
+ "lagam",
+ "percent-encoding",
+ "poth",
+ "regex",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -1063,9 +1085,9 @@ dependencies = [
  "bytes",
  "dhap",
  "druto-redis",
+ "druto-router",
  "lagam",
  "proptest",
- "router",
  "serde",
  "serde_json",
 ]
@@ -1466,29 +1488,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d902046e6a28a1e4c3cab97258a0ce11e994903f01c2d97a9447a0b3df85f4f6"
 
 [[package]]
-name = "router"
-version = "0.1.0"
-dependencies = [
- "bojha",
- "bytes",
- "chirkut",
- "dhap",
- "druto-session",
- "futures-util",
- "gopon",
- "jachai",
- "khonj",
- "lagam",
- "percent-encoding",
- "poth",
- "proptest",
- "regex",
- "serde",
- "serde_json",
- "tokio",
-]
-
-[[package]]
 name = "rustix"
 version = "1.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1627,10 +1626,10 @@ dependencies = [
  "base64",
  "chirkut",
  "dhap",
+ "druto-router",
  "druto-session",
  "getrandom 0.4.3",
  "gopon",
- "router",
  "serde_json",
  "subtle",
 ]
