@@ -210,18 +210,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bodyparser"
-version = "0.1.0"
-dependencies = [
- "bojha",
- "dhap",
- "druto-router",
- "poth",
- "tempfile",
- "tokio",
-]
-
-[[package]]
 name = "bojha"
 version = "0.1.0"
 source = "git+https://github.com/Hitarashi/bojha.git?branch=main#eb7c17fcdddc3e1eec0090e1e6ea8cb8de0f65a8"
