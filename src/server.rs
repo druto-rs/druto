@@ -110,12 +110,18 @@ impl Server {
 
     /// Creates a server configured from the `HOST` and `PORT` environment variables.
     ///
-    /// Defaults to `127.0.0.1:3333` if neither environment variable is defined.
+    /// Defaults to `127.0.0.1:5555` if neither environment variable is defined.
     #[must_use]
     pub fn from_env() -> Self {
         let host = std::env::var("HOST").unwrap_or_else(|_| "127.0.0.1".to_string());
-        let port = std::env::var("PORT").unwrap_or_else(|_| "3333".to_string());
+        let port = std::env::var("PORT").unwrap_or_else(|_| "5555".to_string());
         Self::bind(format!("{host}:{port}"))
+    }
+
+    /// Returns the configured TCP socket address string if set.
+    #[must_use]
+    pub fn tcp_addr(&self) -> Option<&str> {
+        self.tcp_addr.as_deref()
     }
 
     /// Creates a server configured to bind to a Unix Domain Socket path.

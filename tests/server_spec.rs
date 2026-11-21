@@ -211,8 +211,12 @@ async fn test_live_tcp_listener_and_graceful_shutdown() {
 
 #[test]
 fn test_server_from_env_defaults() {
+    unsafe {
+        std::env::remove_var("HOST");
+        std::env::remove_var("PORT");
+    }
     let server = Server::from_env();
-    let _ = server;
+    assert_eq!(server.tcp_addr(), Some("127.0.0.1:5555"));
 }
 
 // Simple in-memory duplex stream for testing serve_stream without ports
