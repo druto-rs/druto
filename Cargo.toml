@@ -10,7 +10,6 @@ rust-version = "1.95"
 
 [workspace.dependencies]
 # Workspace Crates
-redis = { path = "crates/redis" }
 router = { path = "crates/router" }
 session = { path = "crates/session" }
 
@@ -23,7 +22,6 @@ bojha = { git = "https://github.com/Hitarashi/bojha.git", branch = "main", featu
 bytes = "1.12.2"
 chirkut = { git = "https://github.com/Hitarashi/chirkut.git", branch = "main" }
 dhap = { git = "https://github.com/Hitarashi/dhap.git", branch = "main" }
-fred = { version = "10.1.0", default-features = false }
 futures-io = "0.3.34"
 futures-util = { version = "0.3.34", default-features = false }
 getrandom = "0.4.3"
@@ -38,11 +36,11 @@ percent-encoding = "2.3.2"
 poribesh = { git = "https://github.com/Hitarashi/poribesh.git", branch = "main" }
 poth = { git = "https://github.com/Hitarashi/poth.git", branch = "main" }
 proptest = "1.12.0"
+redis = { package = "druto-redis", git = "https://github.com/druto-rs/redis.git", branch = "main" }
 regex = { version = "1.13.2", default-features = false, features = ["std", "perf"] }
 sebok = { git = "https://github.com/Hitarashi/sebok.git", branch = "main" }
 serde = { version = "1.0.229", default-features = false, features = ["derive", "alloc"] }
 serde_json = "1.0.154"
-sha1 = "0.11.0"
 subtle = "2.6.1"
 tempfile = "3.27.0"
 time = { version = "0.3.55", default-features = false, features = ["std", "formatting", "parsing"] }
