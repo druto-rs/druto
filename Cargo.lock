@@ -945,21 +945,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "shield"
-version = "0.1.0"
-dependencies = [
- "base64",
- "chirkut",
- "dhap",
- "druto-router",
- "druto-session",
- "getrandom",
- "gopon",
- "serde_json",
- "subtle",
-]
-
-[[package]]
 name = "signal-hook-registry"
 version = "1.4.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"

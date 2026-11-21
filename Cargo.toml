@@ -12,14 +12,11 @@ rust-version = "1.95"
 # External Dependencies
 async-io = "2.6.0"
 barta = { git = "https://github.com/Hitarashi/barta.git", branch = "main" }
-base64 = "0.23.1"
 borno = { git = "https://github.com/Hitarashi/borno.git", branch = "main" }
 bytes = "1.12.2"
-chirkut = { git = "https://github.com/Hitarashi/chirkut.git", branch = "main" }
 dhap = { git = "https://github.com/Hitarashi/dhap.git", branch = "main" }
 futures-io = "0.3.34"
 futures-util = { version = "0.3.34", default-features = false }
-getrandom = "0.4.3"
 gopon = { git = "https://github.com/Hitarashi/gopon.git", branch = "main" }
 http = "1.5.0"
 jachai = { git = "https://github.com/Hitarashi/jachai.git", branch = "main" }
@@ -32,6 +29,4 @@ router = { package = "druto-router", git = "https://github.com/druto-rs/router.g
 sebok = { git = "https://github.com/Hitarashi/sebok.git", branch = "main" }
 serde = { version = "1.0.229", default-features = false, features = ["derive", "alloc"] }
 serde_json = "1.0.154"
-session = { package = "druto-session", git = "https://github.com/druto-rs/session.git", branch = "main" }
-subtle = "2.6.1"
 tokio = { version = "1.54.1", default-features = false }
