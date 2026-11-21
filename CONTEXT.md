@@ -21,7 +21,7 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 | **Layer 0: Primitives**      | String inflection, pluralization, casing                          | `borno` (ext)     | `@poppinss/string`       | `illuminate/support` (Str/Pluralizer) |
 | **Layer 0: Primitives**      | Nested bracket-notation query string parser & serializer          | `khonj` (ext)     | `@poppinss/qs`           | `illuminate/http` (query parser)      |
 | **Layer 0: Primitives**      | Typed asynchronous pub/sub event dispatcher & testing fakes       | `events`          | `@adonisjs/events`       | `illuminate/events`                   |
-| **Layer 0: Primitives**      | AEAD encryption, HMAC signing, key rotation, signed URLs          | `crypto`          | `@boringnode/encryption` | `illuminate/encryption`               |
+| **Layer 0: Primitives**      | AEAD encryption, HMAC signing, key rotation, signed URLs          | `gopon` (ext)     | `@boringnode/encryption` | `illuminate/encryption`               |
 | **Layer 0: Primitives**      | Password hashing drivers (Argon2id, Bcrypt), rehash detection     | `hash`            | `@adonisjs/hash`         | `illuminate/hashing`                  |
 | **Layer 1: Configuration**   | .env parsing & boot-time schema validation                        | `poribesh` (ext)  | `@adonisjs/env`          | `Dotenv` + `config`                   |
 | **Layer 2: State & Storage** | RFC 6265 cookies, signed & encrypted cookie jars                  | `cookie`          | `@adonisjs/http-server`  | `illuminate/cookie`                   |
@@ -48,7 +48,6 @@ crates/
 ├── bodyparser/  # Streaming multipart parser, file uploads, body size enforcement
 ├── cookie/      # RFC 6265 cookies, plain, signed, and encrypted cookie jars
 ├── cors/        # Cross-Origin Resource Sharing (CORS) preflight and header negotiation
-├── crypto/      # Authenticated encryption, HMAC signing, key rotation, signed URLs
 ├── druto/       # Framework umbrella facade
 ├── events/      # Strongly typed asynchronous event dispatcher & testing fakes
 ├── hash/        # Password hashing drivers, automatic rehash detection, verification

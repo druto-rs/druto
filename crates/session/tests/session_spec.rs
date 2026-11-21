@@ -11,7 +11,7 @@ use std::{
 };
 
 use cookie::{Cookie, CookieJar, SameSite};
-use crypto::{Encrypter, Key, KeyRing};
+use gopon::{Encrypter, Key, KeyRing};
 use pipeline::{Pipeline, from_terminal};
 use proptest::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -188,7 +188,7 @@ fn test_session_error_conversions() {
     let converted_json: SessionError = json_err.into();
     assert!(matches!(converted_json, SessionError::Serialization(_)));
 
-    let crypto_err = crypto::CryptoError::Internal("test".to_string());
+    let crypto_err = gopon::Error::Internal("test".to_string());
     let converted_crypto: SessionError = crypto_err.into();
     assert!(matches!(converted_crypto, SessionError::Crypto(_)));
 }

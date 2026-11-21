@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use crypto::{Encrypter, HmacSigner, KeyRing};
+use gopon::{Encrypter, HmacSigner, KeyRing};
 use time::{Duration, OffsetDateTime};
 
 use crate::{

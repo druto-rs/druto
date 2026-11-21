@@ -9,7 +9,7 @@ use std::{
 };
 
 use bytes::Bytes;
-use crypto::{Key, UrlSigner};
+use gopon::{Key, KeyRing, UrlSigner};
 use matcher::Method;
 use pipeline::{BoxFuture as PipelineBoxFuture, Middleware, Next, PipelineError};
 use proptest::prelude::*;
@@ -1594,7 +1594,7 @@ fn test_error_display_and_conversions_exhaustive() {
     );
 
     // Conversions
-    let from_crypto: RouterError = crypto::CryptoError::InvalidSignature.into();
+    let from_crypto: RouterError = gopon::Error::InvalidSignature.into();
     assert!(matches!(from_crypto, RouterError::InvalidSignature));
 
     let from_cookie: RouterError = cookie::CookieError::InvalidName("bad".to_string()).into();
@@ -2455,17 +2455,17 @@ fn test_error_conversions_and_display_complete() {
     let pipeline_err: RouterError = PipelineError::NextAlreadyCalled.into();
     assert!(matches!(pipeline_err, RouterError::Pipeline(_)));
 
-    let crypto_sig_err: RouterError = crypto::CryptoError::InvalidSignature.into();
+    let crypto_sig_err: RouterError = gopon::Error::InvalidSignature.into();
     assert_eq!(crypto_sig_err, RouterError::InvalidSignature);
 
-    let crypto_exp_err: RouterError = crypto::CryptoError::ExpiredSignature {
+    let crypto_exp_err: RouterError = gopon::Error::ExpiredSignature {
         expires: 10,
         current: 20,
     }
     .into();
     assert_eq!(crypto_exp_err, RouterError::InvalidSignature);
 
-    let crypto_other_err: RouterError = crypto::CryptoError::AuthenticationFailed.into();
+    let crypto_other_err: RouterError = gopon::Error::AuthenticationFailed.into();
     assert!(matches!(crypto_other_err, RouterError::Internal(_)));
 
     let cookie_err: RouterError = cookie::CookieError::InvalidName("bad name".to_string()).into();
@@ -2694,7 +2694,7 @@ fn test_context_and_request_extended_coverage() {
     );
 
     let key = Key::generate().expect("generate key");
-    let ring = crypto::KeyRing::new(key.clone());
+    let ring = KeyRing::new(key.clone());
     let signer = UrlSigner::new(key);
 
     let signed_url = signer.sign_temporary("/profile?tab=security", 10_000);

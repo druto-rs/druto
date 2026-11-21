@@ -5,7 +5,7 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use crypto::UrlSigner;
+use gopon::UrlSigner;
 use matcher::MethodMatcher;
 
 use crate::error::RouterError;

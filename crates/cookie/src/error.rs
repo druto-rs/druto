@@ -17,8 +17,8 @@ pub enum CookieError {
     PurposeMismatch,
     /// Attempted a signed or encrypted operation on an unkeyed cookie jar.
     MissingKey,
-    /// Underlying cryptographic error from the `crypto` crate.
-    Crypto(crypto::CryptoError),
+    /// Underlying cryptographic error from the `gopon` library.
+    Crypto(gopon::Error),
     /// Base64 or UTF-8 string encoding/decoding failure.
     EncodingError(String),
 }
@@ -64,11 +64,11 @@ impl std::error::Error for CookieError {
     }
 }
 
-impl From<crypto::CryptoError> for CookieError {
-    fn from(error: crypto::CryptoError) -> Self {
+impl From<gopon::Error> for CookieError {
+    fn from(error: gopon::Error) -> Self {
         match error {
-            crypto::CryptoError::AuthenticationFailed => Self::AuthenticationFailed,
-            crypto::CryptoError::PurposeMismatch => Self::PurposeMismatch,
+            gopon::Error::AuthenticationFailed => Self::AuthenticationFailed,
+            gopon::Error::PurposeMismatch => Self::PurposeMismatch,
             other => Self::Crypto(other),
         }
     }

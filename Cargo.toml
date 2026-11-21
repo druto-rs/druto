@@ -11,7 +11,6 @@ rust-version = "1.95"
 [workspace.dependencies]
 # Workspace Crates
 cookie = { path = "crates/cookie" }
-crypto = { path = "crates/crypto" }
 matcher = { path = "crates/matcher" }
 pipeline = { path = "crates/pipeline" }
 redis = { path = "crates/redis" }
@@ -19,17 +18,15 @@ router = { path = "crates/router" }
 session = { path = "crates/session" }
 
 # External Dependencies
-aes-gcm = "0.11.1"
 argon2 = "0.6.0"
 base64 = "0.23.1"
 bcrypt = "0.19.3"
 borno = { git = "https://github.com/Hitarashi/borno.git", branch = "main" }
 bytes = "1.12.2"
-chacha20poly1305 = "0.11.0"
 fred = { version = "10.1.0", default-features = false }
 futures-util = { version = "0.3.34", default-features = false }
 getrandom = "0.4.3"
-hmac = "0.13.0"
+gopon = { git = "https://github.com/Hitarashi/gopon.git", branch = "main" }
 khonj = { git = "https://github.com/Hitarashi/khonj.git", branch = "main" }
 kouta = { git = "https://github.com/Hitarashi/kouta.git", branch = "main" }
 percent-encoding = "2.3.2"
@@ -39,9 +36,7 @@ regex = { version = "1.13.2", default-features = false, features = ["std", "perf
 serde = { version = "1.0.229", default-features = false, features = ["derive", "alloc"] }
 serde_json = "1.0.154"
 sha1 = "0.11.0"
-sha2 = "0.11.1"
 subtle = "2.6.1"
 tempfile = "3.27.0"
 time = { version = "0.3.55", default-features = false, features = ["std", "formatting", "parsing"] }
 tokio = { version = "1.54.1", default-features = false }
-zeroize = "1.9.2"

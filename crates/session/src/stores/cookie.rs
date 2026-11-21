@@ -3,7 +3,7 @@
 use std::{future::ready, sync::Arc, time::Duration};
 
 use cookie::security::ENCRYPTED_PREFIX;
-use crypto::Encrypter;
+use gopon::Encrypter;
 
 use crate::{
     error::SessionError,

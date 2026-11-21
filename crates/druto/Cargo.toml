@@ -7,6 +7,7 @@ rust-version.workspace = true
 
 [dependencies]
 borno.workspace = true
+gopon.workspace = true
 khonj.workspace = true
 kouta.workspace = true
 poribesh.workspace = true

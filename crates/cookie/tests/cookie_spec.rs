@@ -1,7 +1,7 @@
 use std::error::Error;
 
 use cookie::{Cookie, CookieConfig, CookieError, CookieJar, CookieSecurity, SameSite};
-use crypto::{Key, KeyRing};
+use gopon::{Key, KeyRing};
 use proptest::prelude::*;
 use time::{Duration, OffsetDateTime};
 
@@ -515,8 +515,8 @@ fn test_cookie_mutators_and_tombstone_detection() {
 #[test]
 fn test_security_module_direct_pack_and_unpack() {
     let key = test_key();
-    let signer = crypto::HmacSigner::new(key.clone());
-    let encrypter = crypto::Encrypter::new(KeyRing::new(key));
+    let signer = gopon::HmacSigner::new(key.clone());
+    let encrypter = gopon::Encrypter::new(KeyRing::new(key));
 
     // Signed low-level
     let signed = cookie::security::pack_signed("token", "val_xyz", &signer);
@@ -573,17 +573,17 @@ fn test_cookie_error_display_and_traits() {
     let err_enc = CookieError::EncodingError("utf8".to_string());
     assert!(format!("{err_enc}").contains("cookie encoding error"));
 
-    let crypto_err = crypto::CryptoError::MalformedEnvelope("corrupt".to_string());
+    let crypto_err = gopon::Error::MalformedEnvelope("corrupt".to_string());
     let err_crypto = CookieError::from(crypto_err.clone());
     assert!(format!("{err_crypto}").contains("cryptographic error"));
     assert!(err_crypto.source().is_some());
 
     assert_eq!(
-        CookieError::from(crypto::CryptoError::AuthenticationFailed),
+        CookieError::from(gopon::Error::AuthenticationFailed),
         CookieError::AuthenticationFailed
     );
     assert_eq!(
-        CookieError::from(crypto::CryptoError::PurposeMismatch),
+        CookieError::from(gopon::Error::PurposeMismatch),
         CookieError::PurposeMismatch
     );
 }

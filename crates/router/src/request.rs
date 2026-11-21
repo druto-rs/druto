@@ -4,7 +4,7 @@ use std::{fmt, net::IpAddr, str::FromStr};
 
 use bytes::Bytes;
 use cookie::CookieJar;
-use crypto::UrlSigner;
+use gopon::{KeyRing, UrlSigner};
 use khonj::from_str as qs_from_str;
 use matcher::Method;
 use serde::de::DeserializeOwned;
@@ -396,7 +396,7 @@ pub struct RequestBuilder {
     body: Bytes,
     client_ip: Option<IpAddr>,
     trust_proxy: bool,
-    keyring: Option<crypto::KeyRing>,
+    keyring: Option<KeyRing>,
 }
 
 impl RequestBuilder {
@@ -483,7 +483,7 @@ impl RequestBuilder {
 
     /// Attaches a cryptographic key ring for encrypted/signed cookies.
     #[must_use]
-    pub fn keyring(mut self, keyring: crypto::KeyRing) -> Self {
+    pub fn keyring(mut self, keyring: KeyRing) -> Self {
         self.keyring = Some(keyring);
         self
     }

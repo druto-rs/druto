@@ -4,7 +4,7 @@ use std::{fmt, sync::Arc};
 
 use base64::prelude::*;
 use cookie::{Cookie, SameSite};
-use crypto::{hmac::HmacSigner, key::Key};
+use gopon::{HmacSigner, Key};
 use router::{HttpContext, Response, StatusCode};
 use session::SessionContext;
 use subtle::ConstantTimeEq;

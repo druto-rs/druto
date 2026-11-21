@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use crypto::UrlSigner;
+use gopon::UrlSigner;
 use matcher::Method;
 use pipeline::{BoxedMiddleware, Middleware};
 

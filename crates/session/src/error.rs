@@ -72,8 +72,8 @@ impl From<serde_json::Error> for SessionError {
     }
 }
 
-impl From<crypto::CryptoError> for SessionError {
-    fn from(err: crypto::CryptoError) -> Self {
+impl From<gopon::Error> for SessionError {
+    fn from(err: gopon::Error) -> Self {
         Self::Crypto(err.to_string())
     }
 }

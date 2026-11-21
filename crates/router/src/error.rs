@@ -126,11 +126,12 @@ impl From<serde_json::Error> for RouterError {
     }
 }
 
-impl From<crypto::CryptoError> for RouterError {
-    fn from(error: crypto::CryptoError) -> Self {
+impl From<gopon::Error> for RouterError {
+    fn from(error: gopon::Error) -> Self {
         match error {
-            crypto::CryptoError::InvalidSignature
-            | crypto::CryptoError::ExpiredSignature { .. } => Self::InvalidSignature,
+            gopon::Error::InvalidSignature | gopon::Error::ExpiredSignature { .. } => {
+                Self::InvalidSignature
+            }
             other => Self::Internal(other.to_string()),
         }
     }

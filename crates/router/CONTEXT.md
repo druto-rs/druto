@@ -4,7 +4,7 @@
 
 `router` is the HTTP routing, request/response, and execution context layer for the Druto web framework. It bridges
 `matcher` (radix trie route matching), `pipeline` (middleware execution), `cookie` (cookie jars), `qs` (nested query
-parameter parsing), `crypto` (signed URLs), and `session` (session state) into a cohesive, developer-friendly, and
+parameter parsing), `gopon` (signed URLs), and `session` (session state) into a cohesive, developer-friendly, and
 high-performance HTTP layer.
 
 ## Reference Architecture
@@ -129,7 +129,7 @@ Following the pattern in AdonisJS, Topcoat, and Cot, routing operates in two dis
       verb (`PUT`, `PATCH`, `DELETE`), which the router matches against.
 
 8. **Reverse Routing & Cryptographic Signed URLs (`UrlGenerator`)**:
-    - `UrlGenerator` combines `matcher::MethodMatcher::build_path` with `crypto::UrlSigner`.
+    - `UrlGenerator` combines `matcher::MethodMatcher::build_path` with `gopon::UrlSigner`.
     - Exposed on `CompiledRouter` and `HttpContext`: `ctx.url_for("users.show", &[("id", "42")])` and
       `ctx.signed_url_for("verify.email", &[("id", "42")], ttl)`.
     - `Request` provides verification helpers: `request.has_valid_signature(&signer)` and

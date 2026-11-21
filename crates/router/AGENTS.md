@@ -4,7 +4,7 @@
 
 This crate owns the HTTP routing engine, request/response models, middleware onion runner, and execution context
 (`HttpContext`).
-It bridges `matcher`, `pipeline`, `cookie`, `qs`, `crypto`, and `session` without coupling directly to concrete
+It bridges `matcher`, `pipeline`, `cookie`, `khonj`, `gopon`, and `session` without coupling directly to concrete
 transport socket listeners.
 
 ## Design Rules
@@ -43,7 +43,7 @@ transport socket listeners.
 9. **Reverse URL & Cryptographic Signing**:
     - Reverse URL generation must strictly validate required parameters and URL-encode dynamic values using
       `matcher::MethodMatcher::build_path`.
-    - Integrate `crypto::UrlSigner` into `UrlGenerator` and expose signature checks on `Request`.
+    - Integrate `gopon::UrlSigner` into `UrlGenerator` and expose signature checks on `Request`.
 10. **Automatic RFC 9110 Compliance & Error Mapping**:
     - Handle automatic `OPTIONS` (`204 No Content` + `Allow` header), automatic `HEAD` (fallback to `GET` + body
       suppression),

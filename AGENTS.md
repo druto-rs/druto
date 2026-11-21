@@ -46,7 +46,6 @@ When working within a specific crate, consult its local `CONTEXT.md` and `AGENTS
 - **`crates/bodyparser`**: [`CONTEXT.md`](crates/bodyparser/CONTEXT.md) | [`AGENTS.md`](crates/bodyparser/AGENTS.md)
 - **`crates/cookie`**: [`CONTEXT.md`](crates/cookie/CONTEXT.md) | [`AGENTS.md`](crates/cookie/AGENTS.md)
 - **`crates/cors`**: [`CONTEXT.md`](crates/cors/CONTEXT.md) | [`AGENTS.md`](crates/cors/AGENTS.md)
-- **`crates/crypto`**: [`CONTEXT.md`](crates/crypto/CONTEXT.md) | [`AGENTS.md`](crates/crypto/AGENTS.md)
 - **`crates/druto`**: [`CONTEXT.md`](crates/druto/CONTEXT.md) | [`AGENTS.md`](crates/druto/AGENTS.md)
 - **`crates/events`**: [`CONTEXT.md`](crates/events/CONTEXT.md) | [`AGENTS.md`](crates/events/AGENTS.md)
 - **`crates/hash`**: [`CONTEXT.md`](crates/hash/CONTEXT.md) | [`AGENTS.md`](crates/hash/AGENTS.md)

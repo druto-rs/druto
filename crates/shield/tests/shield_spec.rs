@@ -12,7 +12,7 @@ use std::{
 
 use base64::prelude::*;
 use cookie::SameSite;
-use crypto::key::Key;
+use gopon::Key;
 use pipeline::{Pipeline, PipelineError, from_terminal};
 use router::{HeaderName, HttpContext, Method, Request, Response, RouterError, StatusCode};
 use session::{Session, SessionContext, SessionId};
@@ -1228,7 +1228,7 @@ fn test_clear_site_data_configuration() {
 #[test]
 fn test_standard_base64_padded_token_verification() {
     let secret = Key::generate().unwrap();
-    let signer = crypto::hmac::HmacSigner::new(secret.clone());
+    let signer = gopon::HmacSigner::new(secret.clone());
     let salt = [42u8; 16];
     let sig = signer.sign(&salt);
     let mut combined = [0u8; 48];

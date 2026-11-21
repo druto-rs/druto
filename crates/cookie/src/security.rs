@@ -1,6 +1,6 @@
 //! Packing and unpacking helpers for plain, signed, and encrypted cookies.
 
-use crypto::{Encrypter, HmacSigner};
+use gopon::{Encrypter, HmacSigner, KeyRing};
 
 use crate::error::CookieError;
 
@@ -92,7 +92,7 @@ pub fn unpack_encrypted(
 pub fn unpack_signed_with_keyring(
     name: &str,
     raw: &str,
-    keyring: &crypto::KeyRing,
+    keyring: &KeyRing,
 ) -> Result<String, CookieError> {
     let stripped = raw
         .strip_prefix(SIGNED_PREFIX)
@@ -119,7 +119,7 @@ pub fn unpack_signed_with_keyring(
 pub fn unpack_encrypted_with_keyring(
     name: &str,
     raw: &str,
-    keyring: &crypto::KeyRing,
+    keyring: &KeyRing,
 ) -> Result<String, CookieError> {
     let encrypter = Encrypter::new(keyring.clone());
     unpack_encrypted(name, raw, &encrypter)

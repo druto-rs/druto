@@ -318,7 +318,7 @@ checksum = "be95d4a884358a21a199689323c29e9256b4a1b315e22f183d155422041d3a9a"
 name = "cookie"
 version = "0.1.0"
 dependencies = [
- "crypto",
+ "gopon",
  "proptest",
  "time",
 ]
@@ -391,20 +391,6 @@ name = "crc16"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "338089f42c427b86394a5ee60ff321da23a5c89c9d89514c829687b26359fcff"
-
-[[package]]
-name = "crypto"
-version = "0.1.0"
-dependencies = [
- "aes-gcm",
- "base64",
- "chacha20poly1305",
- "getrandom 0.4.3",
- "hmac",
- "sha2",
- "subtle",
- "zeroize",
-]
 
 [[package]]
 name = "crypto-common"
@@ -489,6 +475,7 @@ name = "druto"
 version = "0.1.0"
 dependencies = [
  "borno",
+ "gopon",
  "khonj",
  "kouta",
  "poribesh",
@@ -736,6 +723,21 @@ name = "glob-match"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9985c9503b412198aa4197559e9a318524ebc4519c229bfa05a535828c950b9d"
+
+[[package]]
+name = "gopon"
+version = "0.1.0"
+source = "git+https://github.com/Hitarashi/gopon.git?branch=main#42f6de69d24877017c3c080b7efa7b27749f2362"
+dependencies = [
+ "aes-gcm",
+ "base64",
+ "chacha20poly1305",
+ "getrandom 0.4.3",
+ "hmac",
+ "sha2",
+ "subtle",
+ "zeroize",
+]
 
 [[package]]
 name = "hash"
@@ -1345,7 +1347,7 @@ version = "0.1.0"
 dependencies = [
  "bytes",
  "cookie",
- "crypto",
+ "gopon",
  "khonj",
  "matcher",
  "percent-encoding",
@@ -1528,8 +1530,8 @@ version = "0.1.0"
 dependencies = [
  "base64",
  "cookie",
- "crypto",
  "getrandom 0.4.3",
+ "gopon",
  "pipeline",
  "proptest",
  "redis",
@@ -1577,8 +1579,8 @@ version = "0.1.0"
 dependencies = [
  "base64",
  "cookie",
- "crypto",
  "getrandom 0.4.3",
+ "gopon",
  "pipeline",
  "router",
  "serde_json",
