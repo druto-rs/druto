@@ -5,4 +5,23 @@ edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
 
+[features]
+default = ["async", "macros"]
+async = ["dep:futures-util"]
+macros = []
+router = ["dep:router", "dep:khonj", "async"]
+
 [dependencies]
+# External Dependencies
+regex = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Optional Dependencies
+futures-util = { workspace = true, optional = true, features = ["alloc"] }
+khonj = { workspace = true, optional = true }
+router = { workspace = true, optional = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
