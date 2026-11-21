@@ -10,14 +10,10 @@ rust-version.workspace = true
 router.workspace = true
 
 # External Dependencies
-bytes.workspace = true
+bojha = { workspace = true, features = ["async", "http"] }
 dhap.workspace = true
-futures-util = { workspace = true, features = ["alloc"] }
-khonj.workspace = true
-poth.workspace = true
-serde.workspace = true
-serde_json.workspace = true
-tempfile.workspace = true
 
 [dev-dependencies]
+poth.workspace = true
+tempfile.workspace = true
 tokio = { workspace = true, features = ["full"] }

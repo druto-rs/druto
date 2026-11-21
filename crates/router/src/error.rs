@@ -154,3 +154,19 @@ impl From<session::SessionError> for RouterError {
         Self::Internal(error.to_string())
     }
 }
+
+impl From<bojha::BodyParserError> for RouterError {
+    fn from(error: bojha::BodyParserError) -> Self {
+        match error {
+            bojha::BodyParserError::PayloadTooLarge { limit, received } => Self::PayloadTooLarge {
+                max_bytes: limit,
+                received_bytes: received,
+            },
+            bojha::BodyParserError::JsonError(msg)
+            | bojha::BodyParserError::FormError(msg)
+            | bojha::BodyParserError::Utf8Error(msg)
+            | bojha::BodyParserError::MalformedMultipart(msg) => Self::DeserializationError(msg),
+            other => Self::Internal(other.to_string()),
+        }
+    }
+}

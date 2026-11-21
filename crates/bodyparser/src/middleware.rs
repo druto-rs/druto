@@ -2,17 +2,9 @@
 
 use std::sync::Arc;
 
+use bojha::{BodyParserConfig, PayloadLimits};
 use dhap::{BoxFuture, Error as DhapError, Middleware, Next};
-use khonj::encoding::decode_component;
 use router::{HeaderName, HttpContext, Response, RouterError};
-
-use crate::{
-    config::BodyParserConfig,
-    form_data::{FormFields, UploadedFiles},
-    limits::PayloadLimits,
-    multipart::{MultipartParser, extract_boundary},
-    parsers::{form::parse_form_value, json::parse_json_value, text::parse_text},
-};
 
 /// Middleware automatically parsing incoming request bodies according to their Content-Type.
 #[derive(Clone, Debug)]
@@ -57,7 +49,10 @@ impl Middleware<HttpContext, Response, RouterError> for BodyParserMiddleware {
     ) -> BoxFuture<'a, Result<Response, DhapError<RouterError>>> {
         Box::pin(async move {
             // 1. Bypass if the HTTP method is not permitted for body parsing (e.g. GET, HEAD)
-            if !self.config.is_method_allowed(ctx.request.intended_method()) {
+            if !self
+                .config
+                .is_method_allowed(ctx.request.intended_method().as_str())
+            {
                 return next.run(ctx).await;
             }
 
@@ -72,61 +67,26 @@ impl Middleware<HttpContext, Response, RouterError> for BodyParserMiddleware {
                 None => return next.run(ctx).await,
             };
 
-            // 4. Decode according to MIME type
-            if content_type.starts_with("multipart/form-data") {
-                // Check if route is marked for manual streaming bypass
-                if self.config.should_process_manually(ctx.request.path()) {
-                    return next.run(ctx).await;
+            // 4. Check if route is marked for manual streaming bypass
+            if content_type.starts_with("multipart/form-data")
+                && self.config.should_process_manually(ctx.request.path())
+            {
+                return next.run(ctx).await;
+            }
+
+            // 5. Decode according to Content-Type via bojha
+            let parsed = bojha::parse(Some(&content_type), ctx.request.body(), &self.config)
+                .map_err(|error| DhapError::Execution(RouterError::from(error)))?;
+
+            match parsed {
+                bojha::ParsedBody::Multipart { fields, files } => {
+                    ctx.extensions.insert(fields);
+                    ctx.extensions.insert(files);
                 }
-
-                let boundary = extract_boundary(&content_type)
-                    .map_err(|error| DhapError::Execution(RouterError::from(error)))?;
-
-                let mut parser = MultipartParser::new(boundary, *self.config.limits());
-                if let Some(temp_dir) = self.config.temp_dir() {
-                    parser = parser.temp_dir(temp_dir);
+                bojha::ParsedBody::Form(fields) => {
+                    ctx.extensions.insert(fields);
                 }
-
-                let parsed = parser
-                    .parse_slice(ctx.request.body())
-                    .map_err(|error| DhapError::Execution(RouterError::from(error)))?;
-
-                let structured_tree = parsed
-                    .structured_fields()
-                    .map_err(|error| DhapError::Execution(RouterError::from(error)))?;
-
-                let raw_pairs: Vec<(String, String)> = parsed
-                    .text_fields()
-                    .map(|(k, v)| (k.to_string(), v.to_string()))
-                    .collect();
-
-                let form_fields = FormFields::new(raw_pairs, structured_tree);
-                let uploaded_files = UploadedFiles::new(parsed.into_files());
-
-                ctx.extensions.insert(form_fields);
-                ctx.extensions.insert(uploaded_files);
-            } else if content_type.starts_with("application/json") {
-                parse_json_value(ctx.request.body(), self.config.limits())
-                    .map_err(|error| DhapError::Execution(RouterError::from(error)))?;
-            } else if content_type.starts_with("application/x-www-form-urlencoded") {
-                let tree = parse_form_value(ctx.request.body(), self.config.limits())
-                    .map_err(|error| DhapError::Execution(RouterError::from(error)))?;
-
-                let raw_query = std::str::from_utf8(ctx.request.body()).unwrap_or("");
-                let raw_pairs: Vec<(String, String)> = raw_query
-                    .split('&')
-                    .filter(|pair| !pair.is_empty())
-                    .filter_map(|pair| {
-                        pair.split_once('=')
-                            .map(|(k, v)| (decode_component(k), decode_component(v)))
-                    })
-                    .collect();
-
-                let form_fields = FormFields::new(raw_pairs, tree);
-                ctx.extensions.insert(form_fields);
-            } else if content_type.starts_with("text/") {
-                parse_text(ctx.request.body(), self.config.limits())
-                    .map_err(|error| DhapError::Execution(RouterError::from(error)))?;
+                _ => {}
             }
 
             next.run(ctx).await

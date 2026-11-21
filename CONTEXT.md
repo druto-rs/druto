@@ -34,7 +34,7 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 | **Layer 3: HTTP**            | Web security hardening (CSRF, CSP, HSTS, FrameGuard, NoSniff)     | `shield`          | `@adonisjs/shield`       | `VerifyCsrfToken` + Security Headers  |
 | **Layer 3: HTTP**            | Rate limiting, token bucket, sliding window & HTTP headers        | `limiter`         | `@adonisjs/limiter`      | `illuminate/cache` (RateLimiter)      |
 | **Layer 3: HTTP**            | Request schema definition, validation rules, sanitization, errors | `jachai` (ext)    | `vinejs`                 | `illuminate/validation`               |
-| **Layer 3: HTTP**            | Streaming multipart parser, file upload handling, size limits     | `bodyparser`      | `@adonisjs/bodyparser`   | `illuminate/http` (UploadedFile)      |
+| **Layer 3: HTTP**            | Streaming multipart parser, file upload handling, size limits     | `bojha` (ext) / `bodyparser` | `@adonisjs/bodyparser`   | `illuminate/http` (UploadedFile)      |
 | **Layer 3: HTTP**            | High-performance static asset file serving, range requests, ETags | `staticfiles`     | `@adonisjs/static`       | `public/` / `ServeFile`               |
 | **Layer 3: HTTP**            | Authentication guards, session/token authenticators, identity     | `auth`            | `@adonisjs/auth`         | `illuminate/auth`                     |
 | **Layer 4: Data**            | Query builder, migrations, ORM                                    | `db` *(planned)*  | `@adonisjs/lucid`        | `illuminate/database` (Eloquent)      |
@@ -46,7 +46,7 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 ```
 crates/
 ├── auth/        # Authentication guards, session/token authenticators, user identity
-├── bodyparser/  # Streaming multipart parser, file uploads, body size enforcement
+├── bodyparser/  # Bodyparser HTTP middleware (powered by bojha)
 ├── cors/        # Cross-Origin Resource Sharing (CORS) preflight and header negotiation
 ├── druto/       # Framework umbrella facade
 ├── limiter/     # Rate limiting, token bucket, sliding window, and HTTP headers

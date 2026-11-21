@@ -18,6 +18,7 @@ session = { path = "crates/session" }
 barta = { git = "https://github.com/Hitarashi/barta.git", branch = "main" }
 base64 = "0.23.1"
 borno = { git = "https://github.com/Hitarashi/borno.git", branch = "main" }
+bojha = { git = "https://github.com/Hitarashi/bojha.git", branch = "main", features = ["http"] }
 bytes = "1.12.2"
 chirkut = { git = "https://github.com/Hitarashi/chirkut.git", branch = "main" }
 dhap = { git = "https://github.com/Hitarashi/dhap.git", branch = "main" }
