@@ -7,6 +7,7 @@ rust-version = "1.95"
 description = "Ergonomic, batteries-included web framework for Rust"
 repository = "https://github.com/druto-rs/druto"
 readme = "README.md"
+default-run = "druto"
 keywords = ["druto", "web", "framework", "async", "http"]
 categories = ["web-programming::http-server", "network-programming"]
 
