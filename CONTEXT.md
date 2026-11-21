@@ -38,7 +38,7 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 | **Layer 3: HTTP**            | High-performance static asset file serving, range requests, ETags | `staticfiles`     | `@adonisjs/static`       | `public/` / `ServeFile`               |
 | **Layer 3: HTTP**            | Authentication guards, session/token authenticators, identity     | `auth`            | `@adonisjs/auth`         | `illuminate/auth`                     |
 | **Layer 4: Data**            | Query builder, migrations, ORM                                    | `db` *(planned)*  | `@adonisjs/lucid`        | `illuminate/database` (Eloquent)      |
-| **Layer 5: Developer Tools** | CLI command suite, generators                                     | `cli` *(planned)* | `@adonisjs/ace`          | `illuminate/console` (Artisan)        |
+| **Layer 5: Developer Tools** | CLI command suite, generators                                     | `druto::cli` / `karigor` (ext)    | `@adonisjs/ace`          | `illuminate/console` (Artisan)        |
 | **Layer 6: Facade**          | Framework umbrella & prelude                                      | `druto`           | `@adonisjs/core`         | `laravel/framework`                   |
 
 ## Facade Architecture
@@ -54,5 +54,5 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 - **Shield**: [`druto-rs/shield`](https://github.com/druto-rs/shield) — Web application security suite (CSRF, CSP, FrameGuard, HSTS)
 - **Session**: [`druto-rs/session`](https://github.com/druto-rs/session) — Multi-driver HTTP session management, flash data, fixation defense
 - **Redis**: [`druto-rs/redis`](https://github.com/druto-rs/redis) — Asynchronous Redis client manager, connection pooling, and pub/sub
-- **Karigor**: [`druto-rs/karigor`](https://github.com/druto-rs/karigor) — Craftsman CLI, generators, stubs, and development server
 - **Ignitor**: [`druto-rs/ignitor`](https://github.com/druto-rs/ignitor) — Application bootstrapper, runtime lifecycle manager, and server orchestrator
+- **Karigor (External Primitives)**: [`Hitarashi/karigor`](https://github.com/Hitarashi/karigor) — Framework-agnostic CLI toolkit, kernel, command trait, UI and template engine

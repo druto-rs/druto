@@ -3,6 +3,7 @@
 //! Provides the primary application builder, routing engine, runtime-agnostic HTTP/1.1 server,
 //! in-memory test harness, and modular feature-flagged facade submodules.
 
+pub mod cli;
 pub mod error;
 pub mod server;
 pub mod test_server;
