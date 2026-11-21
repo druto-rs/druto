@@ -3,8 +3,7 @@
 ## Purpose
 
 `druto` is the top-level umbrella facade for the Druto web framework. It re-exports and integrates the framework's
-modular crates into a cohesive developer experience, delivering the complete "batteries-included" web framework vision
-inspired by Laravel and AdonisJS.
+modular crates into a cohesive developer experience, delivering the complete "batteries-included" web framework vision.
 
 ## Architectural Philosophy
 
@@ -30,6 +29,7 @@ inspired by Laravel and AdonisJS.
 - `poribesh`: Environment variable loading, expansion, and boot-time schema validation.
 - `poth`: URL pattern matching, parameter extraction, and HTTP method routing.
 - `router`: HTTP routing, request/response models, middleware pipeline, and reverse URL generation.
+- `sebok`: Universal HTTP/1.1 server engine (RFC 9110/9112), runtime-neutral connection loop, and streaming body parser.
 - `session`: Multi-driver HTTP session management, flash data, and session fixation defense.
 - *(Future)* `auth`, `validation`, `db`, `cli`.
 
@@ -37,4 +37,6 @@ inspired by Laravel and AdonisJS.
 
 - Provide the unified `druto::prelude::*` for application authors.
 - Serve as the developer-facing documentation entry point.
+- Expose `druto::Server` and `druto::ServerConfig` for runtime-agnostic production server execution.
+- Expose `druto::TestServer` for fast in-memory, zero-port integration testing.
 - Coordinate framework startup, service provider registration, and application lifecycle.

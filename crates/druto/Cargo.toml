@@ -6,13 +6,26 @@ license.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+async-io.workspace = true
 barta.workspace = true
 borno.workspace = true
+bytes.workspace = true
 dhap.workspace = true
+futures-io.workspace = true
+futures-util = { workspace = true, features = ["io", "std"] }
 gopon.workspace = true
+http.workspace = true
 jachai.workspace = true
 khonj.workspace = true
 kouta.workspace = true
 mishron.workspace = true
 poribesh.workspace = true
 poth.workspace = true
+router.workspace = true
+sebok.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["rt", "macros", "sync"] }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["full"] }
