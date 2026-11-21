@@ -48,6 +48,7 @@ dhap = { git = "https://github.com/Hitarashi/dhap.git", branch = "main" }
 futures-io = "0.3.34"
 futures-util = { version = "0.3.34", default-features = false, features = ["io", "std"] }
 http = "1.5.0"
+ignitor = { package = "druto-ignitor", git = "https://github.com/druto-rs/ignitor.git", branch = "main" }
 khonj = { git = "https://github.com/Hitarashi/khonj.git", branch = "main" }
 kouta = { git = "https://github.com/Hitarashi/kouta.git", branch = "main" }
 poth = { git = "https://github.com/Hitarashi/poth.git", branch = "main" }

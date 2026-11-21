@@ -219,6 +219,42 @@ fn test_server_from_env_defaults() {
     assert_eq!(server.tcp_addr(), Some("127.0.0.1:5555"));
 }
 
+#[tokio::test]
+async fn test_druto_ignitor_lifecycle() {
+    let mut router = Router::new();
+    router.get(
+        "/ping",
+        from_handler(|ctx| {
+            Box::pin(async move {
+                ctx.response.text("pong");
+                Ok(())
+            })
+        }),
+    );
+
+    let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel::<()>();
+
+    let server_task = tokio::spawn(async move {
+        Ignitor::new()
+            .routes(router)
+            .bind("127.0.0.1:0")
+            .banner(false)
+            .env(false)
+            .tracing(false)
+            .with_graceful_shutdown(async move {
+                let () = shutdown_rx.await.unwrap();
+            })
+            .start()
+            .await
+    });
+
+    tokio::time::sleep(Duration::from_millis(50)).await;
+    assert!(shutdown_tx.send(()).is_ok());
+
+    let result = server_task.await.unwrap();
+    assert!(result.is_ok());
+}
+
 // Simple in-memory duplex stream for testing serve_stream without ports
 struct InMemBufferInner {
     data: Vec<u8>,
@@ -381,8 +417,8 @@ async fn test_facade_reexports_and_middleware_wiring() {
 #[test]
 fn test_facade_submodule_namespaces() {
     use druto::{
-        bodyparser, cors, crypto, env, events, hash, limiter, redis, session, shield, string,
-        validation,
+        bodyparser, cors, crypto, env, events, hash, ignitor, limiter, redis, session, shield,
+        string, validation,
     };
 
     assert_eq!(string::to_snake_case("UserProfile"), "user_profile");
@@ -418,6 +454,9 @@ fn test_facade_submodule_namespaces() {
 
     let hash_mgr = hash::HashManager::builder().build();
     drop(hash_mgr);
+
+    let ignitor_builder = ignitor::Ignitor::new();
+    drop(ignitor_builder);
 
     let schema = validation::schema::object();
     drop(schema);

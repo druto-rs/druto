@@ -51,3 +51,4 @@ Modular crates are maintained in standalone repositories under the `druto-rs` or
 - **Session**: `https://github.com/druto-rs/session`
 - **Redis**: `https://github.com/druto-rs/redis`
 - **Karigor (CLI)**: `https://github.com/druto-rs/karigor`
+- **Ignitor**: `https://github.com/druto-rs/ignitor`

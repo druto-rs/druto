@@ -55,3 +55,4 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 - **Session**: [`druto-rs/session`](https://github.com/druto-rs/session) — Multi-driver HTTP session management, flash data, fixation defense
 - **Redis**: [`druto-rs/redis`](https://github.com/druto-rs/redis) — Asynchronous Redis client manager, connection pooling, and pub/sub
 - **Karigor**: [`druto-rs/karigor`](https://github.com/druto-rs/karigor) — Craftsman CLI, generators, stubs, and development server
+- **Ignitor**: [`druto-rs/ignitor`](https://github.com/druto-rs/ignitor) — Application bootstrapper, runtime lifecycle manager, and server orchestrator

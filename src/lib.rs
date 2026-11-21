@@ -21,6 +21,7 @@ pub use dhap;
 pub use error::ServerError;
 #[cfg(feature = "crypto")]
 pub use gopon as crypto;
+pub use ignitor;
 #[cfg(feature = "validation")]
 pub use jachai as validation;
 pub use khonj;
@@ -55,6 +56,7 @@ pub mod prelude {
     pub use cors::{CorsConfig, CorsConfigBuilder, CorsMiddleware, OriginPolicy};
     #[cfg(feature = "crypto")]
     pub use gopon::{Encrypter, HmacSigner, Key, KeyRing, UrlSigner};
+    pub use ignitor::{Ignitor, start};
     #[cfg(feature = "limiter")]
     pub use limiter::{LimiterConfig, LimiterConfigBuilder, LimiterMiddleware};
     #[cfg(feature = "hash")]
