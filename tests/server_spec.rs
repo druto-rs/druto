@@ -324,3 +324,97 @@ impl Drop for InMemDuplex {
         }
     }
 }
+
+#[cfg(feature = "full")]
+#[tokio::test]
+async fn test_facade_reexports_and_middleware_wiring() {
+    let mut router = Router::new();
+
+    let cors = CorsMiddleware::new(
+        CorsConfig::builder()
+            .allow_origin(OriginPolicy::Any)
+            .build(),
+    );
+    router.middleware(cors);
+
+    let shield = ShieldMiddleware::new(
+        ShieldConfig::builder()
+            .preset(SecurityPreset::SecureDefaults)
+            .build(),
+    );
+    router.middleware(shield);
+
+    let limiter = LimiterMiddleware::builder().build();
+    router.middleware(limiter);
+
+    let bodyparser = BodyParserMiddleware::default_config();
+    router.middleware(bodyparser);
+
+    let session_mgr = Arc::new(SessionManager::new(
+        SessionConfig::builder().build(),
+        Arc::new(druto::session::MemorySessionStore::new()),
+    ));
+    router.middleware(SessionMiddleware::new(session_mgr));
+
+    router.get(
+        "/facade-check",
+        from_handler(|ctx| {
+            Box::pin(async move {
+                ctx.response.text("Facade OK");
+                Ok(())
+            })
+        }),
+    );
+
+    let client = TestServer::new(router).unwrap();
+    let response = client.get("/facade-check").send().await.unwrap();
+
+    response.assert_ok();
+    response.assert_text("Facade OK");
+}
+
+#[cfg(feature = "full")]
+#[test]
+fn test_facade_submodule_namespaces() {
+    use druto::{
+        bodyparser, cors, crypto, env, events, hash, limiter, redis, session, shield, string,
+        validation,
+    };
+
+    assert_eq!(string::to_snake_case("UserProfile"), "user_profile");
+    assert_eq!(string::pluralize("category"), "categories");
+
+    let cors_config = cors::CorsConfig::default();
+    drop(cors_config);
+
+    let limiter_config = limiter::LimiterConfig::default();
+    drop(limiter_config);
+
+    let shield_config = shield::ShieldConfig::default();
+    drop(shield_config);
+
+    let bodyparser_mw = bodyparser::BodyParserMiddleware::default_config();
+    drop(bodyparser_mw);
+
+    let session_config = session::SessionConfig::default();
+    drop(session_config);
+
+    let redis_config = redis::RedisConfig::default();
+    drop(redis_config);
+
+    let keyring = crypto::KeyRing::new(crypto::Key::generate().unwrap());
+    let encrypter = crypto::Encrypter::new(keyring);
+    drop(encrypter);
+
+    let loader = env::EnvLoader::new();
+    drop(loader);
+
+    let dispatcher = events::Dispatcher::new();
+    drop(dispatcher);
+
+    let hash_mgr = hash::HashManager::builder().build();
+    drop(hash_mgr);
+
+    let schema = validation::schema::object();
+    drop(schema);
+}

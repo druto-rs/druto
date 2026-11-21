@@ -41,20 +41,17 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 | **Layer 5: Developer Tools** | CLI command suite, generators                                     | `cli` *(planned)* | `@adonisjs/ace`          | `illuminate/console` (Artisan)        |
 | **Layer 6: Facade**          | Framework umbrella & prelude                                      | `druto`           | `@adonisjs/core`         | `laravel/framework`                   |
 
-## Workspace Structure
+## Facade Architecture
 
-```
-crates/
-├── auth/        # Authentication guards, session/token authenticators, user identity
-├── bodyparser/  # Bodyparser HTTP middleware (powered by bojha)
-├── cors/        # Cross-Origin Resource Sharing (CORS) preflight and header negotiation
-├── druto/       # Framework umbrella facade
-├── limiter/     # Rate limiting, token bucket, sliding window, and HTTP headers
-├── redis/       # Asynchronous Redis client manager, connection pooling, and pub/sub
-├── router/      # HTTP routing, request/response, groups, context, URL generation
-├── session/     # Multi-driver HTTP session management, flash data, fixation defense
-├── shield/      # Web application security suite (CSRF, CSP, FrameGuard, HSTS, NoSniff)
-└── staticfiles/ # High-performance static asset file serving, range requests, ETags
-```
+`druto` is structured as a single-package umbrella facade crate that aggregates and provides unified entry points, developer ergonomics, and preconfigured defaults across the modular framework ecosystem.
 
-Each crate maintains its own `CONTEXT.md` (architecture and boundaries) and `AGENTS.md` (agent rules and constraints).
+### Modular Ecosystem Repositories (`druto-rs`)
+
+- **Router**: [`druto-rs/router`](https://github.com/druto-rs/router) — HTTP routing, request/response, groups, context, URL generation
+- **Bodyparser**: [`druto-rs/bodyparser`](https://github.com/druto-rs/bodyparser) — Multipart decoding, file uploads, size quotas
+- **CORS**: [`druto-rs/cors`](https://github.com/druto-rs/cors) — Cross-Origin Resource Sharing preflight and headers
+- **Limiter**: [`druto-rs/limiter`](https://github.com/druto-rs/limiter) — Rate limiting, token bucket, sliding window, HTTP headers
+- **Shield**: [`druto-rs/shield`](https://github.com/druto-rs/shield) — Web application security suite (CSRF, CSP, FrameGuard, HSTS)
+- **Session**: [`druto-rs/session`](https://github.com/druto-rs/session) — Multi-driver HTTP session management, flash data, fixation defense
+- **Redis**: [`druto-rs/redis`](https://github.com/druto-rs/redis) — Asynchronous Redis client manager, connection pooling, and pub/sub
+- **Karigor**: [`druto-rs/karigor`](https://github.com/druto-rs/karigor) — Craftsman CLI, generators, stubs, and development server

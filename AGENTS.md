@@ -37,18 +37,17 @@ Activate and adhere to the following specialized skills when applicable:
   navigation patterns.
 - **`diagnosing-bugs`**: Use when investigating build failures, runtime errors, panics, or performance regressions.
 
-# Crate-Specific Context & Instructions
+# Repository & Ecosystem Context
 
-When working within a specific crate, consult its local `CONTEXT.md` and `AGENTS.md`:
+Druto is the top-level facade library and umbrella entry point for the Druto web framework.
+Modular crates are maintained in standalone repositories under the `druto-rs` organization:
 
 - **Root Context**: [`CONTEXT.md`](CONTEXT.md)
-- **`crates/auth`**: [`CONTEXT.md`](crates/auth/CONTEXT.md) | [`AGENTS.md`](crates/auth/AGENTS.md)
-- **`crates/bodyparser`**: [`CONTEXT.md`](crates/bodyparser/CONTEXT.md) | [`AGENTS.md`](crates/bodyparser/AGENTS.md)
-- **`crates/cors`**: [`CONTEXT.md`](crates/cors/CONTEXT.md) | [`AGENTS.md`](crates/cors/AGENTS.md)
-- **`crates/druto`**: [`CONTEXT.md`](crates/druto/CONTEXT.md) | [`AGENTS.md`](crates/druto/AGENTS.md)
-- **`crates/limiter`**: [`CONTEXT.md`](crates/limiter/CONTEXT.md) | [`AGENTS.md`](crates/limiter/AGENTS.md)
-- **`crates/redis`**: [`CONTEXT.md`](crates/redis/CONTEXT.md) | [`AGENTS.md`](crates/redis/AGENTS.md)
-- **`crates/router`**: [`CONTEXT.md`](crates/router/CONTEXT.md) | [`AGENTS.md`](crates/router/AGENTS.md)
-- **`crates/session`**: [`CONTEXT.md`](crates/session/CONTEXT.md) | [`AGENTS.md`](crates/session/AGENTS.md)
-- **`crates/shield`**: [`CONTEXT.md`](crates/shield/CONTEXT.md) | [`AGENTS.md`](crates/shield/AGENTS.md)
-- **`crates/staticfiles`**: [`CONTEXT.md`](crates/staticfiles/CONTEXT.md) | [`AGENTS.md`](crates/staticfiles/AGENTS.md)
+- **Router**: `https://github.com/druto-rs/router`
+- **Bodyparser**: `https://github.com/druto-rs/bodyparser`
+- **CORS**: `https://github.com/druto-rs/cors`
+- **Limiter**: `https://github.com/druto-rs/limiter`
+- **Shield**: `https://github.com/druto-rs/shield`
+- **Session**: `https://github.com/druto-rs/session`
+- **Redis**: `https://github.com/druto-rs/redis`
+- **Karigor (CLI)**: `https://github.com/druto-rs/karigor`

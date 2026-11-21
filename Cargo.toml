@@ -1,32 +1,75 @@
-[workspace]
-members = ["crates/*"]
-resolver = "3"
-
-[workspace.package]
+[package]
+name = "druto"
 version = "0.1.0"
 edition = "2024"
-license = "MIT"
+license = "MIT OR Apache-2.0"
 rust-version = "1.95"
+description = "Ergonomic, batteries-included web framework for Rust"
+repository = "https://github.com/druto-rs/druto"
+readme = "README.md"
+keywords = ["druto", "web", "framework", "async", "http"]
+categories = ["web-programming::http-server", "network-programming"]
 
-[workspace.dependencies]
-# External Dependencies
+[features]
+default = ["full"]
+full = [
+    "bodyparser",
+    "cors",
+    "crypto",
+    "env",
+    "events",
+    "hash",
+    "limiter",
+    "redis",
+    "session",
+    "shield",
+    "string",
+    "validation",
+]
+
+# Modular Facade Features
+bodyparser = ["dep:bodyparser"]
+cors = ["dep:cors"]
+crypto = ["dep:gopon"]
+env = ["dep:poribesh"]
+events = ["dep:barta"]
+hash = ["dep:mishron"]
+limiter = ["dep:limiter"]
+redis = ["dep:redis"]
+session = ["dep:session"]
+shield = ["dep:shield"]
+string = ["dep:borno"]
+validation = ["dep:jachai"]
+
+[dependencies]
 async-io = "2.6.0"
-barta = { git = "https://github.com/Hitarashi/barta.git", branch = "main" }
-borno = { git = "https://github.com/Hitarashi/borno.git", branch = "main" }
 bytes = "1.12.2"
 dhap = { git = "https://github.com/Hitarashi/dhap.git", branch = "main" }
 futures-io = "0.3.34"
-futures-util = { version = "0.3.34", default-features = false }
-gopon = { git = "https://github.com/Hitarashi/gopon.git", branch = "main" }
+futures-util = { version = "0.3.34", default-features = false, features = ["io", "std"] }
 http = "1.5.0"
-jachai = { git = "https://github.com/Hitarashi/jachai.git", branch = "main" }
 khonj = { git = "https://github.com/Hitarashi/khonj.git", branch = "main" }
 kouta = { git = "https://github.com/Hitarashi/kouta.git", branch = "main" }
-mishron = { git = "https://github.com/Hitarashi/mishron.git", branch = "main" }
-poribesh = { git = "https://github.com/Hitarashi/poribesh.git", branch = "main" }
 poth = { git = "https://github.com/Hitarashi/poth.git", branch = "main" }
 router = { package = "druto-router", git = "https://github.com/druto-rs/router.git", branch = "main" }
 sebok = { git = "https://github.com/Hitarashi/sebok.git", branch = "main" }
 serde = { version = "1.0.229", default-features = false, features = ["derive", "alloc"] }
 serde_json = "1.0.154"
-tokio = { version = "1.54.1", default-features = false }
+tokio = { version = "1.54.1", default-features = false, features = ["rt", "macros", "sync"] }
+
+# Feature-flagged facade components
+barta = { git = "https://github.com/Hitarashi/barta.git", branch = "main", optional = true }
+bodyparser = { package = "druto-bodyparser", git = "https://github.com/druto-rs/bodyparser.git", branch = "main", optional = true }
+borno = { git = "https://github.com/Hitarashi/borno.git", branch = "main", optional = true }
+cors = { package = "druto-cors", git = "https://github.com/druto-rs/cors.git", branch = "main", optional = true }
+gopon = { git = "https://github.com/Hitarashi/gopon.git", branch = "main", optional = true }
+jachai = { git = "https://github.com/Hitarashi/jachai.git", branch = "main", optional = true }
+limiter = { package = "druto-limiter", git = "https://github.com/druto-rs/limiter.git", branch = "main", optional = true }
+mishron = { git = "https://github.com/Hitarashi/mishron.git", branch = "main", optional = true }
+poribesh = { git = "https://github.com/Hitarashi/poribesh.git", branch = "main", optional = true }
+redis = { package = "druto-redis", git = "https://github.com/druto-rs/redis.git", branch = "main", optional = true }
+session = { package = "druto-session", git = "https://github.com/druto-rs/session.git", branch = "main", optional = true }
+shield = { package = "druto-shield", git = "https://github.com/druto-rs/shield.git", branch = "main", optional = true }
+
+[dev-dependencies]
+tokio = { version = "1.54.1", features = ["full"] }
