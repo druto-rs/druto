@@ -491,6 +491,7 @@ dependencies = [
  "borno",
  "khonj",
  "kouta",
+ "poribesh",
 ]
 
 [[package]]
@@ -498,14 +499,6 @@ name = "either"
 version = "1.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0e9c71c2167ca323c882b99918929403426e2373ea17242ff5653e0d5e1058be"
-
-[[package]]
-name = "env"
-version = "0.1.0"
-dependencies = [
- "regex",
- "serde",
-]
 
 [[package]]
 name = "equivalent"
@@ -1119,6 +1112,15 @@ dependencies = [
  "cpubits",
  "cpufeatures 0.3.1",
  "universal-hash",
+]
+
+[[package]]
+name = "poribesh"
+version = "0.1.0"
+source = "git+https://github.com/Hitarashi/poribesh.git?branch=main#214fc5e1a214905475ee5886dd57c5a3ed0aeafd"
+dependencies = [
+ "regex",
+ "serde",
 ]
 
 [[package]]

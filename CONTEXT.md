@@ -23,7 +23,7 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 | **Layer 0: Primitives**      | Typed asynchronous pub/sub event dispatcher & testing fakes       | `events`          | `@adonisjs/events`       | `illuminate/events`                   |
 | **Layer 0: Primitives**      | AEAD encryption, HMAC signing, key rotation, signed URLs          | `crypto`          | `@boringnode/encryption` | `illuminate/encryption`               |
 | **Layer 0: Primitives**      | Password hashing drivers (Argon2id, Bcrypt), rehash detection     | `hash`            | `@adonisjs/hash`         | `illuminate/hashing`                  |
-| **Layer 1: Configuration**   | .env parsing & boot-time schema validation                        | `env`             | `@adonisjs/env`          | `Dotenv` + `config`                   |
+| **Layer 1: Configuration**   | .env parsing & boot-time schema validation                        | `poribesh` (ext)  | `@adonisjs/env`          | `Dotenv` + `config`                   |
 | **Layer 2: State & Storage** | RFC 6265 cookies, signed & encrypted cookie jars                  | `cookie`          | `@adonisjs/http-server`  | `illuminate/cookie`                   |
 | **Layer 2: State & Storage** | Multi-driver session management & flash data                      | `session`         | `@adonisjs/session`      | `illuminate/session`                  |
 | **Layer 2: State & Storage** | Asynchronous Redis connection manager, pooling & pub/sub          | `redis`           | `@adonisjs/redis`        | `illuminate/redis`                    |
@@ -50,7 +50,6 @@ crates/
 ├── cors/        # Cross-Origin Resource Sharing (CORS) preflight and header negotiation
 ├── crypto/      # Authenticated encryption, HMAC signing, key rotation, signed URLs
 ├── druto/       # Framework umbrella facade
-├── env/         # Environment variable loading, expansion, and schema validation
 ├── events/      # Strongly typed asynchronous event dispatcher & testing fakes
 ├── hash/        # Password hashing drivers, automatic rehash detection, verification
 ├── limiter/     # Rate limiting, token bucket, sliding window, and HTTP headers

@@ -9,3 +9,4 @@ rust-version.workspace = true
 borno.workspace = true
 khonj.workspace = true
 kouta.workspace = true
+poribesh.workspace = true
