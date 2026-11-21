@@ -903,7 +903,7 @@ checksum = "3bd1574e617a9a6c1f8f8181bd7e841e1f20e4277607ef28945765188d6284d4"
 [[package]]
 name = "jachai"
 version = "0.1.0"
-source = "git+https://github.com/Hitarashi/jachai.git?branch=main#e6c9650159613150228fa2221c438ecf3fece06f"
+source = "git+https://github.com/Hitarashi/jachai.git?branch=main#97363cb0ff641525e77e5a227f6c153bd690d935"
 dependencies = [
  "futures-util",
  "regex",
