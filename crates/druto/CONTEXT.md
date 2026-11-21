@@ -22,6 +22,7 @@ inspired by Laravel and AdonisJS.
 - `borno`: Grammatical inflections, casing transformations, and string conventions.
 - `cookie`: RFC 6265 cookies, signed and encrypted cookie jars.
 - `gopon`: Authenticated encryption, HMAC signing, key rotation, and signed URLs.
+- `jachai`: Universal declarative schema definition, validation, sanitization, and structured error reporting.
 - `khonj`: Nested bracket-notation query string parsing and serialization.
 - `kouta`: Unified multi-driver caching engine, multi-tier stores, and stampede protection.
 - `mishron`: Password hashing drivers (Argon2id, Bcrypt) and automatic rehash detection.

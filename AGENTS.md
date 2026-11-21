@@ -53,4 +53,3 @@ When working within a specific crate, consult its local `CONTEXT.md` and `AGENTS
 - **`crates/session`**: [`CONTEXT.md`](crates/session/CONTEXT.md) | [`AGENTS.md`](crates/session/AGENTS.md)
 - **`crates/shield`**: [`CONTEXT.md`](crates/shield/CONTEXT.md) | [`AGENTS.md`](crates/shield/AGENTS.md)
 - **`crates/staticfiles`**: [`CONTEXT.md`](crates/staticfiles/CONTEXT.md) | [`AGENTS.md`](crates/staticfiles/AGENTS.md)
-- **`crates/validator`**: [`CONTEXT.md`](crates/validator/CONTEXT.md) | [`AGENTS.md`](crates/validator/AGENTS.md)

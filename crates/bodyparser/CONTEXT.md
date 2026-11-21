@@ -114,7 +114,7 @@ The crate synthesizes proven body ingestion architectures from framework designs
   storage/drive crates.
 - **Not Image/Media Processing**: Does not perform image transformation, resizing, or transcoding.
 - **Not Domain Validation**: Validates file mechanics (size, MIME type, extension); domain schema validation belongs to
-  `validator`.
+  `jachai`.
 
 ## Implemented Public Surface
 

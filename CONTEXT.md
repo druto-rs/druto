@@ -33,7 +33,7 @@ The framework is modeled on the layered design of AdonisJS (`@poppinss/*` and `@
 | **Layer 3: HTTP**            | Cross-Origin Resource Sharing (CORS) preflight & response headers | `cors`            | `@adonisjs/cors`         | `fruitcake/laravel-cors`              |
 | **Layer 3: HTTP**            | Web security hardening (CSRF, CSP, HSTS, FrameGuard, NoSniff)     | `shield`          | `@adonisjs/shield`       | `VerifyCsrfToken` + Security Headers  |
 | **Layer 3: HTTP**            | Rate limiting, token bucket, sliding window & HTTP headers        | `limiter`         | `@adonisjs/limiter`      | `illuminate/cache` (RateLimiter)      |
-| **Layer 3: HTTP**            | Request schema definition, validation rules, sanitization, errors | `validator`       | `vinejs`                 | `illuminate/validation`               |
+| **Layer 3: HTTP**            | Request schema definition, validation rules, sanitization, errors | `jachai` (ext)    | `vinejs`                 | `illuminate/validation`               |
 | **Layer 3: HTTP**            | Streaming multipart parser, file upload handling, size limits     | `bodyparser`      | `@adonisjs/bodyparser`   | `illuminate/http` (UploadedFile)      |
 | **Layer 3: HTTP**            | High-performance static asset file serving, range requests, ETags | `staticfiles`     | `@adonisjs/static`       | `public/` / `ServeFile`               |
 | **Layer 3: HTTP**            | Authentication guards, session/token authenticators, identity     | `auth`            | `@adonisjs/auth`         | `illuminate/auth`                     |
@@ -55,8 +55,7 @@ crates/
 ├── router/      # HTTP routing, request/response, groups, context, URL generation
 ├── session/     # Multi-driver HTTP session management, flash data, fixation defense
 ├── shield/      # Web application security suite (CSRF, CSP, FrameGuard, HSTS, NoSniff)
-├── staticfiles/ # High-performance static asset file serving, range requests, ETags
-└── validator/   # Request schema definition, validation rules, sanitization, errors
+└── staticfiles/ # High-performance static asset file serving, range requests, ETags
 ```
 
 Each crate maintains its own `CONTEXT.md` (architecture and boundaries) and `AGENTS.md` (agent rules and constraints).

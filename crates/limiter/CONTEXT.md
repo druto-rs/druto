@@ -138,7 +138,7 @@ The crate synthesizes proven rate-limiting paradigms from industry standards and
 - **Not an Authentication Provider**: Does not validate credentials or decode tokens; reads authenticated identities
   from `HttpContext`.
 - **Not a WAF / Firewall**: Does not inspect payload bodies or validate SQL/HTML injection; that belongs to
-  `crates/shield` and `crates/validator`.
+  `crates/shield` and `jachai`.
 - **Not a Network Socket Throttler**: Operates at Layer 7 HTTP application level, not TCP SYN/connection flood
   prevention.
 

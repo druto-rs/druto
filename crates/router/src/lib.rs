@@ -31,6 +31,7 @@ pub mod route;
 pub mod router;
 pub mod status;
 pub mod url_generator;
+pub mod validator;
 
 pub use compiled::CompiledRouter;
 pub use context::HttpContext;
@@ -48,13 +49,15 @@ pub use route::Route;
 pub use router::{ErrorHandlerFn, Router, RouterConfig};
 pub use status::StatusCode;
 pub use url_generator::UrlGenerator;
+pub use validator::HttpContextValidateExt;
 
 /// Common imports and traits for building HTTP applications and handlers.
 pub mod prelude {
     pub use crate::{
         CompiledRouter, ErrorHandlerFn, HeaderMap, HeaderName, HeaderValue, HttpContext,
-        IntoResponse, Method, Redirect, Request, RequestBuilder, ResourceAction,
-        ResourceController, Response, ResponseBody, Route, RouteGroup, RouteResource, Router,
-        RouterConfig, RouterError, StatusCode, UrlGenerator, from_fn, from_handler, routes,
+        HttpContextValidateExt, IntoResponse, Method, Redirect, Request, RequestBuilder,
+        ResourceAction, ResourceController, Response, ResponseBody, Route, RouteGroup,
+        RouteResource, Router, RouterConfig, RouterError, StatusCode, UrlGenerator, from_fn,
+        from_handler, routes,
     };
 }

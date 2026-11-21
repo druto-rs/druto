@@ -25,6 +25,7 @@ fred = { version = "10.1.0", default-features = false }
 futures-util = { version = "0.3.34", default-features = false }
 getrandom = "0.4.3"
 gopon = { git = "https://github.com/Hitarashi/gopon.git", branch = "main" }
+jachai = { git = "https://github.com/Hitarashi/jachai.git", branch = "main" }
 khonj = { git = "https://github.com/Hitarashi/khonj.git", branch = "main" }
 kouta = { git = "https://github.com/Hitarashi/kouta.git", branch = "main" }
 mishron = { git = "https://github.com/Hitarashi/mishron.git", branch = "main" }

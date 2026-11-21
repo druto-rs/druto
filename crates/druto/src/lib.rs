@@ -4,6 +4,7 @@ pub use barta;
 pub use borno;
 pub use dhap;
 pub use gopon;
+pub use jachai;
 pub use khonj;
 pub use kouta;
 pub use mishron;

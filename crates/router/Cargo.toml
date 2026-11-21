@@ -13,7 +13,9 @@ session.workspace = true
 
 # External Dependencies
 bytes.workspace = true
+futures-util = { workspace = true, features = ["alloc"] }
 gopon.workspace = true
+jachai.workspace = true
 khonj.workspace = true
 percent-encoding.workspace = true
 poth.workspace = true
@@ -23,3 +25,4 @@ serde_json.workspace = true
 
 [dev-dependencies]
 proptest.workspace = true
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

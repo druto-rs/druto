@@ -1,18 +1,14 @@
-//! HTTP router integration, context extraction traits, and automatic 422 error response handling.
+//! HTTP router validation integration, context extraction traits, and automatic 422 error response handling.
 
-#[cfg(feature = "async")]
 use futures_util::future::BoxFuture;
-use router::{
-    RouterError, context::HttpContext, header::HeaderName, into_response::IntoResponse,
-    request::Request, status::StatusCode,
+use jachai::{
+    RequestParts, RequestSchema, Schema, ValidatedRequest, ValidationContext, ValidationError,
 };
 use serde_json::Value;
 
 use crate::{
-    context::ValidationContext,
-    error::ValidationError,
-    request::{RequestParts, RequestSchema, ValidatedRequest},
-    schema::Schema,
+    RouterError, context::HttpContext, header::HeaderName, into_response::IntoResponse,
+    request::Request, status::StatusCode,
 };
 
 impl IntoResponse for ValidationError {
@@ -75,7 +71,6 @@ pub trait HttpContextValidateExt {
         schema: &RequestSchema,
     ) -> Result<ValidatedRequest, ValidationError>;
 
-    #[cfg(feature = "async")]
     /// Asynchronously validates the request body against a schema.
     fn validate_body_async<'a, S, T>(
         &'a mut self,
@@ -85,7 +80,6 @@ pub trait HttpContextValidateExt {
         S: Schema<T> + 'a,
         T: 'a;
 
-    #[cfg(feature = "async")]
     /// Asynchronously validates all request components using a composite [`RequestSchema`].
     fn validate_request_async<'a>(
         &'a mut self,
@@ -144,7 +138,6 @@ impl HttpContextValidateExt for HttpContext {
         schema.validate_with_context(&parts, &vctx)
     }
 
-    #[cfg(feature = "async")]
     fn validate_body_async<'a, S, T>(
         &'a mut self,
         schema: &'a S,
@@ -161,7 +154,6 @@ impl HttpContextValidateExt for HttpContext {
         })
     }
 
-    #[cfg(feature = "async")]
     fn validate_request_async<'a>(
         &'a mut self,
         schema: &'a RequestSchema,
@@ -191,11 +183,8 @@ fn extract_query_json(request: &Request) -> Value {
         _ => return Value::Object(serde_json::Map::new()),
     };
 
-    #[cfg(feature = "router")]
-    {
-        if let Ok(tree) = khonj::parse(query_str) {
-            return khonj_value_to_json(&tree);
-        }
+    if let Ok(tree) = khonj::parse(query_str) {
+        return khonj_value_to_json(&tree);
     }
 
     let mut map = serde_json::Map::new();
@@ -209,7 +198,6 @@ fn extract_query_json(request: &Request) -> Value {
     Value::Object(map)
 }
 
-#[cfg(feature = "router")]
 fn khonj_value_to_json(val: &khonj::Value) -> Value {
     match val {
         khonj::Value::Null => Value::Null,
