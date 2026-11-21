@@ -18,18 +18,19 @@ inspired by Laravel and AdonisJS.
 
 `druto` unifies the workspace crates:
 
+- `borno`: Grammatical inflections, casing transformations, and string conventions.
 - `cookie`: RFC 6265 cookies, signed and encrypted cookie jars.
 - `crypto`: Authenticated encryption, HMAC signing, key rotation, and signed URLs.
 - `env`: Environment variable loading, expansion, and boot-time schema validation.
 - `events`: Strongly typed asynchronous event dispatcher, wildcard pub/sub, and testing fakes.
 - `hash`: Password hashing drivers (Argon2id, Bcrypt) and automatic rehash detection.
-- `inflector`: Grammatical inflections, casing transformations, and string conventions.
+- `khonj`: Nested bracket-notation query string parsing and serialization.
+- `kouta`: Unified multi-driver caching engine, multi-tier stores, and stampede protection.
 - `matcher`: Fast URL pattern matching and parameter extraction.
 - `pipeline`: Asynchronous middleware onion execution.
-- `qs`: Nested bracket-notation query string parsing and serialization.
 - `router`: HTTP routing, request/response models, middleware pipeline, and reverse URL generation.
 - `session`: Multi-driver HTTP session management, flash data, and session fixation defense.
-- *(Future)* `auth`, `cache`, `validation`, `db`, `cli`.
+- *(Future)* `auth`, `validation`, `db`, `cli`.
 
 ## Responsibilities of `druto`
 

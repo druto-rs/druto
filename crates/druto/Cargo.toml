@@ -6,5 +6,6 @@ license.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+borno.workspace = true
 khonj.workspace = true
 kouta.workspace = true

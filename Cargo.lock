@@ -192,6 +192,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "borno"
+version = "0.1.0"
+source = "git+https://github.com/Hitarashi/borno.git?branch=main#ccec8b5921ed36811b6eb7cc20d5325a25856725"
+dependencies = [
+ "regex",
+]
+
+[[package]]
 name = "borsh"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -480,6 +488,7 @@ dependencies = [
 name = "druto"
 version = "0.1.0"
 dependencies = [
+ "borno",
  "khonj",
  "kouta",
 ]
@@ -880,14 +889,6 @@ checksum = "cc4e190f5d26ca7051642629da2c52fc03bde85a03197c99408dcd291734c855"
 dependencies = [
  "equivalent",
  "hashbrown",
-]
-
-[[package]]
-name = "inflector"
-version = "0.1.0"
-dependencies = [
- "regex",
- "serde",
 ]
 
 [[package]]
