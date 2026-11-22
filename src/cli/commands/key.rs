@@ -145,19 +145,19 @@ pub fn execute_key_generate(
     });
 
     if existing_value.is_some() && !force {
-        if std::io::stdin().is_terminal() {
-            let overwrite = ui.confirm(
-                "An APP_KEY is already set. Do you want to overwrite it?",
-                false,
-            )?;
-            if !overwrite {
-                ui.info("Key generation aborted. Existing key preserved.");
-                return Ok(key_str);
-            }
-        } else {
+        if !std::io::stdin().is_terminal() || karigor::ui::is_non_interactive() {
             return Err(
                 "APP_KEY is already set in environment file. Use --force to overwrite it.".into(),
             );
+        }
+
+        let overwrite = ui.confirm(
+            "An APP_KEY is already set. Do you want to overwrite it?",
+            false,
+        )?;
+        if !overwrite {
+            ui.info("Key generation aborted. Existing key preserved.");
+            return Ok(key_str);
         }
     }
 

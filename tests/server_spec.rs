@@ -461,3 +461,103 @@ fn test_facade_submodule_namespaces() {
     let schema = validation::schema::object();
     drop(schema);
 }
+
+#[tokio::test]
+async fn test_test_server_comprehensive_methods_and_assertions() {
+    let mut router = Router::new();
+
+    router.put(
+        "/items/:id",
+        from_handler(|ctx| {
+            Box::pin(async move {
+                let id = ctx.request.params().get("id").unwrap().to_string();
+                let body_str = std::str::from_utf8(ctx.request.body()).unwrap();
+                ctx.response.set_header("x-item-id", id);
+                ctx.response.text(format!("Updated: {body_str}"));
+                Ok(())
+            })
+        }),
+    );
+
+    router.delete(
+        "/items/:id",
+        from_handler(|ctx| {
+            Box::pin(async move {
+                ctx.response.set_status(StatusCode::NO_CONTENT);
+                Ok(())
+            })
+        }),
+    );
+
+    router.patch(
+        "/items/:id",
+        from_handler(|ctx| {
+            Box::pin(async move {
+                let payload: serde_json::Value =
+                    serde_json::from_slice(ctx.request.body()).unwrap();
+                let action = payload
+                    .get("action")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("unknown");
+                ctx.response.text(format!("Patched: {action}"));
+                Ok(())
+            })
+        }),
+    );
+
+    let client = TestServer::new(router).unwrap();
+
+    let put_res = client
+        .put("/items/101")
+        .header("x-custom-request", "true")
+        .body(bytes::Bytes::from_static(b"Item Ten"))
+        .send()
+        .await
+        .unwrap();
+
+    put_res.assert_status(StatusCode::OK);
+    put_res.assert_ok();
+    put_res.assert_text("Updated: Item Ten");
+    assert_eq!(put_res.status(), StatusCode::OK);
+    assert_eq!(
+        put_res.body(),
+        &bytes::Bytes::from_static(b"Updated: Item Ten")
+    );
+    assert!(put_res.headers().contains_key("x-item-id"));
+
+    let del_res = client.delete("/items/101").send().await.unwrap();
+    del_res.assert_status(StatusCode::NO_CONTENT);
+
+    let patch_res = client
+        .patch("/items/101")
+        .json(&serde_json::json!({ "action": "archive" }))
+        .unwrap()
+        .send()
+        .await
+        .unwrap();
+    patch_res.assert_ok();
+    patch_res.assert_text("Patched: archive");
+
+    let mut custom_router = Router::new();
+    custom_router.post(
+        "/echo",
+        from_handler(|ctx| {
+            Box::pin(async move {
+                let query = ctx.request.query().unwrap_or_default().to_string();
+                let text = std::str::from_utf8(ctx.request.body()).unwrap();
+                ctx.response.text(format!("{query}:{text}"));
+                Ok(())
+            })
+        }),
+    );
+    let custom_client = TestServer::new(custom_router).unwrap();
+    let echo_res = custom_client
+        .request(poth::Method::Post, "/echo")
+        .query("tag=important")
+        .text("urgent message")
+        .send()
+        .await
+        .unwrap();
+    echo_res.assert_ok();
+    echo_res.assert_text("tag=important:urgent message");
+}
