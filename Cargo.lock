@@ -836,7 +836,7 @@ checksum = "9985c9503b412198aa4197559e9a318524ebc4519c229bfa05a535828c950b9d"
 [[package]]
 name = "gopon"
 version = "0.1.0"
-source = "git+https://github.com/Hitarashi/gopon.git?branch=main#42f6de69d24877017c3c080b7efa7b27749f2362"
+source = "git+https://github.com/Hitarashi/gopon.git?branch=main#f428c82c002295e40ca73c14e9bfb1c516414ec5"
 dependencies = [
  "aes-gcm",
  "base64",

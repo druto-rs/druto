@@ -29,4 +29,5 @@ pub fn create_kernel() -> karigor::Kernel {
         .register(commands::RoutesCommand)
         .register(commands::MiddlewareCommand)
         .register(commands::DoctorCommand)
+        .register(commands::KeyGenerateCommand)
 }

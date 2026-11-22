@@ -2,6 +2,7 @@
 
 pub mod dev;
 pub mod doctor;
+pub mod key;
 pub mod make;
 pub mod middleware;
 pub mod new;
@@ -9,6 +10,7 @@ pub mod routes;
 
 pub use dev::DevCommand;
 pub use doctor::DoctorCommand;
+pub use key::KeyGenerateCommand;
 pub use make::{
     MakeCommandCommand, MakeControllerCommand, MakeMiddlewareCommand, MakeRouteCommand,
     StubPublishCommand,

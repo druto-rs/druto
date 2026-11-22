@@ -193,3 +193,72 @@ fn test_cli_execute_exit_codes() {
     let exit_unknown = kernel.execute(vec!["druto".to_string(), "nonexistent".to_string()]);
     assert_ne!(exit_unknown, 0);
 }
+
+#[test]
+fn test_cli_key_generate_show() {
+    let kernel = create_kernel();
+    let result = kernel.handle(vec![
+        "druto".to_string(),
+        "key:generate".to_string(),
+        "--show".to_string(),
+    ]);
+    assert!(result.is_ok());
+}
+
+#[test]
+fn test_cli_key_generate_write_to_env() {
+    let temp = tempdir().expect("tempdir");
+    let env_path = temp.path().join(".env");
+    let env_str = env_path.to_str().expect("valid path").to_string();
+
+    let kernel = create_kernel();
+    let result = kernel.handle(vec![
+        "druto".to_string(),
+        "key:generate".to_string(),
+        "--env".to_string(),
+        env_str,
+    ]);
+    assert!(result.is_ok());
+
+    let content = fs::read_to_string(&env_path).expect("read env");
+    assert!(content.contains("APP_KEY=base64:"));
+    let key_line = content
+        .lines()
+        .find(|l| l.starts_with("APP_KEY="))
+        .expect("APP_KEY line");
+    assert!(key_line.len() > 15);
+}
+
+#[test]
+fn test_cli_key_generate_overwrite_with_force() {
+    let temp = tempdir().expect("tempdir");
+    let env_path = temp.path().join(".env");
+    fs::write(&env_path, "PORT=5555\nAPP_KEY=base64:old_dummy_key\n").expect("write dummy");
+
+    let env_str = env_path.to_str().expect("valid path").to_string();
+    let kernel = create_kernel();
+    let result = kernel.handle(vec![
+        "druto".to_string(),
+        "key:generate".to_string(),
+        "--env".to_string(),
+        env_str,
+        "--force".to_string(),
+    ]);
+    assert!(result.is_ok());
+
+    let content = fs::read_to_string(&env_path).expect("read env");
+    assert!(content.contains("PORT=5555"));
+    assert!(!content.contains("old_dummy_key"));
+    assert!(content.contains("APP_KEY=base64:"));
+}
+
+#[test]
+fn test_cli_key_generate_alias_resolution() {
+    let kernel = create_kernel();
+    let result = kernel.handle(vec![
+        "druto".to_string(),
+        "generate:key".to_string(),
+        "--show".to_string(),
+    ]);
+    assert!(result.is_ok());
+}
