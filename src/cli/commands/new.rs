@@ -2,11 +2,7 @@
 
 use std::{fs, io::IsTerminal, path::Path};
 
-use colored::Colorize;
-use karigor::{
-    prelude::*,
-    ui::{ColorfulTheme, Confirm, Input, Select},
-};
+use karigor::prelude::*;
 use tracing::info;
 
 /// Command generating a new Druto web application.
@@ -28,7 +24,7 @@ impl Command for NewCommand {
     fn run<'a>(&'a self, ctx: &'a mut Context) -> CommandFuture<'a> {
         Box::pin(async move {
             let initial_name = ctx.arg("name").map(ToString::to_string);
-            execute_new(initial_name)
+            execute_new(&ctx.ui, initial_name)
                 .await
                 .map_err(|err| KarigorError::Execution(err.to_string().into()))
         })
@@ -36,8 +32,11 @@ impl Command for NewCommand {
 }
 
 /// Executes project scaffolding.
-pub async fn execute_new(initial_name: Option<String>) -> Result<(), Box<dyn std::error::Error>> {
-    karigor::ui::print_banner(
+pub async fn execute_new(
+    ui: &Ui,
+    initial_name: Option<String>,
+) -> Result<(), Box<dyn std::error::Error>> {
+    ui.banner(
         "Druto Scaffolding Wizard",
         "Generate a new Druto web application",
     );
@@ -45,12 +44,7 @@ pub async fn execute_new(initial_name: Option<String>) -> Result<(), Box<dyn std
     let is_terminal = std::io::stdin().is_terminal();
 
     let (project_name, init_git) = if is_terminal && initial_name.is_none() {
-        let theme = ColorfulTheme::default();
-
-        let name: String = Input::with_theme(&theme)
-            .with_prompt("Project name")
-            .default("my-druto-app".to_string())
-            .interact_text()?;
+        let name = ui.input("Project name", Some("my-druto-app"))?;
 
         let presets = [
             "REST API (Batteries-Included: Router, CORS, Limiter, Shield, Bodyparser)",
@@ -58,16 +52,9 @@ pub async fn execute_new(initial_name: Option<String>) -> Result<(), Box<dyn std
             "Full-Stack Web (Router, Session, Redis, Shield)",
         ];
 
-        let preset_index = Select::with_theme(&theme)
-            .with_prompt("Choose architecture preset")
-            .items(presets)
-            .default(0)
-            .interact()?;
+        let preset_index = ui.select("Choose architecture preset", &presets, 0)?;
 
-        let init_git = Confirm::with_theme(&theme)
-            .with_prompt("Initialize a Git repository?")
-            .default(true)
-            .interact()?;
+        let init_git = ui.confirm("Initialize a Git repository?", true)?;
 
         info!(
             project = %name,
@@ -82,7 +69,7 @@ pub async fn execute_new(initial_name: Option<String>) -> Result<(), Box<dyn std
         (name, true)
     };
 
-    karigor::ui::print_section(&format!(
+    ui.section(&format!(
         "Scaffolding Project: {}",
         project_name.bold().cyan()
     ));
@@ -97,7 +84,7 @@ pub async fn execute_new(initial_name: Option<String>) -> Result<(), Box<dyn std
         return Err(format!("Directory `{}` already exists", project_name).into());
     }
 
-    let spinner = karigor::ui::create_spinner("Creating project directory structure...");
+    let spinner = ui.spinner("Creating project directory structure...");
 
     fs::create_dir_all(project_dir.join("src").join("routes"))?;
     fs::create_dir_all(project_dir.join("src").join("controllers"))?;
@@ -144,7 +131,7 @@ pub fn routes() -> Router {
         "/",
         from_handler(|ctx| {
             Box::pin(async move {
-                ctx.response.text("Welcome to Druto Framework! ⚡\n");
+                ctx.response.text("Welcome to Druto Framework!\n");
                 Ok(())
             })
         }),
@@ -214,54 +201,28 @@ cargo druto routes
 
     spinner.finish_and_clear();
 
-    karigor::ui::print_success(&format!(
+    ui.success(&format!(
         "Created Druto application in {}",
         project_dir.display().to_string().bold().cyan()
     ));
-    karigor::ui::print_success("Wrote Cargo.toml with Druto framework dependencies");
-    karigor::ui::print_success("Generated HTTP server entrypoint in src/main.rs");
-    karigor::ui::print_success("Configured initial routing table in src/routes/mod.rs");
+    ui.success("Wrote Cargo.toml with Druto framework dependencies");
+    ui.success("Generated HTTP server entrypoint in src/main.rs");
+    ui.success("Configured initial routing table in src/routes/mod.rs");
     if init_git {
-        karigor::ui::print_success("Initialized Git repository");
+        ui.success("Initialized Git repository");
     }
 
-    println!();
-    println!(
-        "{}",
-        " ╭── Next Steps ─────────────────────────────────────────────╮".cyan()
+    let mut steps = ui.steps();
+    steps.step(
+        "Navigate to project directory",
+        format!("cd {}", project_name.bold().yellow()),
     );
-    println!(
-        " {}                                                          {}",
-        "│".cyan(),
-        "│".cyan()
+    steps.step("Start HTTP development server", "cargo druto dev");
+    steps.step(
+        "Generate modular route and controller",
+        "cargo druto make:route user --controller",
     );
-    println!(
-        " {}   cd {}                                            {}",
-        "│".cyan(),
-        project_name.bold().yellow(),
-        "│".cyan()
-    );
-    println!(
-        " {}   cargo druto dev       {}                     {}",
-        "│".cyan(),
-        "# Start HTTP web server".dimmed(),
-        "│".cyan()
-    );
-    println!(
-        " {}   cargo druto make:route user --controller               {}",
-        "│".cyan(),
-        "│".cyan()
-    );
-    println!(
-        " {}                                                          {}",
-        "│".cyan(),
-        "│".cyan()
-    );
-    println!(
-        "{}",
-        " ╰───────────────────────────────────────────────────────────╯".cyan()
-    );
-    println!();
+    ui.render_steps(&steps);
 
     Ok(())
 }

@@ -2,7 +2,6 @@
 
 use std::path::Path;
 
-use colored::Colorize;
 use karigor::prelude::*;
 use tracing::info;
 
@@ -40,7 +39,7 @@ impl Command for DevCommand {
             let port = ctx.flag_str("port").and_then(|p| p.parse::<u16>().ok());
             let dry_run = ctx.flag_bool("dry-run");
 
-            execute_dev(host, port, dry_run)
+            execute_dev(&ctx.ui, host, port, dry_run)
                 .await
                 .map_err(|err| KarigorError::Execution(err.to_string().into()))
         })
@@ -49,6 +48,7 @@ impl Command for DevCommand {
 
 /// Executes the development server supervisor.
 pub async fn execute_dev(
+    ui: &Ui,
     host: Option<String>,
     port: Option<u16>,
     dry_run: bool,
@@ -63,70 +63,50 @@ pub async fn execute_dev(
         "Initializing development server supervisor"
     );
 
-    println!();
-    println!(
-        "{}",
-        " ╭──────────────────────────────────────────────────────────╮".cyan()
-    );
-    println!(
-        " {}                                                          {}",
-        "│".cyan(),
-        "│".cyan()
-    );
-    println!(
-        " {}   {}                   {}",
-        "│".cyan(),
-        "⚡ Druto Development Server v0.1.0".bold().white(),
-        "│".cyan()
-    );
-    println!(
-        " {}                                                          {}",
-        "│".cyan(),
-        "│".cyan()
-    );
-    println!(
-        " {}   {}  http://{}:{}                     {}",
-        "│".cyan(),
+    let inner_width: usize = 58;
+    let format_box_line = |content: &str| -> String {
+        let pad = inner_width.saturating_sub(karigor::ui::visible_width(content));
+        format!(
+            " {}{}{}{}",
+            "│".cyan(),
+            content,
+            " ".repeat(pad),
+            "│".cyan()
+        )
+    };
+
+    ui.print("");
+    ui.print(format!(" ╭{}╮", "─".repeat(inner_width)).cyan().to_string());
+    ui.print(format_box_line(""));
+    ui.print(format_box_line(&format!(
+        "   {}",
+        "Druto Development Server v0.1.0".bold().white()
+    )));
+    ui.print(format_box_line(""));
+    ui.print(format_box_line(&format!(
+        "   {}  http://{}:{}",
         "➜  Local:  ".green().bold(),
         bind_host,
-        bind_port,
-        "│".cyan()
-    );
-    println!(
-        " {}   {}  {} (unoptimized + debuginfo)         {}",
-        "│".cyan(),
+        bind_port
+    )));
+    ui.print(format_box_line(&format!(
+        "   {}  {} (unoptimized + debuginfo)",
         "➜  Mode:   ".dimmed(),
-        "Development".bold().yellow(),
-        "│".cyan()
-    );
-    println!(
-        " {}                                                          {}",
-        "│".cyan(),
-        "│".cyan()
-    );
-    println!(
-        " {}   [Ctrl+C] to stop server                                {}",
-        "│".cyan(),
-        "│".cyan()
-    );
-    println!(
-        " {}                                                          {}",
-        "│".cyan(),
-        "│".cyan()
-    );
-    println!(
-        "{}",
-        " ╰──────────────────────────────────────────────────────────╯".cyan()
-    );
-    println!();
+        "Development".bold().yellow()
+    )));
+    ui.print(format_box_line(""));
+    ui.print(format_box_line("   [Ctrl+C] to stop server"));
+    ui.print(format_box_line(""));
+    ui.print(format!(" ╰{}╯", "─".repeat(inner_width)).cyan().to_string());
+    ui.print("");
 
     if dry_run {
-        karigor::ui::print_info("[dry-run] Server supervisor configured successfully.");
+        ui.info("[dry-run] Server supervisor configured successfully.");
         return Ok(());
     }
 
     if Path::new("Cargo.toml").exists() {
-        karigor::ui::print_info(&format!(
+        ui.info(&format!(
             "Starting application process on {bind_host}:{bind_port}..."
         ));
 
@@ -142,9 +122,7 @@ pub async fn execute_dev(
             return Err(format!("Process exited with status: {status}").into());
         }
     } else {
-        karigor::ui::print_warn(
-            "No Cargo.toml found in current directory. Run this inside a Druto project.",
-        );
+        ui.warn("No Cargo.toml found in current directory. Run this inside a Druto project.");
     }
 
     Ok(())

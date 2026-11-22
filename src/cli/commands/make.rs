@@ -2,7 +2,6 @@
 
 use std::{fs, path::Path};
 
-use colored::Colorize;
 use karigor::prelude::*;
 use serde_json::json;
 use tracing::info;
@@ -42,7 +41,7 @@ impl Command for MakeRouteCommand {
             let controller = ctx.flag_bool("controller");
             let dry_run = ctx.flag_bool("dry-run");
 
-            execute_make_route(name, controller, dry_run)
+            execute_make_route(&ctx.ui, name, controller, dry_run)
                 .map_err(|err| KarigorError::Execution(err.to_string().into()))
         })
     }
@@ -81,7 +80,7 @@ impl Command for MakeControllerCommand {
             let resource = ctx.flag_bool("resource");
             let dry_run = ctx.flag_bool("dry-run");
 
-            execute_make_controller(name, resource, dry_run)
+            execute_make_controller(&ctx.ui, name, resource, dry_run)
                 .map_err(|err| KarigorError::Execution(err.to_string().into()))
         })
     }
@@ -116,7 +115,7 @@ impl Command for MakeMiddlewareCommand {
             let name = ctx.arg("name").unwrap();
             let dry_run = ctx.flag_bool("dry-run");
 
-            execute_make_middleware(name, dry_run)
+            execute_make_middleware(&ctx.ui, name, dry_run)
                 .map_err(|err| KarigorError::Execution(err.to_string().into()))
         })
     }
@@ -151,7 +150,7 @@ impl Command for MakeCommandCommand {
             let name = ctx.arg("name").unwrap();
             let dry_run = ctx.flag_bool("dry-run");
 
-            execute_make_command(name, dry_run)
+            execute_make_command(&ctx.ui, name, dry_run)
                 .map_err(|err| KarigorError::Execution(err.to_string().into()))
         })
     }
@@ -184,7 +183,7 @@ impl Command for StubPublishCommand {
     fn run<'a>(&'a self, ctx: &'a mut Context) -> CommandFuture<'a> {
         Box::pin(async move {
             let force = ctx.flag_bool("force");
-            execute_stub_publish(force)
+            execute_stub_publish(&ctx.ui, force)
                 .map_err(|err| KarigorError::Execution(err.to_string().into()))
         })
     }
@@ -192,6 +191,7 @@ impl Command for StubPublishCommand {
 
 /// Executes modular route generator.
 pub fn execute_make_route(
+    ui: &Ui,
     name: &str,
     controller: bool,
     dry_run: bool,
@@ -210,7 +210,7 @@ pub fn execute_make_route(
         "Generating modular route component"
     );
 
-    karigor::ui::print_section(&format!("Scaffolding Route Module: {}", name.bold().cyan()));
+    ui.section(&format!("Scaffolding Route Module: {}", name.bold().cyan()));
 
     let context = json!({
         "name": name,
@@ -237,15 +237,15 @@ pub fn execute_make_route(
 
         let outcome = injector::inject_route_module(Path::new(routes_mod_path), &name_snake)?;
 
-        karigor::ui::print_success(&format!("Generated {}", route_path.bold().white()));
+        ui.success(&format!("Generated {}", route_path.bold().white()));
         if outcome.module_injected {
-            karigor::ui::print_info(&format!(
+            ui.info(&format!(
                 "Injected {} into {}",
                 format!("pub mod {name_snake};").yellow(),
                 routes_mod_path.cyan()
             ));
         } else {
-            karigor::ui::print_info(&format!(
+            ui.info(&format!(
                 "Module {} already present in {}",
                 format!("pub mod {name_snake};").yellow(),
                 routes_mod_path.cyan()
@@ -253,13 +253,13 @@ pub fn execute_make_route(
         }
 
         if outcome.route_mounted {
-            karigor::ui::print_info(&format!(
+            ui.info(&format!(
                 "Mounted {} in {}",
                 format!("router.nest(\"/{name_snake}\", {name_snake}::routes());").yellow(),
                 routes_mod_path.cyan()
             ));
         } else {
-            karigor::ui::print_info(&format!(
+            ui.info(&format!(
                 "Route {} already mounted in {}",
                 format!("\"/{name_snake}\"").yellow(),
                 routes_mod_path.cyan()
@@ -267,11 +267,11 @@ pub fn execute_make_route(
         }
         format_file(Path::new(routes_mod_path));
     } else {
-        karigor::ui::print_info(&format!(
+        ui.info(&format!(
             "[dry-run] Would generate {}",
             route_path.bold().white()
         ));
-        karigor::ui::print_info(&format!(
+        ui.info(&format!(
             "[dry-run] Would inject into {}",
             routes_mod_path.cyan()
         ));
@@ -304,18 +304,18 @@ pub fn execute_make_route(
             let injected =
                 injector::inject_controller_module(Path::new(controllers_mod_path), &name_snake)?;
 
-            karigor::ui::print_success(&format!(
+            ui.success(&format!(
                 "Generated paired controller {}",
                 controller_path.bold().white()
             ));
             if injected {
-                karigor::ui::print_info(&format!(
+                ui.info(&format!(
                     "Injected {} into {}",
                     format!("pub mod {name_snake};").yellow(),
                     controllers_mod_path.cyan()
                 ));
             } else {
-                karigor::ui::print_info(&format!(
+                ui.info(&format!(
                     "Controller module {} already present in {}",
                     format!("pub mod {name_snake};").yellow(),
                     controllers_mod_path.cyan()
@@ -323,37 +323,38 @@ pub fn execute_make_route(
             }
             format_file(Path::new(controllers_mod_path));
         } else {
-            karigor::ui::print_info(&format!(
+            ui.info(&format!(
                 "[dry-run] Would generate {}",
                 controller_path.bold().white()
             ));
-            karigor::ui::print_info(&format!(
+            ui.info(&format!(
                 "[dry-run] Would inject into {}",
                 controllers_mod_path.cyan()
             ));
         }
     }
 
-    println!();
-    println!("  Route Definition Preview:");
-    println!(
+    ui.print("");
+    ui.print("  Route Definition Preview:");
+    ui.print(format!(
         "  {}",
         "───────────────────────────────────────────────────────".dimmed()
-    );
+    ));
     for line in rendered_route.lines() {
-        println!("  {line}");
+        ui.print(format!("  {line}"));
     }
-    println!(
+    ui.print(format!(
         "  {}",
         "───────────────────────────────────────────────────────".dimmed()
-    );
-    println!();
+    ));
+    ui.print("");
 
     Ok(())
 }
 
 /// Executes controller generator.
 pub fn execute_make_controller(
+    ui: &Ui,
     name: &str,
     resource: bool,
     dry_run: bool,
@@ -372,7 +373,7 @@ pub fn execute_make_controller(
         "Generating controller component"
     );
 
-    karigor::ui::print_section(&format!("Scaffolding Controller: {}", name.bold().cyan()));
+    ui.section(&format!("Scaffolding Controller: {}", name.bold().cyan()));
 
     let context = json!({
         "name": name,
@@ -400,15 +401,15 @@ pub fn execute_make_controller(
         let injected =
             injector::inject_controller_module(Path::new(controllers_mod_path), &name_snake)?;
 
-        karigor::ui::print_success(&format!("Generated {}", path_str.bold().white()));
+        ui.success(&format!("Generated {}", path_str.bold().white()));
         if injected {
-            karigor::ui::print_info(&format!(
+            ui.info(&format!(
                 "Injected {} into {}",
                 format!("pub mod {name_snake};").yellow(),
                 controllers_mod_path.cyan()
             ));
         } else {
-            karigor::ui::print_info(&format!(
+            ui.info(&format!(
                 "Controller module {} already present in {}",
                 format!("pub mod {name_snake};").yellow(),
                 controllers_mod_path.cyan()
@@ -416,36 +417,37 @@ pub fn execute_make_controller(
         }
         format_file(Path::new(controllers_mod_path));
     } else {
-        karigor::ui::print_info(&format!(
+        ui.info(&format!(
             "[dry-run] Would generate {}",
             path_str.bold().white()
         ));
-        karigor::ui::print_info(&format!(
+        ui.info(&format!(
             "[dry-run] Would inject into {}",
             controllers_mod_path.cyan()
         ));
     }
 
-    println!();
-    println!("  Controller Code Preview:");
-    println!(
+    ui.print("");
+    ui.print("  Controller Code Preview:");
+    ui.print(format!(
         "  {}",
         "───────────────────────────────────────────────────────".dimmed()
-    );
+    ));
     for line in rendered.lines() {
-        println!("  {line}");
+        ui.print(format!("  {line}"));
     }
-    println!(
+    ui.print(format!(
         "  {}",
         "───────────────────────────────────────────────────────".dimmed()
-    );
-    println!();
+    ));
+    ui.print("");
 
     Ok(())
 }
 
 /// Executes middleware generator.
 pub fn execute_make_middleware(
+    ui: &Ui,
     name: &str,
     dry_run: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
@@ -458,7 +460,7 @@ pub fn execute_make_middleware(
         "Generating onion middleware component"
     );
 
-    karigor::ui::print_section(&format!(
+    ui.section(&format!(
         "Scaffolding Onion Middleware: {}",
         name.bold().cyan()
     ));
@@ -482,38 +484,42 @@ pub fn execute_make_middleware(
         fs::write(file_path, &rendered)?;
         format_file(file_path);
 
-        karigor::ui::print_success(&format!("Generated {}", path_str.bold().white()));
-        karigor::ui::print_info(&format!(
+        ui.success(&format!("Generated {}", path_str.bold().white()));
+        ui.info(&format!(
             "Remember to register in pipeline: {}",
             format!("router.middleware({name_pascal});").yellow()
         ));
     } else {
-        karigor::ui::print_info(&format!(
+        ui.info(&format!(
             "[dry-run] Would generate {}",
             path_str.bold().white()
         ));
     }
 
-    println!();
-    println!("  Middleware Code Preview:");
-    println!(
+    ui.print("");
+    ui.print("  Middleware Code Preview:");
+    ui.print(format!(
         "  {}",
         "───────────────────────────────────────────────────────".dimmed()
-    );
+    ));
     for line in rendered.lines() {
-        println!("  {line}");
+        ui.print(format!("  {line}"));
     }
-    println!(
+    ui.print(format!(
         "  {}",
         "───────────────────────────────────────────────────────".dimmed()
-    );
-    println!();
+    ));
+    ui.print("");
 
     Ok(())
 }
 
 /// Executes custom console command generator.
-pub fn execute_make_command(name: &str, dry_run: bool) -> Result<(), Box<dyn std::error::Error>> {
+pub fn execute_make_command(
+    ui: &Ui,
+    name: &str,
+    dry_run: bool,
+) -> Result<(), Box<dyn std::error::Error>> {
     let name_snake = name.to_snake_case().into_owned();
     let name_pascal = name.to_pascal_case().into_owned();
 
@@ -523,7 +529,7 @@ pub fn execute_make_command(name: &str, dry_run: bool) -> Result<(), Box<dyn std
         "Generating console command component"
     );
 
-    karigor::ui::print_section(&format!(
+    ui.section(&format!(
         "Scaffolding Console Command: {}",
         name.bold().cyan()
     ));
@@ -547,52 +553,52 @@ pub fn execute_make_command(name: &str, dry_run: bool) -> Result<(), Box<dyn std
         fs::write(file_path, &rendered)?;
         format_file(file_path);
 
-        karigor::ui::print_success(&format!("Generated {}", path_str.bold().white()));
+        ui.success(&format!("Generated {}", path_str.bold().white()));
     } else {
-        karigor::ui::print_info(&format!(
+        ui.info(&format!(
             "[dry-run] Would generate {}",
             path_str.bold().white()
         ));
     }
 
-    println!();
-    println!("  Command Code Preview:");
-    println!(
+    ui.print("");
+    ui.print("  Command Code Preview:");
+    ui.print(format!(
         "  {}",
         "───────────────────────────────────────────────────────".dimmed()
-    );
+    ));
     for line in rendered.lines() {
-        println!("  {line}");
+        ui.print(format!("  {line}"));
     }
-    println!(
+    ui.print(format!(
         "  {}",
         "───────────────────────────────────────────────────────".dimmed()
-    );
-    println!();
+    ));
+    ui.print("");
 
     Ok(())
 }
 
 /// Publishes default stubs into `./stubs/` directory.
-pub fn execute_stub_publish(force: bool) -> Result<(), Box<dyn std::error::Error>> {
-    karigor::ui::print_section("Publishing Default Template Stubs");
+pub fn execute_stub_publish(ui: &Ui, force: bool) -> Result<(), Box<dyn std::error::Error>> {
+    ui.section("Publishing Default Template Stubs");
 
     let target_dir = Path::new("stubs");
     let results = stubs::publish_stubs(target_dir, force)?;
 
     for (filename, written) in results {
         if written {
-            karigor::ui::print_success(&format!("Published stubs/{}", filename.bold().white()));
+            ui.success(&format!("Published stubs/{}", filename.bold().white()));
         } else {
-            karigor::ui::print_warn(&format!(
+            ui.warn(&format!(
                 "Skipped stubs/{filename} (already exists, use --force to overwrite)"
             ));
         }
     }
 
-    println!();
-    karigor::ui::print_info("You can now customize these stubs to match your project conventions.");
-    println!();
+    ui.print("");
+    ui.info("You can now customize these stubs to match your project conventions.");
+    ui.print("");
 
     Ok(())
 }

@@ -1,6 +1,5 @@
 //! Route inspection and endpoint visualization for Druto.
 
-use colored::Colorize;
 use karigor::prelude::*;
 use serde::Serialize;
 use tracing::info;
@@ -34,7 +33,7 @@ impl Command for RoutesCommand {
             let filter = ctx.flag_str("filter").map(ToString::to_string);
             let json = ctx.flag_bool("json");
 
-            execute_routes(filter, json)
+            execute_routes(&ctx.ui, filter, json)
                 .map_err(|err| KarigorError::Execution(err.to_string().into()))
         })
     }
@@ -107,6 +106,7 @@ const SAMPLE_ROUTES: &[RouteInfo] = &[
 
 /// Executes route table visualization.
 pub fn execute_routes(
+    ui: &Ui,
     filter: Option<String>,
     as_json: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
@@ -128,14 +128,13 @@ pub fn execute_routes(
 
     if as_json {
         let json_str = serde_json::to_string_pretty(&filtered)?;
-        println!("{json_str}");
+        ui.print(json_str);
         return Ok(());
     }
 
-    karigor::ui::print_banner("Druto Route Registry", "Compiled HTTP Route Pipeline");
+    ui.banner("Druto Route Registry", "Compiled HTTP Route Pipeline");
 
-    let mut table =
-        karigor::ui::create_table(&["Method", "URI Path", "Handler", "Middleware Pipeline"]);
+    let mut table = ui.table(&["Method", "URI Path", "Handler", "Middleware Pipeline"]);
 
     for route in &filtered {
         let mw_display = if route.middlewares.is_empty() {
@@ -145,21 +144,21 @@ pub fn execute_routes(
         };
 
         table.add_row(vec![
-            karigor::ui::cell_http_method(route.method),
-            Cell::new(route.path).add_attribute(karigor::ui::Attribute::Bold),
-            Cell::new(route.handler).fg(karigor::ui::Color::Cyan),
+            ui.cell_http_method(route.method),
+            Cell::new(route.path).add_attribute(Attribute::Bold),
+            Cell::new(route.handler).fg(Color::Cyan),
             Cell::new(mw_display),
         ]);
     }
 
-    println!("{table}");
-    println!();
-    println!(
+    ui.print(table.to_string());
+    ui.print("");
+    ui.print(format!(
         "  Total Endpoints: {} | Filter: {}",
         filtered.len().to_string().bold().green(),
         filter.as_deref().unwrap_or("none").bold().yellow()
-    );
-    println!();
+    ));
+    ui.print("");
 
     Ok(())
 }

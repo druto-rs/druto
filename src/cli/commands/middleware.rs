@@ -1,6 +1,5 @@
 //! Middleware onion pipeline inspection for Druto.
 
-use colored::Colorize;
 use karigor::prelude::*;
 use tracing::info;
 
@@ -21,9 +20,9 @@ impl Command for MiddlewareCommand {
     }
 
     fn run<'a>(&'a self, ctx: &'a mut Context) -> CommandFuture<'a> {
-        let _ = ctx;
         Box::pin(async move {
-            execute_middleware().map_err(|err| KarigorError::Execution(err.to_string().into()))
+            execute_middleware(&ctx.ui)
+                .map_err(|err| KarigorError::Execution(err.to_string().into()))
         })
     }
 }
@@ -69,15 +68,15 @@ const SAMPLE_MIDDLEWARES: &[MiddlewareInfo] = &[
 ];
 
 /// Displays the active middleware onion pipeline.
-pub fn execute_middleware() -> Result<(), Box<dyn std::error::Error>> {
+pub fn execute_middleware(ui: &Ui) -> Result<(), Box<dyn std::error::Error>> {
     info!("Inspecting active onion middleware pipeline");
 
-    karigor::ui::print_banner(
+    ui.banner(
         "Onion Middleware Pipeline",
         "Execution order from outermost layer to innermost handler",
     );
 
-    let mut table = karigor::ui::create_table(&[
+    let mut table = ui.table(&[
         "Layer",
         "Middleware Component",
         "Crate Source",
@@ -98,11 +97,11 @@ pub fn execute_middleware() -> Result<(), Box<dyn std::error::Error>> {
         ]);
     }
 
-    println!("{table}");
-    println!(
+    ui.print(table.to_string());
+    ui.print(format!(
         "\n  {} Requests enter at Layer #1 and traverse sequentially inward to route handlers.\n",
         "◆".cyan()
-    );
+    ));
 
     Ok(())
 }

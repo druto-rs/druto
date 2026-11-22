@@ -53,7 +53,6 @@ validation = ["dep:jachai"]
 [dependencies]
 async-io = "2.6.0"
 bytes = "1.12.2"
-colored = "3.1.1"
 dhap = { git = "https://github.com/Hitarashi/dhap.git", branch = "main" }
 futures-io = "0.3.34"
 futures-util = { version = "0.3.34", default-features = false, features = ["io", "std"] }
