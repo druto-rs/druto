@@ -1021,11 +1021,11 @@ dependencies = [
 [[package]]
 name = "karigor"
 version = "0.1.0"
-source = "git+https://github.com/Hitarashi/karigor.git?branch=main#f402de4a6abaeb91f9b887874f5d96a33d4d28e0"
+source = "git+https://github.com/Hitarashi/karigor.git?branch=main#3142df063a76bf20bf5fed9ac2388ea2a26beb6a"
 dependencies = [
  "borno",
+ "libc",
  "minijinja",
- "serde",
  "serde_json",
 ]
 

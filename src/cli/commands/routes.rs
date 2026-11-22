@@ -28,14 +28,12 @@ impl Command for RoutesCommand {
         ]
     }
 
-    fn run<'a>(&'a self, ctx: &'a mut Context) -> CommandFuture<'a> {
-        Box::pin(async move {
-            let filter = ctx.flag_str("filter").map(ToString::to_string);
-            let json = ctx.flag_bool("json");
+    fn run(&self, ctx: &mut Context) -> Result<(), Error> {
+        let filter = ctx.flag_str("filter").map(ToString::to_string);
+        let json = ctx.flag_bool("json");
 
-            execute_routes(&ctx.ui, filter, json)
-                .map_err(|err| KarigorError::Execution(err.to_string().into()))
-        })
+        execute_routes(&ctx.ui, filter, json)
+            .map_err(|err| Error::Execution(err.to_string().into()))
     }
 }
 

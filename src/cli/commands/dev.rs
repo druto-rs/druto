@@ -33,21 +33,18 @@ impl Command for DevCommand {
         ]
     }
 
-    fn run<'a>(&'a self, ctx: &'a mut Context) -> CommandFuture<'a> {
-        Box::pin(async move {
-            let host = ctx.flag_str("host").map(ToString::to_string);
-            let port = ctx.flag_str("port").and_then(|p| p.parse::<u16>().ok());
-            let dry_run = ctx.flag_bool("dry-run");
+    fn run(&self, ctx: &mut Context) -> Result<(), Error> {
+        let host = ctx.flag_str("host").map(ToString::to_string);
+        let port = ctx.flag_str("port").and_then(|p| p.parse::<u16>().ok());
+        let dry_run = ctx.flag_bool("dry-run");
 
-            execute_dev(&ctx.ui, host, port, dry_run)
-                .await
-                .map_err(|err| KarigorError::Execution(err.to_string().into()))
-        })
+        execute_dev(&ctx.ui, host, port, dry_run)
+            .map_err(|err| Error::Execution(err.to_string().into()))
     }
 }
 
 /// Executes the development server supervisor.
-pub async fn execute_dev(
+pub fn execute_dev(
     ui: &Ui,
     host: Option<String>,
     port: Option<u16>,
@@ -63,42 +60,21 @@ pub async fn execute_dev(
         "Initializing development server supervisor"
     );
 
-    let inner_width: usize = 58;
-    let format_box_line = |content: &str| -> String {
-        let pad = inner_width.saturating_sub(karigor::ui::visible_width(content));
-        format!(
-            " {}{}{}{}",
-            "│".cyan(),
-            content,
-            " ".repeat(pad),
-            "│".cyan()
-        )
-    };
-
-    ui.print("");
-    ui.print(format!(" ╭{}╮", "─".repeat(inner_width)).cyan().to_string());
-    ui.print(format_box_line(""));
-    ui.print(format_box_line(&format!(
-        "   {}",
-        "Druto Development Server v0.1.0".bold().white()
-    )));
-    ui.print(format_box_line(""));
-    ui.print(format_box_line(&format!(
-        "   {}  http://{}:{}",
-        "➜  Local:  ".green().bold(),
-        bind_host,
-        bind_port
-    )));
-    ui.print(format_box_line(&format!(
-        "   {}  {} (unoptimized + debuginfo)",
-        "➜  Mode:   ".dimmed(),
-        "Development".bold().yellow()
-    )));
-    ui.print(format_box_line(""));
-    ui.print(format_box_line("   [Ctrl+C] to stop server"));
-    ui.print(format_box_line(""));
-    ui.print(format!(" ╰{}╯", "─".repeat(inner_width)).cyan().to_string());
-    ui.print("");
+    ui.render_sticker("Druto Development Server v0.1.0", |card| {
+        card.line(format!(
+            "{}  http://{}:{}",
+            "➜  Local:  ".green().bold(),
+            bind_host,
+            bind_port
+        ));
+        card.line(format!(
+            "{}  {} (unoptimized + debuginfo)",
+            "➜  Mode:   ".dimmed(),
+            "Development".bold().yellow()
+        ));
+        card.line("");
+        card.line("   [Ctrl+C] to stop server");
+    });
 
     if dry_run {
         ui.info("[dry-run] Server supervisor configured successfully.");

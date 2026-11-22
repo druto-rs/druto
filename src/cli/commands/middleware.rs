@@ -19,11 +19,8 @@ impl Command for MiddlewareCommand {
         &["list:middleware", "middleware:list"]
     }
 
-    fn run<'a>(&'a self, ctx: &'a mut Context) -> CommandFuture<'a> {
-        Box::pin(async move {
-            execute_middleware(&ctx.ui)
-                .map_err(|err| KarigorError::Execution(err.to_string().into()))
-        })
+    fn run(&self, ctx: &mut Context) -> Result<(), Error> {
+        execute_middleware(&ctx.ui).map_err(|err| Error::Execution(err.to_string().into()))
     }
 }
 

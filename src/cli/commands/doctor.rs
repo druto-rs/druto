@@ -15,10 +15,8 @@ impl Command for DoctorCommand {
         "Run system, environment, port, and connection diagnostics"
     }
 
-    fn run<'a>(&'a self, ctx: &'a mut Context) -> CommandFuture<'a> {
-        Box::pin(async move {
-            execute_doctor(&ctx.ui).map_err(|err| KarigorError::Execution(err.to_string().into()))
-        })
+    fn run(&self, ctx: &mut Context) -> Result<(), Error> {
+        execute_doctor(&ctx.ui).map_err(|err| Error::Execution(err.to_string().into()))
     }
 }
 

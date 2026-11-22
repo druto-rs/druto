@@ -35,15 +35,13 @@ impl Command for MakeRouteCommand {
         ]
     }
 
-    fn run<'a>(&'a self, ctx: &'a mut Context) -> CommandFuture<'a> {
-        Box::pin(async move {
-            let name = ctx.arg("name").unwrap();
-            let controller = ctx.flag_bool("controller");
-            let dry_run = ctx.flag_bool("dry-run");
+    fn run(&self, ctx: &mut Context) -> Result<(), Error> {
+        let name = ctx.arg("name").unwrap();
+        let controller = ctx.flag_bool("controller");
+        let dry_run = ctx.flag_bool("dry-run");
 
-            execute_make_route(&ctx.ui, name, controller, dry_run)
-                .map_err(|err| KarigorError::Execution(err.to_string().into()))
-        })
+        execute_make_route(&ctx.ui, name, controller, dry_run)
+            .map_err(|err| Error::Execution(err.to_string().into()))
     }
 }
 
@@ -74,15 +72,13 @@ impl Command for MakeControllerCommand {
         ]
     }
 
-    fn run<'a>(&'a self, ctx: &'a mut Context) -> CommandFuture<'a> {
-        Box::pin(async move {
-            let name = ctx.arg("name").unwrap();
-            let resource = ctx.flag_bool("resource");
-            let dry_run = ctx.flag_bool("dry-run");
+    fn run(&self, ctx: &mut Context) -> Result<(), Error> {
+        let name = ctx.arg("name").unwrap();
+        let resource = ctx.flag_bool("resource");
+        let dry_run = ctx.flag_bool("dry-run");
 
-            execute_make_controller(&ctx.ui, name, resource, dry_run)
-                .map_err(|err| KarigorError::Execution(err.to_string().into()))
-        })
+        execute_make_controller(&ctx.ui, name, resource, dry_run)
+            .map_err(|err| Error::Execution(err.to_string().into()))
     }
 }
 
@@ -110,14 +106,12 @@ impl Command for MakeMiddlewareCommand {
         )]
     }
 
-    fn run<'a>(&'a self, ctx: &'a mut Context) -> CommandFuture<'a> {
-        Box::pin(async move {
-            let name = ctx.arg("name").unwrap();
-            let dry_run = ctx.flag_bool("dry-run");
+    fn run(&self, ctx: &mut Context) -> Result<(), Error> {
+        let name = ctx.arg("name").unwrap();
+        let dry_run = ctx.flag_bool("dry-run");
 
-            execute_make_middleware(&ctx.ui, name, dry_run)
-                .map_err(|err| KarigorError::Execution(err.to_string().into()))
-        })
+        execute_make_middleware(&ctx.ui, name, dry_run)
+            .map_err(|err| Error::Execution(err.to_string().into()))
     }
 }
 
@@ -145,14 +139,12 @@ impl Command for MakeCommandCommand {
         )]
     }
 
-    fn run<'a>(&'a self, ctx: &'a mut Context) -> CommandFuture<'a> {
-        Box::pin(async move {
-            let name = ctx.arg("name").unwrap();
-            let dry_run = ctx.flag_bool("dry-run");
+    fn run(&self, ctx: &mut Context) -> Result<(), Error> {
+        let name = ctx.arg("name").unwrap();
+        let dry_run = ctx.flag_bool("dry-run");
 
-            execute_make_command(&ctx.ui, name, dry_run)
-                .map_err(|err| KarigorError::Execution(err.to_string().into()))
-        })
+        execute_make_command(&ctx.ui, name, dry_run)
+            .map_err(|err| Error::Execution(err.to_string().into()))
     }
 }
 
@@ -180,12 +172,9 @@ impl Command for StubPublishCommand {
         )]
     }
 
-    fn run<'a>(&'a self, ctx: &'a mut Context) -> CommandFuture<'a> {
-        Box::pin(async move {
-            let force = ctx.flag_bool("force");
-            execute_stub_publish(&ctx.ui, force)
-                .map_err(|err| KarigorError::Execution(err.to_string().into()))
-        })
+    fn run(&self, ctx: &mut Context) -> Result<(), Error> {
+        let force = ctx.flag_bool("force");
+        execute_stub_publish(&ctx.ui, force).map_err(|err| Error::Execution(err.to_string().into()))
     }
 }
 

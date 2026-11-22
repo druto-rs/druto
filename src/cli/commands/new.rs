@@ -21,18 +21,14 @@ impl Command for NewCommand {
         vec![Argument::optional("name", "Project name", None)]
     }
 
-    fn run<'a>(&'a self, ctx: &'a mut Context) -> CommandFuture<'a> {
-        Box::pin(async move {
-            let initial_name = ctx.arg("name").map(ToString::to_string);
-            execute_new(&ctx.ui, initial_name)
-                .await
-                .map_err(|err| KarigorError::Execution(err.to_string().into()))
-        })
+    fn run(&self, ctx: &mut Context) -> Result<(), Error> {
+        let initial_name = ctx.arg("name").map(ToString::to_string);
+        execute_new(&ctx.ui, initial_name).map_err(|err| Error::Execution(err.to_string().into()))
     }
 }
 
 /// Executes project scaffolding.
-pub async fn execute_new(
+pub fn execute_new(
     ui: &Ui,
     initial_name: Option<String>,
 ) -> Result<(), Box<dyn std::error::Error>> {
